@@ -284,7 +284,7 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 6px 24px;
+        padding: 6px;
         gap: 16px;
       }
 
@@ -304,7 +304,7 @@
       /* Desktop nav links */
       .nav-links { display: flex; align-items: center; gap: 2px; list-style: none; margin: 0 auto; padding: 0; }
       .nav-links a {
-        padding: 7px 14px;
+        padding: 7px;
         border-radius: 9px;
         font-size: 13.5px;
         font-weight: 600;
