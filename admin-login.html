@@ -13,7 +13,6 @@
   --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
   --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
   --border: #e6f0f5; --white: #fff;
-  --shadow-lg: 0 20px 50px -12px rgba(0,80,110,0.15);
 }
 body { font-family: 'Inter', sans-serif; background: var(--light-gray); color: #1e293b; line-height: 1.6; }
 a { text-decoration: none; color: inherit; }
@@ -63,12 +62,10 @@ a { text-decoration: none; color: inherit; }
 }
 .auth-badge i { font-size: 12px; }
 
-/* ---------- PANES ---------- */
 .pane { display: none; }
 .pane.active { display: block; animation: paneIn 0.3s ease; }
 @keyframes paneIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ---------- FORM ---------- */
 .form-group { margin-bottom: 16px; }
 .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 7px; }
 .form-group input {
@@ -118,20 +115,16 @@ a { text-decoration: none; color: inherit; }
 }
 .back-to-login:hover { color: var(--primary); }
 
-/* ---------- CAPTCHA ---------- */
+/* CAPTCHA */
 .captcha-box {
-  background: #f5fafd;
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 16px;
+  background: #f5fafd; border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 12px 14px; margin-bottom: 16px;
 }
 .captcha-box.error { border-color: var(--danger); background: #fff7f8; }
 .captcha-label {
   display: flex; align-items: center; justify-content: space-between;
   font-size: 11px; font-weight: 700; color: var(--gray);
-  text-transform: uppercase; letter-spacing: 0.4px;
-  margin-bottom: 9px;
+  text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 9px;
 }
 .captcha-label span:last-child { text-transform: none; letter-spacing: 0; font-size: 11.5px; }
 .captcha-row { display: flex; align-items: center; gap: 8px; }
@@ -168,7 +161,6 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 0 0 4px rgba(13,110,158,0.08);
 }
 
-/* ---------- DIVIDER + LINKS ---------- */
 .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0 16px; color: var(--gray); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
@@ -178,7 +170,6 @@ a { text-decoration: none; color: inherit; }
 }
 .back-link:hover { color: var(--primary); }
 
-/* ---------- FORGOT PASSWORD ---------- */
 .info-box {
   background: #f5fafd; border: 1.5px solid var(--border);
   border-radius: 14px; padding: 16px;
@@ -188,15 +179,8 @@ a { text-decoration: none; color: inherit; }
 .info-box i { color: var(--primary); margin-right: 4px; }
 .info-box strong { color: var(--dark); }
 
-/* ---------- SUCCESS ---------- */
-.status-line {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 13px; color: var(--gray); padding: 10px 0;
-}
-.status-line .dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--warning); flex-shrink: 0;
-}
+.status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); padding: 10px 0; }
+.status-line .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warning); flex-shrink: 0; }
 .status-line.ok .dot { background: var(--success); }
 .status-line.fail .dot { background: var(--danger); }
 
@@ -225,7 +209,7 @@ a { text-decoration: none; color: inherit; }
     <div class="alert" id="err"><i class="fas fa-exclamation-circle"></i><span></span></div>
     <div class="alert success" id="ok"><i class="fas fa-check-circle"></i><span></span></div>
 
-    <!-- ============ PANE 1 — LOGIN ============ -->
+    <!-- PANE 1 — LOGIN -->
     <div class="pane active" id="paneLogin">
       <form id="adminLoginForm" novalidate>
         <div class="form-group">
@@ -240,7 +224,7 @@ a { text-decoration: none; color: inherit; }
           </div>
         </div>
 
-        <!-- ============ CAPTCHA ============ -->
+        <!-- CAPTCHA -->
         <div class="captcha-box" id="captchaBox">
           <div class="captcha-label">
             <span><i class="fas fa-shield-halved"></i> Verification</span>
@@ -267,7 +251,7 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <!-- ============ PANE 2 — SETUP ============ -->
+    <!-- PANE 2 — SETUP -->
     <div class="pane" id="paneSetup">
       <span class="back-to-login" id="backToLoginSetup">
         <i class="fas fa-arrow-left"></i> Back to sign in
@@ -309,7 +293,7 @@ a { text-decoration: none; color: inherit; }
       </form>
     </div>
 
-    <!-- ============ PANE 3 — FORGOT PASSWORD ============ -->
+    <!-- PANE 3 — FORGOT -->
     <div class="pane" id="paneForgot">
       <span class="back-to-login" id="backToLoginForgot">
         <i class="fas fa-arrow-left"></i> Back to sign in
@@ -323,10 +307,10 @@ a { text-decoration: none; color: inherit; }
       <div class="info-box">
         <i class="fas fa-info-circle"></i>
         <strong>How this works:</strong>
-        This is a local system — credentials are stored only on this device, so no reset email can be sent.
+        Credentials are stored only on this device, so no reset email can be sent.
         Clicking the button below will <strong>clear the existing admin password</strong> so you can set a new one.
         <br><br>
-        <strong>Your hospital records, patients, doctors, and bookings will NOT be affected.</strong>
+        <strong>Your hospital records, patients, doctors and bookings will NOT be affected.</strong>
       </div>
 
       <div class="form-group">
@@ -339,7 +323,7 @@ a { text-decoration: none; color: inherit; }
       </button>
     </div>
 
-    <!-- ============ PANE 4 — SUCCESS ============ -->
+    <!-- PANE 4 — SUCCESS -->
     <div class="pane" id="paneSuccess">
       <div style="width:84px;height:84px;border-radius:50%;background:#e1f7ed;color:var(--success);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;">
         <i class="fas fa-check-circle"></i>
@@ -387,7 +371,6 @@ const SALT        = 'medicare::hms::v2::salt';
 const DB_KEY      = 'medicare_hms';
 const SESSION_KEY = 'medicare_session';
 
-/* Candidate dashboard filenames — tried in this order */
 const DASHBOARD_CANDIDATES = [
   '1.html',
   'dashboard.html',
@@ -397,7 +380,121 @@ const DASHBOARD_CANDIDATES = [
 ];
 
 /* =====================================================
-   HELPERS
+   FULL SEED — copied from the dashboard so we never
+   leave the DB in a partial state
+===================================================== */
+const SEED = {
+  user: {
+    username: null,
+    passwordHash: null,
+    name: 'Administrator',
+    email: '',
+    role: 'Administrator',
+    initials: 'AD',
+    createdAt: null
+  },
+  patients: [
+    { id: 'P-1001', name: 'James Sullivan', age: 45, gender: 'Male',  phone: '+1 555-0101', dept: 'Cardiology',  status: 'Admitted' },
+    { id: 'P-1002', name: 'Maria Garcia',   age: 32, gender: 'Female', phone: '+1 555-0102', dept: 'Neurology',   status: 'Outpatient' },
+    { id: 'P-1003', name: 'Robert Kim',     age: 58, gender: 'Male',  phone: '+1 555-0103', dept: 'Orthopedics', status: 'Admitted' },
+    { id: 'P-1004', name: 'Emma Watson',    age: 7,  gender: 'Female', phone: '+1 555-0104', dept: 'Pediatrics',  status: 'Discharged' },
+    { id: 'P-1005', name: 'David Lee',      age: 41, gender: 'Male',  phone: '+1 555-0105', dept: 'Pulmonology', status: 'Outpatient' },
+    { id: 'P-1006', name: 'Sophia Brown',   age: 29, gender: 'Female', phone: '+1 555-0106', dept: 'Cardiology',  status: 'Admitted' }
+  ],
+  doctors: [
+    { id: 'D-01', name: 'Dr. A. Sharma',  dept: 'Cardiology',  patients: 24, initials: 'AS', available: true  },
+    { id: 'D-02', name: 'Dr. M. Costa',   dept: 'Neurology',   patients: 18, initials: 'MC', available: true  },
+    { id: 'D-03', name: 'Dr. L. Wong',    dept: 'Orthopedics', patients: 31, initials: 'LW', available: false },
+    { id: 'D-04', name: 'Dr. S. Patel',   dept: 'Pediatrics',  patients: 27, initials: 'SP', available: true  },
+    { id: 'D-05', name: 'Dr. K. Mensah',  dept: 'Pulmonology', patients: 15, initials: 'KM', available: true  },
+    { id: 'D-06', name: 'Dr. J. Rivera',  dept: 'Emergency',   patients: 12, initials: 'JR', available: true  }
+  ],
+  appointments: [
+    { id: 'A-001', patient: 'James Sullivan', doctor: 'Dr. A. Sharma', dept: 'Cardiology',  datetime: '2025-01-20T10:30', status: 'Confirmed' },
+    { id: 'A-002', patient: 'Maria Garcia',   doctor: 'Dr. M. Costa',  dept: 'Neurology',   datetime: '2025-01-20T11:15', status: 'Confirmed' },
+    { id: 'A-003', patient: 'Robert Kim',     doctor: 'Dr. L. Wong',   dept: 'Orthopedics', datetime: '2025-01-20T13:45', status: 'Pending' },
+    { id: 'A-004', patient: 'Emma Watson',    doctor: 'Dr. S. Patel',  dept: 'Pediatrics',  datetime: '2025-01-20T14:30', status: 'Confirmed' },
+    { id: 'A-005', patient: 'David Lee',      doctor: 'Dr. K. Mensah', dept: 'Pulmonology', datetime: '2025-01-20T15:50', status: 'Cancelled' }
+  ],
+  departments: [
+    { id: 1, name: 'Cardiology',  head: 'Dr. A. Sharma', doctors: 12, patients: 24, capacity: 72, icon: 'fa-heartbeat' },
+    { id: 2, name: 'Neurology',   head: 'Dr. M. Costa',  doctors: 8,  patients: 18, capacity: 58, icon: 'fa-brain' },
+    { id: 3, name: 'Orthopedics', head: 'Dr. L. Wong',   doctors: 10, patients: 31, capacity: 88, icon: 'fa-bone' },
+    { id: 4, name: 'Pediatrics',  head: 'Dr. S. Patel',  doctors: 9,  patients: 27, capacity: 65, icon: 'fa-child' },
+    { id: 5, name: 'Pulmonology', head: 'Dr. K. Mensah', doctors: 7,  patients: 15, capacity: 45, icon: 'fa-lungs' },
+    { id: 6, name: 'Emergency',   head: 'Dr. J. Rivera', doctors: 14, patients: 42, capacity: 92, icon: 'fa-ambulance' }
+  ],
+  services: [
+    { id: 1, name: 'Emergency 24/7', icon: 'fa-ambulance',  desc: 'Round-the-clock emergency care' },
+    { id: 2, name: 'Radiology',      icon: 'fa-x-ray',      desc: 'MRI, CT, X-Ray imaging' },
+    { id: 3, name: 'Laboratory',     icon: 'fa-flask',      desc: 'Full diagnostic testing' },
+    { id: 4, name: 'Vaccination',    icon: 'fa-syringe',    desc: 'Immunization programs' },
+    { id: 5, name: 'Cardiac Rehab',  icon: 'fa-heart',      desc: 'Heart recovery programs' },
+    { id: 6, name: 'Maternity',      icon: 'fa-baby',       desc: 'Prenatal & postnatal care' },
+    { id: 7, name: 'Physiotherapy',  icon: 'fa-dumbbell',   desc: 'Rehabilitation services' },
+    { id: 8, name: 'Pharmacy',       icon: 'fa-pills',      desc: '24/7 in-house pharmacy' }
+  ],
+  invoices: [
+    { id: 'INV-2001', patient: 'James Sullivan', date: '2025-01-15', amount: 1240, status: 'Paid' },
+    { id: 'INV-2002', patient: 'Maria Garcia',   date: '2025-01-16', amount: 580,  status: 'Pending' },
+    { id: 'INV-2003', patient: 'Robert Kim',     date: '2025-01-17', amount: 3120, status: 'Paid' },
+    { id: 'INV-2004', patient: 'Emma Watson',    date: '2025-01-18', amount: 340,  status: 'Overdue' },
+    { id: 'INV-2005', patient: 'David Lee',      date: '2025-01-19', amount: 890,  status: 'Pending' }
+  ]
+};
+
+/* =====================================================
+   DB HELPERS — never wipe, always merge
+===================================================== */
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+function ensureHMSDatabase() {
+  let db = null;
+  try {
+    const raw = localStorage.getItem(DB_KEY);
+    if (raw) db = JSON.parse(raw);
+  } catch (e) { db = null; }
+
+  if (!db || typeof db !== 'object' || Array.isArray(db)) {
+    /* Nothing there — install full seed */
+    db = clone(SEED);
+  } else {
+    /* Something there — fill in any missing keys from seed */
+    Object.keys(SEED).forEach(k => {
+      if (!(k in db)) db[k] = clone(SEED[k]);
+    });
+    if (!db.user || typeof db.user !== 'object') db.user = clone(SEED.user);
+    /* Ensure all arrays are arrays */
+    ['patients','doctors','appointments','departments','services','invoices'].forEach(k => {
+      if (!Array.isArray(db[k])) db[k] = clone(SEED[k]);
+    });
+  }
+
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
+  return db;
+}
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(DB_KEY);
+    if (!raw) return clone(SEED);
+    const d = JSON.parse(raw);
+    if (!d || typeof d !== 'object') return clone(SEED);
+    return d;
+  } catch (e) { return clone(SEED); }
+}
+
+function saveDB(db) {
+  try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch (e) {}
+}
+
+function hasAdminAccount() {
+  const db = loadDB();
+  return !!(db && db.user && db.user.username && db.user.passwordHash);
+}
+
+/* =====================================================
+   HASH
 ===================================================== */
 async function hashPassword(password) {
   const input = SALT + '|' + password;
@@ -417,25 +514,6 @@ async function hashPassword(password) {
   h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
   h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
   return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
-}
-
-function loadDB() {
-  try {
-    const raw = localStorage.getItem(DB_KEY);
-    if (!raw) return { user: {} };
-    const d = JSON.parse(raw) || {};
-    if (!d.user) d.user = {};
-    return d;
-  } catch (e) { return { user: {} }; }
-}
-
-function saveDB(data) {
-  try { localStorage.setItem(DB_KEY, JSON.stringify(data)); } catch (e) {}
-}
-
-function hasAdminAccount() {
-  const db = loadDB();
-  return !!(db && db.user && db.user.username && db.user.passwordHash);
 }
 
 function hashStrength(pw) {
@@ -458,22 +536,19 @@ function showPane(name) {
   if (pane) pane.classList.add('active');
 
   const head = document.getElementById('authHead');
-  if (name === 'Success') {
-    head.style.display = 'none';
-  } else {
-    head.style.display = '';
-    const title = document.getElementById('mainTitle');
-    const sub   = document.getElementById('mainSubtitle');
-    if (name === 'Login') {
-      title.textContent = 'Hospital Dashboard';
-      sub.textContent   = 'Sign in with your administrator credentials';
-    } else if (name === 'Setup') {
-      title.textContent = 'Staff Setup';
-      sub.textContent   = 'Configure administrator access for this device';
-    } else if (name === 'Forgot') {
-      title.textContent = 'Account Recovery';
-      sub.textContent   = 'Reset access to your administrator account';
-    }
+  if (name === 'Success') { head.style.display = 'none'; return; }
+  head.style.display = '';
+  const title = document.getElementById('mainTitle');
+  const sub   = document.getElementById('mainSubtitle');
+  if (name === 'Login') {
+    title.textContent = 'Hospital Dashboard';
+    sub.textContent   = 'Sign in with your administrator credentials';
+  } else if (name === 'Setup') {
+    title.textContent = 'Staff Setup';
+    sub.textContent   = 'Configure administrator access for this device';
+  } else if (name === 'Forgot') {
+    title.textContent = 'Account Recovery';
+    sub.textContent   = 'Reset access to your administrator account';
   }
   clearAlerts();
 }
@@ -484,7 +559,6 @@ function clearAlerts() {
   document.querySelectorAll('.form-group.error').forEach(g => g.classList.remove('error'));
   document.getElementById('captchaBox').classList.remove('error');
 }
-
 function showErr(msg) {
   const el = document.getElementById('err');
   el.querySelector('span').textContent = msg;
@@ -504,15 +578,13 @@ function showOk(msg) {
 let captchaAnswer = null;
 
 function newCaptcha() {
-  const a = Math.floor(Math.random() * 9) + 1;   /* 1..9  */
-  const b = Math.floor(Math.random() * 9) + 1;   /* 1..9  */
+  const a = Math.floor(Math.random() * 9) + 1;
+  const b = Math.floor(Math.random() * 9) + 1;
   const ops = ['+', '×'];
   const op = ops[Math.floor(Math.random() * ops.length)];
-
   let q, ans;
   if (op === '+') { q = a + ' + ' + b; ans = a + b; }
   else            { q = a + ' × ' + b; ans = a * b; }
-
   captchaAnswer = ans;
   document.getElementById('captchaQuestion').textContent = q + ' = ?';
   document.getElementById('captchaAnswer').value = '';
@@ -542,7 +614,7 @@ document.getElementById('captchaAnswer').addEventListener('input', function () {
 });
 
 /* =====================================================
-   PASSWORD VISIBILITY TOGGLE
+   PASS TOGGLE
 ===================================================== */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.pass-toggle');
@@ -561,19 +633,16 @@ document.getElementById('linkCreate').addEventListener('click', e => {
   e.preventDefault();
   openSetup('create');
 });
-
 document.getElementById('linkForgot').addEventListener('click', e => {
   e.preventDefault();
   showPane('Forgot');
   document.getElementById('forgotUser').value = '';
   setTimeout(() => document.getElementById('forgotUser').focus(), 250);
 });
-
 document.getElementById('backToLoginSetup').addEventListener('click', () => {
   showPane('Login');
   setTimeout(() => document.getElementById('adminUser').focus(), 250);
 });
-
 document.getElementById('backToLoginForgot').addEventListener('click', () => {
   showPane('Login');
   setTimeout(() => document.getElementById('adminUser').focus(), 250);
@@ -641,7 +710,7 @@ function markFieldError(id) {
 }
 
 /* =====================================================
-   FORGOT PASSWORD — RESET
+   FORGOT PASSWORD
 ===================================================== */
 document.getElementById('forgotResetBtn').addEventListener('click', () => {
   const typed = document.getElementById('forgotUser').value.trim();
@@ -651,14 +720,10 @@ document.getElementById('forgotResetBtn').addEventListener('click', () => {
     setTimeout(() => openSetup('create'), 1000);
     return;
   }
-
   const db = loadDB();
   const actualUser = db.user.username || '';
 
-  if (!typed) {
-    markFieldError('forgotUser');
-    return showErr('Please type your admin username to confirm.');
-  }
+  if (!typed) { markFieldError('forgotUser'); return showErr('Please type your admin username to confirm.'); }
   if (typed.toLowerCase() !== actualUser.toLowerCase()) {
     markFieldError('forgotUser');
     return showErr('Username does not match the account on this device.');
@@ -671,18 +736,15 @@ document.getElementById('forgotResetBtn').addEventListener('click', () => {
   );
   if (!sure) return;
 
-  try {
-    db.user.passwordHash = null;
-    saveDB(db);
-  } catch (err) {}
-
+  db.user.passwordHash = null;
+  saveDB(db);
   sessionStorage.removeItem(SESSION_KEY);
 
   openSetup('reset');
 });
 
 /* =====================================================
-   DETECT DASHBOARD FILE
+   DASHBOARD FILE DETECT
 ===================================================== */
 async function detectDashboardFile() {
   const statusEl  = document.getElementById('detectStatus');
@@ -705,7 +767,7 @@ async function detectDashboardFile() {
         setTimeout(() => { location.href = file; }, 900);
         return file;
       }
-    } catch (e) { /* try next */ }
+    } catch (e) {}
   }
 
   statusEl.className = 'status-line fail';
@@ -726,7 +788,6 @@ function showSuccess(username, isNew) {
     isNew ? 'Your administrator account is ready. Opening the dashboard…'
           : 'You are now signed in. Opening the dashboard…';
   document.getElementById('credUsername').textContent = username;
-
   showPane('Success');
   detectDashboardFile();
 }
@@ -742,23 +803,22 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
   const password = document.getElementById('adminPass').value;
   const captchaTyped = document.getElementById('captchaAnswer').value.trim();
 
-  /* Basic validation */
   if (!username) { markFieldError('adminUser'); return showErr('Please enter your username.'); }
   if (!password) { markFieldError('adminPass'); return showErr('Please enter your password.'); }
 
-  /* Captcha validation */
   if (!captchaTyped) {
     document.getElementById('captchaBox').classList.add('error');
     return showErr('Please solve the verification question.');
   }
   if (parseInt(captchaTyped, 10) !== captchaAnswer) {
-    document.getElementById('captchaBox').classList.add('error');
     newCaptcha();
     document.getElementById('captchaBox').classList.add('error');
     return showErr('Incorrect verification answer. A new question has been generated.');
   }
 
-  const db = loadDB();
+  /* Make sure the DB structure is fully in place BEFORE we check user */
+  const db = ensureHMSDatabase();
+
   if (!db.user.username || !db.user.passwordHash) {
     showErr('No admin account exists yet. Opening setup…');
     setTimeout(() => openSetup('create'), 800);
@@ -826,14 +886,20 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
   const passwordHash = await hashPassword(pw);
   const initials = (name.split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
 
-  const db = loadDB() || {};
+  /* Ensure full DB structure — merges into existing, never wipes */
+  const db = ensureHMSDatabase();
+
   db.user = {
     ...(db.user || {}),
-    name, username: user, passwordHash, initials,
-    email:  (db.user && db.user.email) || '',
-    role:   'Administrator',
+    name,
+    username: user,
+    passwordHash,
+    initials,
+    email:     (db.user && db.user.email) || '',
+    role:      'Administrator',
     createdAt: new Date().toISOString()
   };
+
   saveDB(db);
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: user, t: Date.now() }));
 
@@ -849,7 +915,6 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
 (function boot() {
   const params = new URLSearchParams(location.search);
 
-  /* Already signed in? */
   if (!params.has('setup')) {
     const raw = sessionStorage.getItem(SESSION_KEY);
     if (raw) {
@@ -873,9 +938,7 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
     showErr('No admin account set up yet. Click "Create admin account" below.');
   }
 
-  /* Generate captcha on load */
   newCaptcha();
-
   setTimeout(() => document.getElementById('adminUser').focus(), 200);
 })();
 </script>
