@@ -31,15 +31,114 @@
   const UserAuth = (function () {
     const DB_KEY = 'medicare_users';
     const SESSION_KEY = 'medicare_user_session';
-    const BOOKINGS_KEY = 'medicare_user_bookings';
     const SALT = 'medicare::user::v1';
 
+    /* All the keys that different pages might use for bookings.
+       We read from ALL of them, and write to ALL of them, so no
+       page ever misses a booking. */
+    const BOOKINGS_KEYS = [
+      'medicare_user_bookings',
+      'medicare_bookings',
+      'medicare_user_bookings_v1',
+      'bookings',
+      'appointments'
+    ];
+
+    /* ---------- session helpers (localStorage + sessionStorage) ---------- */
+    function setSession(id) {
+      const payload = JSON.stringify({ id, t: Date.now() });
+      sessionStorage.setItem(SESSION_KEY, payload);
+      try { localStorage.setItem(SESSION_KEY, payload); } catch (e) {}
+    }
+    function getSessionRaw() {
+      let raw = sessionStorage.getItem(SESSION_KEY);
+      if (!raw) {
+        try { raw = localStorage.getItem(SESSION_KEY); } catch (e) { raw = null; }
+        if (raw) { try { sessionStorage.setItem(SESSION_KEY, raw); } catch (e) {} }
+      }
+      return raw;
+    }
+    function clearSession() {
+      sessionStorage.removeItem(SESSION_KEY);
+      try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    }
+
+    /* ---------- users ---------- */
     const loadUsers = () => {
       try { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
       catch (e) { return []; }
     };
     const saveUsers = list => localStorage.setItem(DB_KEY, JSON.stringify(list));
 
+    /* ---------- bookings: multi-key read/write ---------- */
+    function readKey(k) {
+      try {
+        const raw = JSON.parse(localStorage.getItem(k));
+        return Array.isArray(raw) ? raw : [];
+      } catch (e) { return []; }
+    }
+    function writeKey(k, list) {
+      try { localStorage.setItem(k, JSON.stringify(list)); } catch (e) {}
+    }
+
+    function loadAllBookings() {
+      const seen = new Set();
+      const out = [];
+      BOOKINGS_KEYS.forEach(k => {
+        readKey(k).forEach(b => {
+          if (!b || typeof b !== 'object') return;
+          const uniq = b.id || JSON.stringify(b);
+          if (seen.has(uniq)) return;
+          seen.add(uniq);
+          out.push(b);
+        });
+      });
+      return out;
+    }
+
+    function persistNewBooking(entry) {
+      BOOKINGS_KEYS.forEach(k => {
+        const list = readKey(k);
+        /* Don't add a second copy if it's already there */
+        if (list.some(b => b && b.id === entry.id)) return;
+        list.push(entry);
+        writeKey(k, list);
+      });
+      fireBookingEvents();
+    }
+
+    function patchBookingEverywhere(id, patch) {
+      let updated = null;
+      BOOKINGS_KEYS.forEach(k => {
+        const list = readKey(k);
+        if (!list.length) return;
+        let touched = false;
+        const next = list.map(b => {
+          if (b && b.id === id) {
+            touched = true;
+            updated = { ...b, ...patch, updatedAt: new Date().toISOString() };
+            return updated;
+          }
+          return b;
+        });
+        if (touched) writeKey(k, next);
+      });
+      fireBookingEvents();
+      return updated;
+    }
+
+    function fireBookingEvents() {
+      try {
+        window.dispatchEvent(new CustomEvent('bookings:changed'));
+      } catch (e) {}
+      BOOKINGS_KEYS.forEach(k => {
+        try {
+          window.dispatchEvent(new StorageEvent('storage', { key: k }));
+        } catch (e) {}
+      });
+    }
+
+    /* ---------- password hashing ---------- */
     async function hash(password) {
       const input = SALT + '|' + password;
       if (window.crypto && window.crypto.subtle && window.isSecureContext) {
@@ -73,6 +172,7 @@
         if (!/\d/.test(p)) return 'Password must contain a number.';
         return null;
       },
+
       async signup({ name, email, phone, password }) {
         const users = loadUsers();
         const emailLower = email.trim().toLowerCase();
@@ -94,6 +194,7 @@
         saveUsers(users);
         return { ok: true, user: publicUser(user) };
       },
+
       async login(email, password) {
         const users = loadUsers();
         const user = users.find(u => u.email === String(email).trim().toLowerCase());
@@ -101,20 +202,24 @@
         if ((await hash(password)) !== user.passwordHash) {
           return { ok: false, error: 'Incorrect password.' };
         }
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify({ id: user.id, t: Date.now() }));
+        setSession(user.id);
         return { ok: true, user: publicUser(user) };
       },
-      logout() { sessionStorage.removeItem(SESSION_KEY); },
+
+      logout() { clearSession(); },
+
       current() {
         try {
-          const raw = sessionStorage.getItem(SESSION_KEY);
+          const raw = getSessionRaw();
           if (!raw) return null;
           const s = JSON.parse(raw);
           const user = loadUsers().find(u => u.id === s.id);
           return user ? publicUser(user) : null;
         } catch (e) { return null; }
       },
+
       isLoggedIn() { return !!this.current(); },
+
       async changePassword(current, next) {
         const me = this.current();
         if (!me) return { ok: false, error: 'Not signed in.' };
@@ -127,6 +232,7 @@
         saveUsers(users);
         return { ok: true };
       },
+
       updateProfile({ name, phone }) {
         const me = this.current();
         if (!me) return { ok: false, error: 'Not signed in.' };
@@ -138,40 +244,129 @@
         saveUsers(users);
         return { ok: true, user: publicUser(users[idx]) };
       },
+
+      /* =====================================================
+         BOOKINGS
+      ===================================================== */
+
+      /* Patient's own bookings — matched on userId, uid, or email */
       getBookings() {
         const me = this.current();
         if (!me) return [];
-        try {
-          const all = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-          return all.filter(b => b.userId === me.id);
-        } catch (e) { return []; }
+        const myId = me.id;
+        const myEmail = (me.email || '').toLowerCase();
+        return loadAllBookings().filter(b => {
+          const oId = b.userId || b.uid;
+          const oEmail = (b.userEmail || b.email || '').toLowerCase();
+          return oId === myId || (myEmail && oEmail === myEmail);
+        });
       },
+
+      /* Every booking — for the admin dashboard */
+      getAllBookings() { return loadAllBookings(); },
+
+      /* Create a new booking — writes to every known key */
       addBooking(data) {
         const me = this.current();
-        if (!me) return null;
-        const all = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+        if (!me) {
+          console.warn('[UserAuth.addBooking] No signed-in user — booking NOT saved.');
+          return null;
+        }
+
         const entry = {
-          ...data,
-          id: 'BK-' + Date.now().toString(36).toUpperCase(),
-          userId: me.id,
-          userName: me.name,
-          userEmail: me.email,
+          ...(data || {}),
+          id: 'BK-' + Date.now().toString(36).toUpperCase() +
+              Math.random().toString(36).slice(2, 5).toUpperCase(),
+
+          /* Owner fields — fill in as many aliases as possible */
+          userId:    me.id,
+          uid:       me.id,
+          userEmail: (data && data.userEmail) || me.email,
+          email:     (data && data.email)     || me.email,
+          userName:  me.name,
+          patientName: (data && data.patientName) || me.name,
+          phone:     (data && data.phone) || me.phone || '',
+
           createdAt: new Date().toISOString(),
-          status: 'Pending'
+          updatedAt: new Date().toISOString(),
+          status:    'Pending',
+          adminNote: ''
         };
-        all.push(entry);
-        localStorage.setItem(BOOKINGS_KEY, JSON.stringify(all));
+
+        persistNewBooking(entry);
         return entry;
       },
+
+      /* Patient cancels their own booking */
       cancelBooking(id) {
         const me = this.current();
         if (!me) return;
-        const all = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-        const idx = all.findIndex(b => b.id === id && b.userId === me.id);
-        if (idx >= 0) {
-          all[idx].status = 'Cancelled';
-          localStorage.setItem(BOOKINGS_KEY, JSON.stringify(all));
-        }
+        const myId = me.id;
+        const myEmail = (me.email || '').toLowerCase();
+        BOOKINGS_KEYS.forEach(k => {
+          const list = readKey(k);
+          if (!list.length) return;
+          let touched = false;
+          const next = list.map(b => {
+            const oId = b.userId || b.uid;
+            const oEmail = (b.userEmail || b.email || '').toLowerCase();
+            if (b.id === id && (oId === myId || (myEmail && oEmail === myEmail))) {
+              touched = true;
+              return { ...b, status: 'Cancelled', updatedAt: new Date().toISOString() };
+            }
+            return b;
+          });
+          if (touched) writeKey(k, next);
+        });
+        fireBookingEvents();
+      },
+
+      /* =====================================================
+         ADMIN STATUS-CHANGE HELPERS
+      ===================================================== */
+      confirmBooking(id) {
+        return patchBookingEverywhere(id, { status: 'Confirmed' });
+      },
+      rejectBooking(id, note) {
+        return patchBookingEverywhere(id, {
+          status: 'Cancelled',
+          adminNote: note || ''
+        });
+      },
+      completeBooking(id) {
+        return patchBookingEverywhere(id, { status: 'Completed' });
+      },
+
+      /* =====================================================
+         ADMIN FLAG (mirrors StaffAuth)
+      ===================================================== */
+      isAdmin() {
+        try {
+          const raw = sessionStorage.getItem('medicare_session');
+          if (!raw) return false;
+          const s = JSON.parse(raw);
+          const db = JSON.parse(localStorage.getItem('medicare_hms') || '{}');
+          return !!(s && db.user && db.user.username && s.u === db.user.username);
+        } catch (e) { return false; }
+      },
+      makeAdmin() { /* no-op */ },
+
+      /* =====================================================
+         DEBUG HELPER
+         Call UserAuth.debugBookings() in the console to see
+         what each storage key contains.
+      ===================================================== */
+      debugBookings() {
+        const out = {};
+        BOOKINGS_KEYS.forEach(k => {
+          const list = readKey(k);
+          out[k] = list.length;
+        });
+        out['_currentUser'] = this.current();
+        out['_myBookingsCount'] = this.getBookings().length;
+        out['_allBookingsCount'] = this.getAllBookings().length;
+        console.table(out);
+        return out;
       }
     };
   })();
@@ -231,13 +426,9 @@
       *, *::before, *::after { box-sizing: border-box; }
 
       /* ============================================================
-         STICKY LAYOUT  (sticky-safe: uses \`clip\`, not \`hidden\`)
+         STICKY LAYOUT
       ============================================================ */
-      html {
-        height: 100%;
-        max-width: 100%;
-        overflow-x: clip;
-      }
+      html { height: 100%; }
 
       body {
         display: flex;
@@ -245,8 +436,6 @@
         min-height: 100vh;
         min-height: 100dvh;
         margin: 0;
-        max-width: 100%;
-        overflow-x: clip;
       }
 
       body > *:not(#site-footer) { flex-shrink: 0; }
@@ -256,7 +445,6 @@
         top: 0;
         z-index: 100;
         width: 100%;
-        max-width: 100%;
         flex-shrink: 0;
       }
 
@@ -264,161 +452,140 @@
         margin-top: auto;
         flex-shrink: 0;
         width: 100%;
-        max-width: 100%;
       }
-
-      /* ============================================================
-         DESKTOP (slim header)
-      ============================================================ */
 
       /* ===== NAVBAR ===== */
       .navbar {
         background: #fff;
         box-shadow: 0 2px 16px rgba(0,30,45,0.06);
         position: relative;
-        width: 100%;
-        max-width: 100%;
       }
       .navbar-inner {
         display: flex;
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 6px;
-        gap: 10px;
+        padding: 14px 24px;
+        gap: 20px;
       }
 
-      /* Logo */
-      .nav-logo { display: flex; align-items: center; gap: 9px; flex-shrink: 0; min-width: 0; text-decoration: none; }
+      .nav-logo { display: flex; align-items: center; gap: 12px; flex-shrink: 0; min-width: 0; text-decoration: none; }
       .nav-logo .logo-icon {
         background: var(--primary, #0d6e9e); color: #fff;
-        width: 34px; height: 34px;
-        border-radius: 9px;
+        width: 46px; height: 46px; border-radius: 13px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 16px; flex-shrink: 0;
-        box-shadow: 0 4px 10px -4px rgba(13,110,158,0.3);
+        font-size: 22px; flex-shrink: 0;
+        box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3);
       }
-      .nav-logo h1 { font-size: 16px; font-weight: 800; color: var(--dark, #0b3b4b); line-height: 1; margin: 0; }
-      .nav-logo p  { font-size: 9px; color: var(--gray, #5e7e8c); font-weight: 500; margin: 2px 0 0; }
+      .nav-logo h1 { font-size: 20px; font-weight: 800; color: var(--dark, #0b3b4b); line-height: 1; margin: 0; }
+      .nav-logo p  { font-size: 11px; color: var(--gray, #5e7e8c); font-weight: 500; margin: 3px 0 0; }
 
-      /* Desktop nav links */
-      .nav-links { display: flex; align-items: center; gap: 2px; list-style: none; margin: 0 auto; padding: 0; }
+      .nav-links { display: flex; align-items: center; gap: 6px; list-style: none; margin: 0 auto; padding: 0; }
       .nav-links a {
-        padding: 7px;
-        border-radius: 9px;
-        font-size: 13.5px;
-        font-weight: 600;
-        color: var(--gray, #5e7e8c);
-        text-decoration: none;
-        transition: all 0.15s;
+        padding: 11px 20px; border-radius: 10px;
+        font-size: 14.5px; font-weight: 600; color: var(--gray, #5e7e8c);
+        text-decoration: none; transition: all 0.15s;
         display: inline-block;
       }
       .nav-links a:hover, .nav-links a.active { background: var(--primary-light, #e1f0f8); color: var(--primary, #0d6e9e); }
 
-      .nav-cta { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+      .nav-cta { display: flex; gap: 12px; align-items: center; flex-shrink: 0; }
 
-      /* ===== STAFF CHIP + DROPDOWN ===== */
       .nav-staff { position: relative; }
       .nav-staff-chip {
-        display: inline-flex; align-items: center; gap: 7px;
-        padding: 6px 12px;
-        border-radius: 40px;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 16px; border-radius: 40px;
         background: #fff0e0; color: #c96f1e;
-        font-size: 11.5px; font-weight: 700;
+        font-size: 12px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 0.4px;
         cursor: pointer; user-select: none; transition: all 0.15s;
         white-space: nowrap;
       }
       .nav-staff-chip:hover { background: #ffe4c8; }
       .nav-staff-chip .dot {
-        width: 6px; height: 6px; border-radius: 50%;
+        width: 7px; height: 7px; border-radius: 50%;
         background: #c96f1e; box-shadow: 0 0 0 3px rgba(201,111,30,0.2);
       }
-      .nav-staff-chip .chev { font-size: 9px; margin-left: 2px; opacity: 0.75; }
+      .nav-staff-chip .chev { font-size: 10px; margin-left: 3px; opacity: 0.75; }
       .nav-staff-menu {
-        position: absolute; top: calc(100% + 6px); right: 0;
-        min-width: 210px; background: #fff; border-radius: 14px;
-        padding: 5px; border: 1px solid var(--border, #e6f0f5);
+        position: absolute; top: calc(100% + 10px); right: 0;
+        min-width: 230px; background: #fff; border-radius: 16px;
+        padding: 8px; border: 1px solid var(--border, #e6f0f5);
         box-shadow: 0 20px 50px -12px rgba(0,80,110,0.2);
         opacity: 0; visibility: hidden; transform: translateY(-6px);
         transition: all 0.18s; z-index: 200;
       }
       .nav-staff-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
       .nav-staff-menu a {
-        display: flex; align-items: center; gap: 9px;
-        padding: 8px 11px;
-        border-radius: 8px;
-        font-size: 13px; font-weight: 500;
+        display: flex; align-items: center; gap: 10px;
+        padding: 11px 14px; border-radius: 10px;
+        font-size: 14px; font-weight: 500;
         color: var(--dark, #0b3b4b); cursor: pointer; text-decoration: none;
       }
-      .nav-staff-menu a i { width: 15px; text-align: center; font-size: 12px; color: var(--gray, #5e7e8c); }
+      .nav-staff-menu a i { width: 16px; text-align: center; font-size: 13px; color: var(--gray, #5e7e8c); }
       .nav-staff-menu a:hover { background: #fff5e8; color: #c96f1e; }
       .nav-staff-menu a:hover i { color: #c96f1e; }
       .nav-staff-menu a.danger:hover { background: #fdecef; color: var(--danger, #e84a5f); }
       .nav-staff-menu a.danger:hover i { color: var(--danger, #e84a5f); }
-      .nav-staff-menu hr { border: 0; border-top: 1px solid var(--border, #e6f0f5); margin: 4px 4px; }
+      .nav-staff-menu hr { border: 0; border-top: 1px solid var(--border, #e6f0f5); margin: 6px 4px; }
 
-      /* ===== USER CHIP ===== */
       .nav-user { position: relative; }
       .nav-user-chip {
-        display: flex; align-items: center; gap: 8px;
+        display: flex; align-items: center; gap: 10px;
         background: #fff; border: 1.5px solid var(--border, #e6f0f5);
-        border-radius: 40px; padding: 2px 12px 2px 2px;
+        border-radius: 40px; padding: 5px 16px 5px 5px;
         cursor: pointer; transition: all 0.18s; user-select: none;
       }
       .nav-user-chip:hover { border-color: var(--primary, #0d6e9e); background: #f9fcfd; }
       .nav-user-avatar {
-        width: 28px; height: 28px; border-radius: 50%;
+        width: 36px; height: 36px; border-radius: 50%;
         background: linear-gradient(135deg, #0d6e9e, #0e8b5e); color: #fff;
         display: flex; align-items: center; justify-content: center;
-        font-weight: 700; font-size: 11px; flex-shrink: 0;
+        font-weight: 700; font-size: 13px; flex-shrink: 0;
       }
-      .nav-user-name { font-size: 12.5px; font-weight: 600; color: var(--dark, #0b3b4b); line-height: 1.05; }
-      .nav-user-role { font-size: 9.5px; color: var(--gray, #5e7e8c); margin-top: 1px; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 500; }
-      .nav-user-chip .chev { font-size: 10px; color: var(--gray, #5e7e8c); }
+      .nav-user-name { font-size: 14px; font-weight: 600; color: var(--dark, #0b3b4b); line-height: 1.1; }
+      .nav-user-role { font-size: 11px; color: var(--gray, #5e7e8c); margin-top: 1px; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 500; }
+      .nav-user-chip .chev { font-size: 11px; color: var(--gray, #5e7e8c); }
       .nav-user-menu {
-        position: absolute; top: calc(100% + 6px); right: 0;
-        min-width: 220px; background: #fff; border-radius: 14px;
-        padding: 5px; border: 1px solid var(--border, #e6f0f5);
+        position: absolute; top: calc(100% + 10px); right: 0;
+        min-width: 240px; background: #fff; border-radius: 16px;
+        padding: 8px; border: 1px solid var(--border, #e6f0f5);
         box-shadow: 0 20px 50px -12px rgba(0,80,110,0.2);
         opacity: 0; visibility: hidden; transform: translateY(-6px);
         transition: all 0.18s; z-index: 200;
       }
       .nav-user-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
       .nav-user-menu a {
-        display: flex; align-items: center; gap: 9px;
-        padding: 8px 11px;
-        border-radius: 8px;
-        font-size: 13px; font-weight: 500;
+        display: flex; align-items: center; gap: 10px;
+        padding: 11px 14px; border-radius: 10px;
+        font-size: 14px; font-weight: 500;
         color: var(--dark, #0b3b4b); cursor: pointer; text-decoration: none;
       }
-      .nav-user-menu a i { width: 15px; text-align: center; font-size: 12px; color: var(--gray, #5e7e8c); }
+      .nav-user-menu a i { width: 16px; text-align: center; font-size: 13px; color: var(--gray, #5e7e8c); }
       .nav-user-menu a:hover { background: var(--primary-light, #e1f0f8); color: var(--primary, #0d6e9e); }
       .nav-user-menu a:hover i { color: var(--primary, #0d6e9e); }
       .nav-user-menu a.staff-link:hover { background: #fff5e8; color: #c96f1e; }
       .nav-user-menu a.staff-link:hover i { color: #c96f1e; }
       .nav-user-menu a.danger:hover { background: #fdecef; color: var(--danger, #e84a5f); }
       .nav-user-menu a.danger:hover i { color: var(--danger, #e84a5f); }
-      .nav-user-menu hr { border: 0; border-top: 1px solid var(--border, #e6f0f5); margin: 4px 4px; }
+      .nav-user-menu hr { border: 0; border-top: 1px solid var(--border, #e6f0f5); margin: 6px 4px; }
 
-      /* ===== BUTTONS (desktop — slim) ===== */
       .btn {
-        padding: 7px 15px;
-        border-radius: 9px; border: none;
-        font-family: inherit; font-size: 13px; font-weight: 600;
+        padding: 13px 26px; border-radius: 12px; border: none;
+        font-family: inherit; font-size: 15px; font-weight: 600;
         cursor: pointer; transition: all 0.2s;
         display: inline-flex; align-items: center; justify-content: center;
-        gap: 6px; text-decoration: none; white-space: nowrap;
+        gap: 9px; text-decoration: none; white-space: nowrap;
+        min-height: 46px;
       }
-      .btn-primary { background: var(--primary, #0d6e9e); color: #fff; box-shadow: 0 4px 10px -4px rgba(13,110,158,0.35); }
+      .btn-primary { background: var(--primary, #0d6e9e); color: #fff; box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3); }
       .btn-primary:hover { background: var(--primary-dark, #0a5578); transform: translateY(-1px); }
       .btn-outline { background: #fff; color: var(--primary, #0d6e9e); border: 1.5px solid var(--border, #e6f0f5); }
       .btn-outline:hover { background: var(--primary-light, #e1f0f8); border-color: var(--primary, #0d6e9e); }
       .btn-white { background: #fff; color: var(--primary, #0d6e9e); }
       .btn-white:hover { background: #f0f7fb; transform: translateY(-1px); }
-      .btn-lg { padding: 12px 24px; font-size: 14.5px; border-radius: 12px; }
+      .btn-lg { padding: 16px 32px; font-size: 16px; border-radius: 14px; min-height: 54px; }
 
-      /* ===== FOOTER (desktop) ===== */
       .footer { background: #0b3b4b; color: #c5d8e2; padding: 50px 0 22px; }
       .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.4fr; gap: 36px; margin-bottom: 32px; }
       .footer-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
@@ -451,7 +618,6 @@
       }
       .footer-socials a:hover { background: var(--primary, #0d6e9e); color: #fff; transform: translateY(-2px); }
 
-      /* ===== AUTH POPUP ===== */
       .auth-popup-overlay {
         position: fixed; inset: 0;
         background: rgba(11, 59, 75, 0.65);
@@ -560,9 +726,6 @@
       .auth-popup-foot a { color: #0d6e9e; font-weight: 600; cursor: pointer; }
       .auth-popup-foot a:hover { text-decoration: underline; }
 
-      /* ============================================================
-         BASE HELPERS FOR MOBILE NAV
-      ============================================================ */
       .nav-toggle { display: none; }
       .nav-collapse {
         display: flex;
@@ -572,30 +735,28 @@
         min-width: 0;
       }
 
-      /* ================= TABLET (≤1024px) ================= */
       @media (max-width: 1024px) {
         .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
         .footer { padding: 40px 0 18px; }
 
         .nav-user-name, .nav-user-role { display: none; }
-        .nav-user-chip { padding: 4px; gap: 0; }
+        .nav-user-chip { padding: 3px; gap: 0; }
         .nav-user-chip .chev { display: none; }
       }
 
-      /* ================= MOBILE NAV (≤960px) — comfortable ================= */
       @media (max-width: 960px) {
-        .navbar-inner { padding: 12px 16px; gap: 10px; }
-        .nav-logo { min-width: 0; gap: 8px; }
-        .nav-logo .logo-icon { width: 36px; height: 36px; font-size: 16px; border-radius: 10px; }
-        .nav-logo h1 { font-size: 16px; }
-        .nav-logo p  { font-size: 9.5px; margin-top: 1px; }
+        .navbar-inner { padding: 6px 12px; gap: 8px; }
+        .nav-logo { min-width: 0; gap: 7px; }
+        .nav-logo .logo-icon { width: 32px; height: 32px; font-size: 15px; border-radius: 9px; }
+        .nav-logo h1 { font-size: 15px; }
+        .nav-logo p  { font-size: 9px; margin-top: 1px; }
 
         .nav-toggle {
           display: flex; align-items: center; justify-content: center;
-          width: 40px; height: 40px; flex-shrink: 0;
+          width: 34px; height: 34px; flex-shrink: 0;
           border: 1.5px solid var(--border, #e6f0f5);
           background: #fff; color: var(--dark, #0b3b4b);
-          border-radius: 10px; font-size: 16px; cursor: pointer;
+          border-radius: 9px; font-size: 14px; cursor: pointer;
           transition: all 0.15s;
         }
         .nav-toggle:hover,
@@ -613,11 +774,11 @@
           align-items: stretch;
           gap: 0;
           background: #fff;
-          padding: 12px 14px 16px;
+          padding: 6px 10px 8px;
           border-top: 1px solid var(--border, #e6f0f5);
           box-shadow: 0 20px 36px -18px rgba(0,60,90,0.28);
-          max-height: calc(100vh - 60px);
-          max-height: calc(100dvh - 60px);
+          max-height: calc(100vh - 50px);
+          max-height: calc(100dvh - 50px);
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
           z-index: 150;
@@ -637,27 +798,23 @@
           padding: 0;
         }
         .nav-links li { margin: 0; }
-        .nav-links a {
-          display: block;
-          padding: 13px 14px;
-          font-size: 15px;
-          border-radius: 10px;
-        }
+        .nav-links a { display: block; padding: 7px 10px; font-size: 13.5px; border-radius: 7px; }
 
         .nav-cta {
           flex-direction: column;
           align-items: stretch;
-          gap: 8px;
+          gap: 5px;
           width: 100%;
-          margin-top: 10px;
-          padding-top: 12px;
+          margin-top: 5px;
+          padding-top: 6px;
           border-top: 1px solid var(--border, #e6f0f5);
         }
         .nav-cta > .btn {
           width: 100%;
-          padding: 13px 16px;
-          font-size: 14.5px;
-          border-radius: 10px;
+          padding: 8px 12px;
+          font-size: 13px;
+          border-radius: 8px;
+          min-height: 0;
         }
 
         .nav-staff, .nav-user { position: relative; width: 100%; }
@@ -665,25 +822,25 @@
         .nav-user-chip {
           width: 100%;
           justify-content: flex-start;
-          gap: 10px;
-          padding: 12px 14px;
-          border-radius: 10px;
-          font-size: 13.5px;
+          gap: 7px;
+          padding: 7px 10px;
+          border-radius: 8px;
+          font-size: 12px;
         }
-        .nav-user-avatar { width: 32px; height: 32px; font-size: 12px; }
-        .nav-user-name { font-size: 14px; }
-        .nav-user-role { font-size: 10px; }
+        .nav-user-avatar { width: 26px; height: 26px; font-size: 10.5px; }
+        .nav-user-name { font-size: 12px; }
+        .nav-user-role { font-size: 9px; }
         .nav-user-name, .nav-user-role { display: block; }
         .nav-user-chip .chev,
-        .nav-staff-chip .chev { display: inline-block; margin-left: auto; font-size: 11px; opacity: 0.7; }
+        .nav-staff-chip .chev { display: inline-block; margin-left: auto; font-size: 9px; opacity: 0.7; }
 
         .nav-staff-menu,
         .nav-user-menu {
           position: static;
           opacity: 1; visibility: visible; transform: none; transition: none;
           min-width: 0; width: 100%;
-          margin-top: 6px; padding: 6px;
-          border: none; border-radius: 10px;
+          margin-top: 3px; padding: 3px;
+          border: none; border-radius: 8px;
           background: #f7fbfd; box-shadow: none;
           display: none;
         }
@@ -691,40 +848,33 @@
         .nav-user-menu.open { display: block; }
 
         .nav-staff-menu a,
-        .nav-user-menu a {
-          padding: 11px 14px;
-          font-size: 14px;
-          gap: 10px;
-          border-radius: 9px;
-        }
+        .nav-user-menu a { padding: 7px 10px; font-size: 13px; gap: 7px; border-radius: 7px; }
         .nav-staff-menu a i,
-        .nav-user-menu a i { font-size: 13px; width: 15px; }
+        .nav-user-menu a i { font-size: 11.5px; width: 13px; }
       }
 
-      /* ================= PHONES (≤768px) ================= */
       @media (max-width: 768px) {
         .footer { padding: 28px 0 16px; }
         .footer-grid { grid-template-columns: 1fr; gap: 20px; margin-bottom: 22px; }
         .footer-bottom { flex-direction: column; text-align: center; gap: 10px; }
       }
 
-      /* ================= SMALL PHONES (≤520px) ================= */
       @media (max-width: 520px) {
-        .navbar-inner { padding: 10px 14px; gap: 8px; }
-        .nav-toggle { width: 38px; height: 38px; font-size: 15px; border-radius: 10px; }
-        .nav-logo .logo-icon { width: 34px; height: 34px; font-size: 15px; border-radius: 10px; }
-        .nav-logo h1 { font-size: 15px; }
-        .nav-logo p  { font-size: 9px; }
+        .navbar-inner { padding: 5px 10px; gap: 6px; }
+        .nav-toggle { width: 32px; height: 32px; font-size: 13px; border-radius: 8px; }
+        .nav-logo .logo-icon { width: 30px; height: 30px; font-size: 14px; border-radius: 8px; }
+        .nav-logo h1 { font-size: 14px; }
+        .nav-logo p  { font-size: 8.5px; }
 
-        .nav-collapse { padding: 10px 12px 14px; }
+        .nav-collapse { padding: 5px 8px 6px; }
 
-        .nav-links a { padding: 12px 12px; font-size: 14.5px; }
-        .nav-cta { gap: 7px; margin-top: 8px; padding-top: 10px; }
-        .nav-cta > .btn { padding: 12px 14px; font-size: 14px; }
-        .nav-staff-chip, .nav-user-chip { padding: 11px 12px; font-size: 13px; }
-        .nav-user-avatar { width: 30px; height: 30px; font-size: 11px; }
+        .nav-links a { padding: 6px 9px; font-size: 13px; }
+        .nav-cta { gap: 4px; margin-top: 4px; padding-top: 5px; }
+        .nav-cta > .btn { padding: 7px 10px; font-size: 12.5px; }
+        .nav-staff-chip, .nav-user-chip { padding: 6px 9px; font-size: 11.5px; }
+        .nav-user-avatar { width: 24px; height: 24px; font-size: 10px; }
         .nav-staff-menu a,
-        .nav-user-menu a { padding: 10px 12px; font-size: 13.5px; }
+        .nav-user-menu a { padding: 6px 9px; font-size: 12.5px; }
 
         .auth-popup-overlay { padding: 10px; }
         .auth-popup { border-radius: 16px; }
@@ -736,35 +886,33 @@
         .auth-popup .form-group input { font-size: 16px; }
       }
 
-      /* ============ SHORT DEVICES (landscape phones) ============ */
       @media (max-height: 700px) {
-        .navbar-inner { padding: 10px 16px; }
-        .nav-logo .logo-icon { width: 34px; height: 34px; font-size: 15px; }
-        .nav-logo h1 { font-size: 15px; }
-        .nav-logo p  { font-size: 9px; }
+        .navbar-inner { padding: 5px 10px; }
+        .nav-logo .logo-icon { width: 30px; height: 30px; font-size: 14px; }
+        .nav-logo h1 { font-size: 14px; }
+        .nav-logo p  { font-size: 8.5px; }
 
-        .nav-toggle { width: 36px; height: 36px; font-size: 15px; }
+        .nav-toggle { width: 32px; height: 32px; font-size: 13px; }
 
-        .nav-collapse { padding: 10px 12px 12px; }
+        .nav-collapse { padding: 5px 8px 6px; }
 
-        .nav-links a { padding: 11px 12px; font-size: 14px; }
-        .nav-cta { gap: 6px; margin-top: 8px; padding-top: 10px; }
-        .nav-cta > .btn { padding: 11px 12px; font-size: 13.5px; }
-        .nav-staff-chip, .nav-user-chip { padding: 10px 12px; font-size: 13px; }
+        .nav-links a { padding: 6px 9px; font-size: 13px; }
+        .nav-cta { gap: 4px; margin-top: 4px; padding-top: 5px; }
+        .nav-cta > .btn { padding: 6px 10px; font-size: 12.5px; }
+        .nav-staff-chip, .nav-user-chip { padding: 6px 9px; font-size: 11.5px; }
         .nav-staff-menu a,
-        .nav-user-menu a { padding: 10px 12px; font-size: 13px; }
+        .nav-user-menu a { padding: 6px 9px; font-size: 12.5px; }
       }
 
       @media (max-height: 560px) {
-        .nav-links a { padding: 9px 11px; font-size: 13.5px; }
-        .nav-cta { gap: 5px; margin-top: 7px; padding-top: 8px; }
-        .nav-cta > .btn { padding: 10px 11px; font-size: 13px; }
-        .nav-staff-chip, .nav-user-chip { padding: 9px 11px; }
+        .nav-links a { padding: 5px 8px; font-size: 12.5px; }
+        .nav-cta { gap: 3px; margin-top: 3px; padding-top: 4px; }
+        .nav-cta > .btn { padding: 5px 9px; font-size: 12px; }
+        .nav-staff-chip, .nav-user-chip { padding: 5px 8px; }
         .nav-staff-menu a,
-        .nav-user-menu a { padding: 9px 11px; font-size: 12.5px; }
+        .nav-user-menu a { padding: 5px 8px; font-size: 12px; }
       }
 
-      /* ============ AUTH POPUP ON SHORT SCREENS ============ */
       @media (max-height: 640px) {
         .auth-popup-hero { padding: 16px 18px 12px; }
         .auth-popup-hero h2 { font-size: 17px; }
@@ -772,17 +920,6 @@
         .auth-popup-logo { width: 40px; height: 40px; font-size: 18px; margin-bottom: 8px; }
       }
 
-      /* ============ ULTRA-WIDE (≥1600px) ============ */
-      @media (min-width: 1600px) {
-        .navbar-inner { padding: 8px 40px; gap: 22px; }
-        .nav-links a { padding: 8px 18px; font-size: 14px; }
-        .btn { padding: 8px 20px; font-size: 13.5px; }
-        .nav-user-chip { padding: 2px 14px 2px 2px; }
-        .nav-user-avatar { width: 30px; height: 30px; font-size: 11.5px; }
-        .nav-staff-chip { padding: 7px 16px; }
-      }
-
-      /* ============ EXTRA SAFETY ============ */
       @media (max-width: 960px) {
         .nav-cta .btn,
         .nav-links a { white-space: normal; text-align: left; }
