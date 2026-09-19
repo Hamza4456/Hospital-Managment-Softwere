@@ -231,9 +231,13 @@
       *, *::before, *::after { box-sizing: border-box; }
 
       /* ============================================================
-         STICKY LAYOUT
+         STICKY LAYOUT  (with ultra-wide overflow safeguards)
       ============================================================ */
-      html { height: 100%; }
+      html {
+        height: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
 
       body {
         display: flex;
@@ -241,6 +245,8 @@
         min-height: 100vh;
         min-height: 100dvh;
         margin: 0;
+        max-width: 100%;
+        overflow-x: hidden;
       }
 
       body > *:not(#site-footer) { flex-shrink: 0; }
@@ -250,6 +256,8 @@
         top: 0;
         z-index: 100;
         width: 100%;
+        max-width: 100%;
+        overflow-x: clip;
         flex-shrink: 0;
       }
 
@@ -257,6 +265,8 @@
         margin-top: auto;
         flex-shrink: 0;
         width: 100%;
+        max-width: 100%;
+        overflow-x: clip;
       }
 
       /* ============================================================
@@ -268,14 +278,16 @@
         background: #fff;
         box-shadow: 0 2px 16px rgba(0,30,45,0.06);
         position: relative;
+        width: 100%;
+        max-width: 100%;
       }
       .navbar-inner {
         display: flex;
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 14px 24px;
-        gap: 20px;
+        padding: 18px 28px;
+        gap: 24px;
       }
 
       /* Logo */
@@ -293,9 +305,13 @@
       /* Desktop nav links */
       .nav-links { display: flex; align-items: center; gap: 6px; list-style: none; margin: 0 auto; padding: 0; }
       .nav-links a {
-        padding: 11px 20px; border-radius: 10px;
-        font-size: 14.5px; font-weight: 600; color: var(--gray, #5e7e8c);
-        text-decoration: none; transition: all 0.15s;
+        padding: 13px 22px;
+        border-radius: 11px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--gray, #5e7e8c);
+        text-decoration: none;
+        transition: all 0.15s;
         display: inline-block;
       }
       .nav-links a:hover, .nav-links a.active { background: var(--primary-light, #e1f0f8); color: var(--primary, #0d6e9e); }
@@ -305,13 +321,15 @@
       /* ===== STAFF CHIP + DROPDOWN ===== */
       .nav-staff { position: relative; }
       .nav-staff-chip {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 10px 16px; border-radius: 40px;
+        display: inline-flex; align-items: center; gap: 9px;
+        padding: 12px 18px;
+        border-radius: 40px;
         background: #fff0e0; color: #c96f1e;
-        font-size: 12px; font-weight: 700;
+        font-size: 13px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 0.4px;
         cursor: pointer; user-select: none; transition: all 0.15s;
         white-space: nowrap;
+        min-height: 50px;
       }
       .nav-staff-chip:hover { background: #ffe4c8; }
       .nav-staff-chip .dot {
@@ -329,9 +347,10 @@
       }
       .nav-staff-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
       .nav-staff-menu a {
-        display: flex; align-items: center; gap: 10px;
-        padding: 11px 14px; border-radius: 10px;
-        font-size: 14px; font-weight: 500;
+        display: flex; align-items: center; gap: 11px;
+        padding: 13px 16px;
+        border-radius: 10px;
+        font-size: 14.5px; font-weight: 500;
         color: var(--dark, #0b3b4b); cursor: pointer; text-decoration: none;
       }
       .nav-staff-menu a i { width: 16px; text-align: center; font-size: 13px; color: var(--gray, #5e7e8c); }
@@ -344,17 +363,18 @@
       /* ===== USER CHIP ===== */
       .nav-user { position: relative; }
       .nav-user-chip {
-        display: flex; align-items: center; gap: 10px;
+        display: flex; align-items: center; gap: 11px;
         background: #fff; border: 1.5px solid var(--border, #e6f0f5);
-        border-radius: 40px; padding: 5px 16px 5px 5px;
+        border-radius: 40px; padding: 6px 18px 6px 6px;
         cursor: pointer; transition: all 0.18s; user-select: none;
+        min-height: 50px;
       }
       .nav-user-chip:hover { border-color: var(--primary, #0d6e9e); background: #f9fcfd; }
       .nav-user-avatar {
-        width: 36px; height: 36px; border-radius: 50%;
+        width: 40px; height: 40px; border-radius: 50%;
         background: linear-gradient(135deg, #0d6e9e, #0e8b5e); color: #fff;
         display: flex; align-items: center; justify-content: center;
-        font-weight: 700; font-size: 13px; flex-shrink: 0;
+        font-weight: 700; font-size: 14px; flex-shrink: 0;
       }
       .nav-user-name { font-size: 14px; font-weight: 600; color: var(--dark, #0b3b4b); line-height: 1.1; }
       .nav-user-role { font-size: 11px; color: var(--gray, #5e7e8c); margin-top: 1px; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 500; }
@@ -369,9 +389,10 @@
       }
       .nav-user-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
       .nav-user-menu a {
-        display: flex; align-items: center; gap: 10px;
-        padding: 11px 14px; border-radius: 10px;
-        font-size: 14px; font-weight: 500;
+        display: flex; align-items: center; gap: 11px;
+        padding: 13px 16px;
+        border-radius: 10px;
+        font-size: 14.5px; font-weight: 500;
         color: var(--dark, #0b3b4b); cursor: pointer; text-decoration: none;
       }
       .nav-user-menu a i { width: 16px; text-align: center; font-size: 13px; color: var(--gray, #5e7e8c); }
@@ -385,12 +406,13 @@
 
       /* ===== BUTTONS (desktop — BIGGER) ===== */
       .btn {
-        padding: 13px 26px; border-radius: 12px; border: none;
+        padding: 14px 28px;
+        border-radius: 12px; border: none;
         font-family: inherit; font-size: 15px; font-weight: 600;
         cursor: pointer; transition: all 0.2s;
         display: inline-flex; align-items: center; justify-content: center;
         gap: 9px; text-decoration: none; white-space: nowrap;
-        min-height: 46px;
+        min-height: 50px;
       }
       .btn-primary { background: var(--primary, #0d6e9e); color: #fff; box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3); }
       .btn-primary:hover { background: var(--primary-dark, #0a5578); transform: translateY(-1px); }
@@ -560,24 +582,24 @@
         .footer { padding: 40px 0 18px; }
 
         .nav-user-name, .nav-user-role { display: none; }
-        .nav-user-chip { padding: 3px; gap: 0; }
+        .nav-user-chip { padding: 5px; gap: 0; min-height: 0; }
         .nav-user-chip .chev { display: none; }
       }
 
-      /* ================= MOBILE NAV (≤960px) — TIGHT ================= */
+      /* ================= MOBILE NAV (≤960px) — comfortable ================= */
       @media (max-width: 960px) {
-        .navbar-inner { padding: 6px 12px; gap: 8px; }
-        .nav-logo { min-width: 0; gap: 7px; }
-        .nav-logo .logo-icon { width: 32px; height: 32px; font-size: 15px; border-radius: 9px; }
-        .nav-logo h1 { font-size: 15px; }
-        .nav-logo p  { font-size: 9px; margin-top: 1px; }
+        .navbar-inner { padding: 12px 16px; gap: 10px; }
+        .nav-logo { min-width: 0; gap: 8px; }
+        .nav-logo .logo-icon { width: 36px; height: 36px; font-size: 16px; border-radius: 10px; }
+        .nav-logo h1 { font-size: 16px; }
+        .nav-logo p  { font-size: 9.5px; margin-top: 1px; }
 
         .nav-toggle {
           display: flex; align-items: center; justify-content: center;
-          width: 34px; height: 34px; flex-shrink: 0;
+          width: 40px; height: 40px; flex-shrink: 0;
           border: 1.5px solid var(--border, #e6f0f5);
           background: #fff; color: var(--dark, #0b3b4b);
-          border-radius: 9px; font-size: 14px; cursor: pointer;
+          border-radius: 10px; font-size: 16px; cursor: pointer;
           transition: all 0.15s;
         }
         .nav-toggle:hover,
@@ -595,11 +617,11 @@
           align-items: stretch;
           gap: 0;
           background: #fff;
-          padding: 6px 10px 8px;
+          padding: 12px 14px 16px;
           border-top: 1px solid var(--border, #e6f0f5);
           box-shadow: 0 20px 36px -18px rgba(0,60,90,0.28);
-          max-height: calc(100vh - 50px);
-          max-height: calc(100dvh - 50px);
+          max-height: calc(100vh - 60px);
+          max-height: calc(100dvh - 60px);
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
           z-index: 150;
@@ -619,23 +641,28 @@
           padding: 0;
         }
         .nav-links li { margin: 0; }
-        .nav-links a { display: block; padding: 7px 10px; font-size: 13.5px; border-radius: 7px; }
+        .nav-links a {
+          display: block;
+          padding: 13px 14px;
+          font-size: 15px;
+          border-radius: 10px;
+        }
 
         .nav-cta {
           flex-direction: column;
           align-items: stretch;
-          gap: 5px;
+          gap: 8px;
           width: 100%;
-          margin-top: 5px;
-          padding-top: 6px;
+          margin-top: 10px;
+          padding-top: 12px;
           border-top: 1px solid var(--border, #e6f0f5);
         }
         .nav-cta > .btn {
           width: 100%;
-          padding: 8px 12px;
-          font-size: 13px;
-          border-radius: 8px;
-          min-height: 0;
+          padding: 13px 16px;
+          font-size: 14.5px;
+          border-radius: 10px;
+          min-height: 48px;
         }
 
         .nav-staff, .nav-user { position: relative; width: 100%; }
@@ -643,25 +670,26 @@
         .nav-user-chip {
           width: 100%;
           justify-content: flex-start;
-          gap: 7px;
-          padding: 7px 10px;
-          border-radius: 8px;
-          font-size: 12px;
+          gap: 10px;
+          padding: 12px 14px;
+          border-radius: 10px;
+          font-size: 13.5px;
+          min-height: 48px;
         }
-        .nav-user-avatar { width: 26px; height: 26px; font-size: 10.5px; }
-        .nav-user-name { font-size: 12px; }
-        .nav-user-role { font-size: 9px; }
+        .nav-user-avatar { width: 32px; height: 32px; font-size: 12px; }
+        .nav-user-name { font-size: 14px; }
+        .nav-user-role { font-size: 10px; }
         .nav-user-name, .nav-user-role { display: block; }
         .nav-user-chip .chev,
-        .nav-staff-chip .chev { display: inline-block; margin-left: auto; font-size: 9px; opacity: 0.7; }
+        .nav-staff-chip .chev { display: inline-block; margin-left: auto; font-size: 11px; opacity: 0.7; }
 
         .nav-staff-menu,
         .nav-user-menu {
           position: static;
           opacity: 1; visibility: visible; transform: none; transition: none;
           min-width: 0; width: 100%;
-          margin-top: 3px; padding: 3px;
-          border: none; border-radius: 8px;
+          margin-top: 6px; padding: 6px;
+          border: none; border-radius: 10px;
           background: #f7fbfd; box-shadow: none;
           display: none;
         }
@@ -669,9 +697,14 @@
         .nav-user-menu.open { display: block; }
 
         .nav-staff-menu a,
-        .nav-user-menu a { padding: 7px 10px; font-size: 13px; gap: 7px; border-radius: 7px; }
+        .nav-user-menu a {
+          padding: 11px 14px;
+          font-size: 14px;
+          gap: 10px;
+          border-radius: 9px;
+        }
         .nav-staff-menu a i,
-        .nav-user-menu a i { font-size: 11.5px; width: 13px; }
+        .nav-user-menu a i { font-size: 13px; width: 15px; }
       }
 
       /* ================= PHONES (≤768px) ================= */
@@ -683,21 +716,21 @@
 
       /* ================= SMALL PHONES (≤520px) ================= */
       @media (max-width: 520px) {
-        .navbar-inner { padding: 5px 10px; gap: 6px; }
-        .nav-toggle { width: 32px; height: 32px; font-size: 13px; border-radius: 8px; }
-        .nav-logo .logo-icon { width: 30px; height: 30px; font-size: 14px; border-radius: 8px; }
-        .nav-logo h1 { font-size: 14px; }
-        .nav-logo p  { font-size: 8.5px; }
+        .navbar-inner { padding: 10px 14px; gap: 8px; }
+        .nav-toggle { width: 38px; height: 38px; font-size: 15px; border-radius: 10px; }
+        .nav-logo .logo-icon { width: 34px; height: 34px; font-size: 15px; border-radius: 10px; }
+        .nav-logo h1 { font-size: 15px; }
+        .nav-logo p  { font-size: 9px; }
 
-        .nav-collapse { padding: 5px 8px 6px; }
+        .nav-collapse { padding: 10px 12px 14px; }
 
-        .nav-links a { padding: 6px 9px; font-size: 13px; }
-        .nav-cta { gap: 4px; margin-top: 4px; padding-top: 5px; }
-        .nav-cta > .btn { padding: 7px 10px; font-size: 12.5px; }
-        .nav-staff-chip, .nav-user-chip { padding: 6px 9px; font-size: 11.5px; }
-        .nav-user-avatar { width: 24px; height: 24px; font-size: 10px; }
+        .nav-links a { padding: 12px 12px; font-size: 14.5px; }
+        .nav-cta { gap: 7px; margin-top: 8px; padding-top: 10px; }
+        .nav-cta > .btn { padding: 12px 14px; font-size: 14px; min-height: 46px; }
+        .nav-staff-chip, .nav-user-chip { padding: 11px 12px; font-size: 13px; min-height: 46px; }
+        .nav-user-avatar { width: 30px; height: 30px; font-size: 11px; }
         .nav-staff-menu a,
-        .nav-user-menu a { padding: 6px 9px; font-size: 12.5px; }
+        .nav-user-menu a { padding: 10px 12px; font-size: 13.5px; }
 
         .auth-popup-overlay { padding: 10px; }
         .auth-popup { border-radius: 16px; }
@@ -711,30 +744,30 @@
 
       /* ============ SHORT DEVICES (landscape phones) ============ */
       @media (max-height: 700px) {
-        .navbar-inner { padding: 5px 10px; }
-        .nav-logo .logo-icon { width: 30px; height: 30px; font-size: 14px; }
-        .nav-logo h1 { font-size: 14px; }
-        .nav-logo p  { font-size: 8.5px; }
+        .navbar-inner { padding: 10px 16px; }
+        .nav-logo .logo-icon { width: 34px; height: 34px; font-size: 15px; }
+        .nav-logo h1 { font-size: 15px; }
+        .nav-logo p  { font-size: 9px; }
 
-        .nav-toggle { width: 32px; height: 32px; font-size: 13px; }
+        .nav-toggle { width: 36px; height: 36px; font-size: 15px; }
 
-        .nav-collapse { padding: 5px 8px 6px; }
+        .nav-collapse { padding: 10px 12px 12px; }
 
-        .nav-links a { padding: 6px 9px; font-size: 13px; }
-        .nav-cta { gap: 4px; margin-top: 4px; padding-top: 5px; }
-        .nav-cta > .btn { padding: 6px 10px; font-size: 12.5px; }
-        .nav-staff-chip, .nav-user-chip { padding: 6px 9px; font-size: 11.5px; }
+        .nav-links a { padding: 11px 12px; font-size: 14px; }
+        .nav-cta { gap: 6px; margin-top: 8px; padding-top: 10px; }
+        .nav-cta > .btn { padding: 11px 12px; font-size: 13.5px; min-height: 44px; }
+        .nav-staff-chip, .nav-user-chip { padding: 10px 12px; font-size: 13px; min-height: 44px; }
         .nav-staff-menu a,
-        .nav-user-menu a { padding: 6px 9px; font-size: 12.5px; }
+        .nav-user-menu a { padding: 10px 12px; font-size: 13px; }
       }
 
       @media (max-height: 560px) {
-        .nav-links a { padding: 5px 8px; font-size: 12.5px; }
-        .nav-cta { gap: 3px; margin-top: 3px; padding-top: 4px; }
-        .nav-cta > .btn { padding: 5px 9px; font-size: 12px; }
-        .nav-staff-chip, .nav-user-chip { padding: 5px 8px; }
+        .nav-links a { padding: 9px 11px; font-size: 13.5px; }
+        .nav-cta { gap: 5px; margin-top: 7px; padding-top: 8px; }
+        .nav-cta > .btn { padding: 10px 11px; font-size: 13px; min-height: 42px; }
+        .nav-staff-chip, .nav-user-chip { padding: 9px 11px; }
         .nav-staff-menu a,
-        .nav-user-menu a { padding: 5px 8px; font-size: 12px; }
+        .nav-user-menu a { padding: 9px 11px; font-size: 12.5px; }
       }
 
       /* ============ AUTH POPUP ON SHORT SCREENS ============ */
@@ -743,6 +776,16 @@
         .auth-popup-hero h2 { font-size: 17px; }
         .auth-popup-hero p { display: none; }
         .auth-popup-logo { width: 40px; height: 40px; font-size: 18px; margin-bottom: 8px; }
+      }
+
+      /* ============ ULTRA-WIDE (≥1600px) ============ */
+      @media (min-width: 1600px) {
+        .navbar-inner { padding: 20px 40px; gap: 28px; }
+        .nav-links a { padding: 14px 26px; font-size: 15.5px; }
+        .btn { padding: 15px 30px; font-size: 15.5px; min-height: 52px; }
+        .nav-user-chip { padding: 7px 20px 7px 7px; min-height: 52px; }
+        .nav-user-avatar { width: 42px; height: 42px; font-size: 15px; }
+        .nav-staff-chip { padding: 13px 20px; min-height: 52px; }
       }
 
       /* ============ EXTRA SAFETY ============ */
