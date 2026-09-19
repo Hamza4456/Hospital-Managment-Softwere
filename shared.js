@@ -268,7 +268,7 @@
       }
 
       /* ============================================================
-         DESKTOP (compact header)
+         DESKTOP (slim header)
       ============================================================ */
 
       /* ===== NAVBAR ===== */
@@ -284,29 +284,29 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 8px 24px;         /* was 10px 20px — trimmed */
-        gap: 18px;
+        padding: 6px 24px;
+        gap: 16px;
       }
 
       /* Logo */
-      .nav-logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; min-width: 0; text-decoration: none; }
+      .nav-logo { display: flex; align-items: center; gap: 9px; flex-shrink: 0; min-width: 0; text-decoration: none; }
       .nav-logo .logo-icon {
         background: var(--primary, #0d6e9e); color: #fff;
-        width: 40px; height: 40px;  /* was 46x46 */
-        border-radius: 11px;
+        width: 34px; height: 34px;
+        border-radius: 9px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 19px; flex-shrink: 0;   /* was 22px */
-        box-shadow: 0 6px 12px -4px rgba(13,110,158,0.3);
+        font-size: 16px; flex-shrink: 0;
+        box-shadow: 0 4px 10px -4px rgba(13,110,158,0.3);
       }
-      .nav-logo h1 { font-size: 18px; font-weight: 800; color: var(--dark, #0b3b4b); line-height: 1; margin: 0; }
-      .nav-logo p  { font-size: 10px; color: var(--gray, #5e7e8c); font-weight: 500; margin: 2px 0 0; }
+      .nav-logo h1 { font-size: 16px; font-weight: 800; color: var(--dark, #0b3b4b); line-height: 1; margin: 0; }
+      .nav-logo p  { font-size: 9px; color: var(--gray, #5e7e8c); font-weight: 500; margin: 2px 0 0; }
 
       /* Desktop nav links */
-      .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; margin: 0 auto; padding: 0; }
+      .nav-links { display: flex; align-items: center; gap: 2px; list-style: none; margin: 0 auto; padding: 0; }
       .nav-links a {
-        padding: 9px 16px;         /* restored compact padding */
-        border-radius: 10px;
-        font-size: 14px;
+        padding: 7px 14px;
+        border-radius: 9px;
+        font-size: 13.5px;
         font-weight: 600;
         color: var(--gray, #5e7e8c);
         text-decoration: none;
@@ -315,111 +315,108 @@
       }
       .nav-links a:hover, .nav-links a.active { background: var(--primary-light, #e1f0f8); color: var(--primary, #0d6e9e); }
 
-      .nav-cta { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+      .nav-cta { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
 
       /* ===== STAFF CHIP + DROPDOWN ===== */
       .nav-staff { position: relative; }
       .nav-staff-chip {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 9px 14px;
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 6px 12px;
         border-radius: 40px;
         background: #fff0e0; color: #c96f1e;
-        font-size: 12px; font-weight: 700;
+        font-size: 11.5px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 0.4px;
         cursor: pointer; user-select: none; transition: all 0.15s;
         white-space: nowrap;
-        min-height: 40px;
       }
       .nav-staff-chip:hover { background: #ffe4c8; }
       .nav-staff-chip .dot {
-        width: 7px; height: 7px; border-radius: 50%;
+        width: 6px; height: 6px; border-radius: 50%;
         background: #c96f1e; box-shadow: 0 0 0 3px rgba(201,111,30,0.2);
       }
-      .nav-staff-chip .chev { font-size: 10px; margin-left: 3px; opacity: 0.75; }
+      .nav-staff-chip .chev { font-size: 9px; margin-left: 2px; opacity: 0.75; }
       .nav-staff-menu {
-        position: absolute; top: calc(100% + 8px); right: 0;
-        min-width: 220px; background: #fff; border-radius: 14px;
-        padding: 6px; border: 1px solid var(--border, #e6f0f5);
+        position: absolute; top: calc(100% + 6px); right: 0;
+        min-width: 210px; background: #fff; border-radius: 14px;
+        padding: 5px; border: 1px solid var(--border, #e6f0f5);
         box-shadow: 0 20px 50px -12px rgba(0,80,110,0.2);
         opacity: 0; visibility: hidden; transform: translateY(-6px);
         transition: all 0.18s; z-index: 200;
       }
       .nav-staff-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
       .nav-staff-menu a {
-        display: flex; align-items: center; gap: 10px;
-        padding: 10px 12px;
-        border-radius: 9px;
-        font-size: 13.5px; font-weight: 500;
+        display: flex; align-items: center; gap: 9px;
+        padding: 8px 11px;
+        border-radius: 8px;
+        font-size: 13px; font-weight: 500;
         color: var(--dark, #0b3b4b); cursor: pointer; text-decoration: none;
       }
-      .nav-staff-menu a i { width: 16px; text-align: center; font-size: 13px; color: var(--gray, #5e7e8c); }
+      .nav-staff-menu a i { width: 15px; text-align: center; font-size: 12px; color: var(--gray, #5e7e8c); }
       .nav-staff-menu a:hover { background: #fff5e8; color: #c96f1e; }
       .nav-staff-menu a:hover i { color: #c96f1e; }
       .nav-staff-menu a.danger:hover { background: #fdecef; color: var(--danger, #e84a5f); }
       .nav-staff-menu a.danger:hover i { color: var(--danger, #e84a5f); }
-      .nav-staff-menu hr { border: 0; border-top: 1px solid var(--border, #e6f0f5); margin: 5px 4px; }
+      .nav-staff-menu hr { border: 0; border-top: 1px solid var(--border, #e6f0f5); margin: 4px 4px; }
 
       /* ===== USER CHIP ===== */
       .nav-user { position: relative; }
       .nav-user-chip {
-        display: flex; align-items: center; gap: 9px;
+        display: flex; align-items: center; gap: 8px;
         background: #fff; border: 1.5px solid var(--border, #e6f0f5);
-        border-radius: 40px; padding: 4px 14px 4px 4px;
+        border-radius: 40px; padding: 2px 12px 2px 2px;
         cursor: pointer; transition: all 0.18s; user-select: none;
-        min-height: 40px;
       }
       .nav-user-chip:hover { border-color: var(--primary, #0d6e9e); background: #f9fcfd; }
       .nav-user-avatar {
-        width: 32px; height: 32px; border-radius: 50%;   /* fixed: was 20x38 oval */
+        width: 28px; height: 28px; border-radius: 50%;
         background: linear-gradient(135deg, #0d6e9e, #0e8b5e); color: #fff;
         display: flex; align-items: center; justify-content: center;
-        font-weight: 700; font-size: 12px; flex-shrink: 0;
+        font-weight: 700; font-size: 11px; flex-shrink: 0;
       }
-      .nav-user-name { font-size: 13.5px; font-weight: 600; color: var(--dark, #0b3b4b); line-height: 1.1; }
-      .nav-user-role { font-size: 10.5px; color: var(--gray, #5e7e8c); margin-top: 1px; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 500; }
-      .nav-user-chip .chev { font-size: 11px; color: var(--gray, #5e7e8c); }
+      .nav-user-name { font-size: 12.5px; font-weight: 600; color: var(--dark, #0b3b4b); line-height: 1.05; }
+      .nav-user-role { font-size: 9.5px; color: var(--gray, #5e7e8c); margin-top: 1px; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 500; }
+      .nav-user-chip .chev { font-size: 10px; color: var(--gray, #5e7e8c); }
       .nav-user-menu {
-        position: absolute; top: calc(100% + 8px); right: 0;
-        min-width: 230px; background: #fff; border-radius: 14px;
-        padding: 6px; border: 1px solid var(--border, #e6f0f5);
+        position: absolute; top: calc(100% + 6px); right: 0;
+        min-width: 220px; background: #fff; border-radius: 14px;
+        padding: 5px; border: 1px solid var(--border, #e6f0f5);
         box-shadow: 0 20px 50px -12px rgba(0,80,110,0.2);
         opacity: 0; visibility: hidden; transform: translateY(-6px);
         transition: all 0.18s; z-index: 200;
       }
       .nav-user-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
       .nav-user-menu a {
-        display: flex; align-items: center; gap: 10px;
-        padding: 10px 12px;
-        border-radius: 9px;
-        font-size: 13.5px; font-weight: 500;
+        display: flex; align-items: center; gap: 9px;
+        padding: 8px 11px;
+        border-radius: 8px;
+        font-size: 13px; font-weight: 500;
         color: var(--dark, #0b3b4b); cursor: pointer; text-decoration: none;
       }
-      .nav-user-menu a i { width: 16px; text-align: center; font-size: 13px; color: var(--gray, #5e7e8c); }
+      .nav-user-menu a i { width: 15px; text-align: center; font-size: 12px; color: var(--gray, #5e7e8c); }
       .nav-user-menu a:hover { background: var(--primary-light, #e1f0f8); color: var(--primary, #0d6e9e); }
       .nav-user-menu a:hover i { color: var(--primary, #0d6e9e); }
       .nav-user-menu a.staff-link:hover { background: #fff5e8; color: #c96f1e; }
       .nav-user-menu a.staff-link:hover i { color: #c96f1e; }
       .nav-user-menu a.danger:hover { background: #fdecef; color: var(--danger, #e84a5f); }
       .nav-user-menu a.danger:hover i { color: var(--danger, #e84a5f); }
-      .nav-user-menu hr { border: 0; border-top: 1px solid var(--border, #e6f0f5); margin: 5px 4px; }
+      .nav-user-menu hr { border: 0; border-top: 1px solid var(--border, #e6f0f5); margin: 4px 4px; }
 
-      /* ===== BUTTONS (desktop) ===== */
+      /* ===== BUTTONS (desktop — slim) ===== */
       .btn {
-        padding: 10px 20px;         /* was 13px 26px */
-        border-radius: 11px; border: none;
-        font-family: inherit; font-size: 14px; font-weight: 600;
+        padding: 7px 15px;
+        border-radius: 9px; border: none;
+        font-family: inherit; font-size: 13px; font-weight: 600;
         cursor: pointer; transition: all 0.2s;
         display: inline-flex; align-items: center; justify-content: center;
-        gap: 8px; text-decoration: none; white-space: nowrap;
-        min-height: 40px;           /* was 48px */
+        gap: 6px; text-decoration: none; white-space: nowrap;
       }
-      .btn-primary { background: var(--primary, #0d6e9e); color: #fff; box-shadow: 0 6px 12px -4px rgba(13,110,158,0.3); }
+      .btn-primary { background: var(--primary, #0d6e9e); color: #fff; box-shadow: 0 4px 10px -4px rgba(13,110,158,0.35); }
       .btn-primary:hover { background: var(--primary-dark, #0a5578); transform: translateY(-1px); }
       .btn-outline { background: #fff; color: var(--primary, #0d6e9e); border: 1.5px solid var(--border, #e6f0f5); }
       .btn-outline:hover { background: var(--primary-light, #e1f0f8); border-color: var(--primary, #0d6e9e); }
       .btn-white { background: #fff; color: var(--primary, #0d6e9e); }
       .btn-white:hover { background: #f0f7fb; transform: translateY(-1px); }
-      .btn-lg { padding: 14px 28px; font-size: 15px; border-radius: 13px; min-height: 48px; }
+      .btn-lg { padding: 12px 24px; font-size: 14.5px; border-radius: 12px; }
 
       /* ===== FOOTER (desktop) ===== */
       .footer { background: #0b3b4b; color: #c5d8e2; padding: 50px 0 22px; }
@@ -581,7 +578,7 @@
         .footer { padding: 40px 0 18px; }
 
         .nav-user-name, .nav-user-role { display: none; }
-        .nav-user-chip { padding: 4px; gap: 0; min-height: 0; }
+        .nav-user-chip { padding: 4px; gap: 0; }
         .nav-user-chip .chev { display: none; }
       }
 
@@ -661,7 +658,6 @@
           padding: 13px 16px;
           font-size: 14.5px;
           border-radius: 10px;
-          min-height: 48px;
         }
 
         .nav-staff, .nav-user { position: relative; width: 100%; }
@@ -673,7 +669,6 @@
           padding: 12px 14px;
           border-radius: 10px;
           font-size: 13.5px;
-          min-height: 48px;
         }
         .nav-user-avatar { width: 32px; height: 32px; font-size: 12px; }
         .nav-user-name { font-size: 14px; }
@@ -725,8 +720,8 @@
 
         .nav-links a { padding: 12px 12px; font-size: 14.5px; }
         .nav-cta { gap: 7px; margin-top: 8px; padding-top: 10px; }
-        .nav-cta > .btn { padding: 12px 14px; font-size: 14px; min-height: 46px; }
-        .nav-staff-chip, .nav-user-chip { padding: 11px 12px; font-size: 13px; min-height: 46px; }
+        .nav-cta > .btn { padding: 12px 14px; font-size: 14px; }
+        .nav-staff-chip, .nav-user-chip { padding: 11px 12px; font-size: 13px; }
         .nav-user-avatar { width: 30px; height: 30px; font-size: 11px; }
         .nav-staff-menu a,
         .nav-user-menu a { padding: 10px 12px; font-size: 13.5px; }
@@ -754,8 +749,8 @@
 
         .nav-links a { padding: 11px 12px; font-size: 14px; }
         .nav-cta { gap: 6px; margin-top: 8px; padding-top: 10px; }
-        .nav-cta > .btn { padding: 11px 12px; font-size: 13.5px; min-height: 44px; }
-        .nav-staff-chip, .nav-user-chip { padding: 10px 12px; font-size: 13px; min-height: 44px; }
+        .nav-cta > .btn { padding: 11px 12px; font-size: 13.5px; }
+        .nav-staff-chip, .nav-user-chip { padding: 10px 12px; font-size: 13px; }
         .nav-staff-menu a,
         .nav-user-menu a { padding: 10px 12px; font-size: 13px; }
       }
@@ -763,7 +758,7 @@
       @media (max-height: 560px) {
         .nav-links a { padding: 9px 11px; font-size: 13.5px; }
         .nav-cta { gap: 5px; margin-top: 7px; padding-top: 8px; }
-        .nav-cta > .btn { padding: 10px 11px; font-size: 13px; min-height: 42px; }
+        .nav-cta > .btn { padding: 10px 11px; font-size: 13px; }
         .nav-staff-chip, .nav-user-chip { padding: 9px 11px; }
         .nav-staff-menu a,
         .nav-user-menu a { padding: 9px 11px; font-size: 12.5px; }
@@ -779,12 +774,12 @@
 
       /* ============ ULTRA-WIDE (≥1600px) ============ */
       @media (min-width: 1600px) {
-        .navbar-inner { padding: 10px 40px; gap: 24px; }
-        .nav-links a { padding: 10px 20px; font-size: 14.5px; }
-        .btn { padding: 11px 24px; font-size: 14.5px; min-height: 42px; }
-        .nav-user-chip { padding: 4px 16px 4px 4px; min-height: 42px; }
-        .nav-user-avatar { width: 34px; height: 34px; font-size: 12.5px; }
-        .nav-staff-chip { padding: 10px 18px; min-height: 42px; }
+        .navbar-inner { padding: 8px 40px; gap: 22px; }
+        .nav-links a { padding: 8px 18px; font-size: 14px; }
+        .btn { padding: 8px 20px; font-size: 13.5px; }
+        .nav-user-chip { padding: 2px 14px 2px 2px; }
+        .nav-user-avatar { width: 30px; height: 30px; font-size: 11.5px; }
+        .nav-staff-chip { padding: 7px 16px; }
       }
 
       /* ============ EXTRA SAFETY ============ */
