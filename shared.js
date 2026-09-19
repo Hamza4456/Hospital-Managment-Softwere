@@ -285,8 +285,7 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 10px 18px;
-        gap: 20px;
+        gap: 10px;
       }
 
       /* Logo */
