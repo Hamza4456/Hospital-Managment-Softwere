@@ -13,7 +13,6 @@
   --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
   --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
   --border: #e6f0f5; --white: #fff;
-  --shadow-lg: 0 20px 50px -12px rgba(0,80,110,0.15);
 }
 body { font-family: 'Inter', sans-serif; background: var(--light-gray); color: #1e293b; line-height: 1.6; }
 a { text-decoration: none; color: inherit; }
@@ -148,19 +147,45 @@ a { text-decoration: none; color: inherit; }
 .cred-row .lbl { color: var(--gray); font-weight: 500; }
 .cred-row .val { color: var(--dark); font-weight: 700; word-break: break-all; text-align: right; }
 
+.status-line {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--gray); padding: 8px 0;
+}
+.status-line .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--warning); flex-shrink: 0;
+}
+.status-line.ok .dot { background: var(--success); }
+.status-line.fail .dot { background: var(--danger); }
+
 .fallback-note {
   background: #fff8e8; border: 1.5px solid #fce4b3;
-  border-radius: 12px; padding: 12px 14px;
-  font-size: 12.5px; color: #8a5a1c; line-height: 1.5;
-  margin-top: 14px; display: none;
+  border-radius: 12px; padding: 14px 16px;
+  font-size: 12.5px; color: #8a5a1c; line-height: 1.6;
+  margin-top: 14px;
 }
-.fallback-note.show { display: block; }
-.fallback-note strong { color: #6a4416; }
+.fallback-note strong { color: #6a4416; display: block; margin-bottom: 6px; }
 .fallback-note code {
   background: #fff; padding: 2px 6px; border-radius: 4px;
   font-size: 11.5px; color: var(--primary-dark);
   border: 1px solid #f0d9a8;
+  cursor: pointer;
+  display: inline-block;
+  margin: 2px 2px;
 }
+.fallback-note code:hover { background: var(--primary-light); border-color: var(--primary); }
+
+.manual-list {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 10px;
+}
+.manual-list a {
+  padding: 8px 14px; border-radius: 10px;
+  background: #fff; border: 1.5px solid var(--border);
+  color: var(--primary); font-size: 12.5px; font-weight: 600;
+  transition: all .15s;
+}
+.manual-list a:hover { background: var(--primary-light); border-color: var(--primary); }
 
 @media (max-width: 640px) {
   .auth-wrap { padding: 30px 16px; }
@@ -210,7 +235,7 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <!-- PANE 2 — SETUP / RESET -->
+    <!-- PANE 2 — SETUP -->
     <div class="pane" id="paneSetup">
       <span class="back-to-login" id="backToLogin">
         <i class="fas fa-arrow-left"></i> Back to sign in
@@ -252,12 +277,12 @@ a { text-decoration: none; color: inherit; }
       </form>
     </div>
 
-    <!-- PANE 3 — SUCCESS -->
+    <!-- PANE 3 — SUCCESS with auto-detect -->
     <div class="pane" id="paneSuccess">
       <div class="success-icon-lg"><i class="fas fa-check-circle"></i></div>
       <div class="success-title">
         <h2 id="successTitle">Account Created!</h2>
-        <p id="successSubtitle">Your administrator account is ready.</p>
+        <p id="successSubtitle">Searching for your dashboard file…</p>
       </div>
 
       <div class="cred-box">
@@ -271,21 +296,22 @@ a { text-decoration: none; color: inherit; }
         </div>
       </div>
 
-      <a href="#" id="goDashboardBtn" class="btn btn-success btn-lg btn-block">
+      <div class="status-line" id="detectStatus">
+        <span class="dot"></span>
+        <span id="detectMsg">Checking for your dashboard file…</span>
+      </div>
+
+      <a href="#" id="goDashboardBtn" class="btn btn-success btn-lg btn-block" style="margin-top:14px; display:none;">
         <i class="fas fa-columns"></i> Open Dashboard
       </a>
 
-      <button type="button" id="copyPathBtn" class="btn btn-outline btn-block" style="margin-top:10px;">
-        <i class="fas fa-link"></i> Copy dashboard file name
-      </button>
-
-      <div class="fallback-note" id="fallbackNote">
-        <strong>Button doesn't work?</strong> Your dashboard file might have a different name.
-        Try opening one of these files directly:
-        <br>
-        <code>1.html</code> · <code>dashboard.html</code> · <code>admin.html</code>
-        <br><br>
-        Your account is still created — just open the dashboard file manually and it will let you in.
+      <div class="fallback-note" id="fallbackNote" style="display:none;">
+        <strong>Couldn't find your dashboard automatically.</strong>
+        Click one of these filenames to open your dashboard — whichever one works:
+        <div class="manual-list" id="manualList"></div>
+        <div style="margin-top:10px;">
+          Your account is created and saved. Any of these files, when opened, will let you in.
+        </div>
       </div>
 
       <a href="index.html" class="back-link" style="margin-top:20px;">
@@ -304,11 +330,16 @@ const SALT        = 'medicare::hms::v2::salt';
 const DB_KEY      = 'medicare_hms';
 const SESSION_KEY = 'medicare_session';
 
-/* 👇👇👇 SET THIS TO YOUR DASHBOARD FILE NAME 👇👇👇
-   Open your dashboard in the browser and look at the URL bar.
-   The last part (e.g. 1.html) is the value you need here. */
-const DASHBOARD_FILE = '1.html';
-/* 👆👆👆 */
+/* Candidate dashboard filenames — tried in this order */
+const DASHBOARD_CANDIDATES = [
+  '1.html',
+  'dashboard.html',
+  'admin.html',
+  'dashboard-doctors.html',
+  'admin-dashboard.html',
+  'hms.html',
+  'index-dashboard.html'
+];
 
 /* =====================================================
    HELPERS
@@ -372,13 +403,12 @@ function showPane(name) {
   if (pane) pane.classList.add('active');
 
   const head  = document.getElementById('authHead');
-  const title = document.getElementById('mainTitle');
-  const sub   = document.getElementById('mainSubtitle');
-
   if (name === 'Success') {
     head.style.display = 'none';
   } else {
     head.style.display = '';
+    const title = document.getElementById('mainTitle');
+    const sub   = document.getElementById('mainSubtitle');
     if (name === 'Login') {
       title.textContent = 'Hospital Dashboard';
       sub.textContent   = 'Sign in with your administrator credentials';
@@ -403,15 +433,8 @@ function showErr(msg) {
   document.getElementById('ok').classList.remove('show');
 }
 
-function showOk(msg) {
-  const el = document.getElementById('ok');
-  el.querySelector('span').textContent = msg;
-  el.classList.add('show');
-  document.getElementById('err').classList.remove('show');
-}
-
 /* =====================================================
-   PASSWORD VISIBILITY TOGGLE
+   PASSWORD TOGGLE
 ===================================================== */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.pass-toggle');
@@ -424,7 +447,7 @@ document.addEventListener('click', e => {
 });
 
 /* =====================================================
-   CREATE ACCOUNT / FORGOT PASSWORD
+   LINK HANDLERS
 ===================================================== */
 document.getElementById('linkCreate').addEventListener('click', e => {
   e.preventDefault();
@@ -433,19 +456,13 @@ document.getElementById('linkCreate').addEventListener('click', e => {
 
 document.getElementById('linkForgot').addEventListener('click', e => {
   e.preventDefault();
-
-  if (!hasAdminAccount()) {
-    openSetup('create');
-    return;
-  }
-
+  if (!hasAdminAccount()) { openSetup('create'); return; }
   const sure = confirm(
     'Reset the admin password?\n\n' +
     'You will set a new username and password on the next screen.\n' +
     'Hospital records will be KEPT.'
   );
   if (!sure) return;
-
   try {
     const db = loadDB() || {};
     if (!db.user) db.user = {};
@@ -453,19 +470,15 @@ document.getElementById('linkForgot').addEventListener('click', e => {
     db.user.passwordHash = null;
     saveDB(db);
   } catch (err) {}
-
   sessionStorage.removeItem(SESSION_KEY);
-
   openSetup('reset');
 });
 
 function openSetup(mode) {
   clearAlerts();
-
   const t   = document.getElementById('setupTitle');
   const s   = document.getElementById('setupSubtitle');
   const btn = document.getElementById('setupSubmitBtn');
-
   if (mode === 'reset') {
     t.textContent = 'Reset Administrator Credentials';
     s.textContent = 'Set a new username and password for this device.';
@@ -475,17 +488,14 @@ function openSetup(mode) {
     s.textContent = 'Set your name, username and a strong password for this device.';
     btn.innerHTML = '<i class="fas fa-user-shield"></i> Create Account';
   }
-
   const db = loadDB();
   if (db && db.user && db.user.name) {
     document.getElementById('suName').value = db.user.name;
   }
-
   document.getElementById('suUser').value  = '';
   document.getElementById('suPass').value  = '';
   document.getElementById('suPass2').value = '';
   updateStrengthMeter();
-
   showPane('Setup');
   setTimeout(() => document.getElementById('suName').focus(), 250);
 }
@@ -515,11 +525,10 @@ function updateStrengthMeter() {
   txt.textContent = map.t;
   txt.style.color = map.col;
 }
-
 document.getElementById('suPass').addEventListener('input', updateStrengthMeter);
 
 /* =====================================================
-   FIELD ERROR
+   FIELD ERROR MARKER
 ===================================================== */
 function markFieldError(id) {
   const el = document.getElementById(id);
@@ -532,50 +541,68 @@ function markFieldError(id) {
 }
 
 /* =====================================================
+   AUTO-DETECT DASHBOARD FILE
+   Tries each candidate via fetch(); first one that
+   returns 200 OK wins.
+===================================================== */
+async function detectDashboardFile() {
+  const statusEl  = document.getElementById('detectStatus');
+  const statusMsg = document.getElementById('detectMsg');
+  const noteBox   = document.getElementById('fallbackNote');
+  const manual    = document.getElementById('manualList');
+  const btn       = document.getElementById('goDashboardBtn');
+
+  statusEl.className = 'status-line';
+  statusEl.style.display = 'flex';
+  noteBox.style.display = 'none';
+  btn.style.display = 'none';
+
+  for (const file of DASHBOARD_CANDIDATES) {
+    statusMsg.textContent = 'Checking ' + file + '…';
+    try {
+      const res = await fetch(file, { method: 'HEAD', cache: 'no-store' });
+      if (res.ok) {
+        statusEl.className = 'status-line ok';
+        statusMsg.textContent = 'Found: ' + file;
+        btn.href = file;
+        btn.innerHTML = '<i class="fas fa-columns"></i> Open Dashboard (' + file + ')';
+        btn.style.display = 'inline-flex';
+
+        /* Auto-redirect after 1.2s */
+        setTimeout(() => { location.href = file; }, 1200);
+        return file;
+      }
+    } catch (e) {
+      /* ignore and try next */
+    }
+  }
+
+  /* Nothing found — show manual picker */
+  statusEl.className = 'status-line fail';
+  statusMsg.textContent = 'Could not auto-detect the dashboard file.';
+  noteBox.style.display = 'block';
+  manual.innerHTML = DASHBOARD_CANDIDATES
+    .map(f => '<a href="' + f + '">' + f + '</a>')
+    .join('');
+  return null;
+}
+
+/* =====================================================
    SHOW SUCCESS PANE
 ===================================================== */
 function showSuccess(username, isNew) {
   document.getElementById('successTitle').textContent =
     isNew ? 'Account Created!' : 'Signed In!';
   document.getElementById('successSubtitle').textContent =
-    isNew ? 'Your administrator account is ready. Open the dashboard to continue.'
-          : 'You are now signed in. Open the dashboard to continue.';
+    isNew ? 'Your administrator account is ready.' 
+          : 'You are now signed in.';
 
   document.getElementById('credUsername').textContent = username;
 
-  /* Point the button at the configured dashboard file */
-  document.getElementById('goDashboardBtn').href = DASHBOARD_FILE;
-
-  /* Show the fallback note after 6 seconds — if user is still here, the redirect didn't work */
-  const note = document.getElementById('fallbackNote');
-  note.classList.remove('show');
-  setTimeout(() => {
-    if (document.getElementById('paneSuccess').classList.contains('active')) {
-      note.classList.add('show');
-    }
-  }, 6000);
-
-  /* Copy-path button */
-  document.getElementById('copyPathBtn').onclick = () => {
-    navigator.clipboard.writeText(DASHBOARD_FILE).then(() => {
-      const btn = document.getElementById('copyPathBtn');
-      const orig = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-check"></i> Copied: ' + DASHBOARD_FILE;
-      setTimeout(() => { btn.innerHTML = orig; }, 1800);
-    }).catch(() => {
-      alert('Dashboard file name: ' + DASHBOARD_FILE);
-    });
-  };
-
   showPane('Success');
 
-  /* Auto-navigate after 3 seconds as a convenience */
-  setTimeout(() => {
-    /* Only navigate if still on success pane (user hasn't clicked Back) */
-    if (document.getElementById('paneSuccess').classList.contains('active')) {
-      location.href = DASHBOARD_FILE;
-    }
-  }, 3000);
+  /* Kick off detection right after the pane is visible */
+  detectDashboardFile();
 }
 
 /* =====================================================
@@ -592,13 +619,11 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
   if (!password) { markFieldError('adminPass'); return showErr('Please enter your password.'); }
 
   const db = loadDB();
-
   if (!db.user.username || !db.user.passwordHash) {
     showErr('No admin account exists yet. Opening setup…');
     setTimeout(() => openSetup('create'), 800);
     return;
   }
-
   if (username.toLowerCase() !== db.user.username.toLowerCase()) {
     markFieldError('adminUser');
     markFieldError('adminPass');
@@ -623,9 +648,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
     return showErr('Invalid username or password.');
   }
 
-  /* Save session */
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: db.user.username, t: Date.now() }));
-
   showSuccess(db.user.username, false);
 });
 
@@ -641,26 +664,17 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
   const pw   = document.getElementById('suPass').value;
   const pw2  = document.getElementById('suPass2').value;
 
-  if (name.length < 2) {
-    markFieldError('suName');
-    return showErr('Please enter your full name.');
-  }
+  if (name.length < 2) { markFieldError('suName'); return showErr('Please enter your full name.'); }
   if (!/^[A-Za-z0-9._-]{4,20}$/.test(user)) {
     markFieldError('suUser');
     return showErr('Username must be 4–20 characters (letters, numbers, . _ -).');
   }
-  if (!pw || pw.length < 8) {
-    markFieldError('suPass');
-    return showErr('Password must be at least 8 characters.');
-  }
+  if (!pw || pw.length < 8) { markFieldError('suPass'); return showErr('Password must be at least 8 characters.'); }
   if (!/[A-Za-z]/.test(pw) || !/\d/.test(pw)) {
     markFieldError('suPass');
     return showErr('Password must contain at least one letter and one number.');
   }
-  if (pw !== pw2) {
-    markFieldError('suPass2');
-    return showErr('Passwords do not match.');
-  }
+  if (pw !== pw2) { markFieldError('suPass2'); return showErr('Passwords do not match.'); }
 
   const btn = document.getElementById('setupSubmitBtn');
   const orig = btn.innerHTML;
@@ -682,7 +696,6 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
     createdAt: new Date().toISOString()
   };
   saveDB(db);
-
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: user, t: Date.now() }));
 
   btn.disabled = false;
@@ -697,7 +710,6 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
 (function boot() {
   const params = new URLSearchParams(location.search);
 
-  /* Already signed in and no ?setup=1 → show success pane (not auto-redirect) */
   if (!params.has('setup')) {
     const raw = sessionStorage.getItem(SESSION_KEY);
     if (raw) {
@@ -712,13 +724,11 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
     }
   }
 
-  /* Force setup view */
   if (params.has('setup')) {
     openSetup('create');
     return;
   }
 
-  /* No account yet → hint */
   if (!hasAdminAccount()) {
     showErr('No admin account set up yet. Click "Create admin account" below.');
   }
