@@ -303,7 +303,6 @@
       /* Desktop nav links */
       .nav-links { display: flex; align-items: center; gap: 6px; list-style: none; margin: 0 auto; padding: 0; }
       .nav-links a {
-        padding: 2px;
         border-radius: 11px;
         font-size: 14.5px;
         font-weight: 600;
