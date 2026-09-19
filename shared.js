@@ -285,7 +285,7 @@
         justify-content: space-between;
         width: 100%;
         padding: 6px;
-        gap: 16px;
+        gap: 10px;
       }
 
       /* Logo */
