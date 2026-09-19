@@ -369,7 +369,7 @@
       }
       .nav-user-chip:hover { border-color: var(--primary, #0d6e9e); background: #f9fcfd; }
       .nav-user-avatar {
-        width: 38px; height: 38px; border-radius: 50%;
+        width: 20px; height: 38px; border-radius: 50%;
         background: linear-gradient(135deg, #0d6e9e, #0e8b5e); color: #fff;
         display: flex; align-items: center; justify-content: center;
         font-weight: 700; font-size: 13.5px; flex-shrink: 0;
