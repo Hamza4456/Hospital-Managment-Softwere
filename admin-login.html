@@ -89,7 +89,7 @@ a { text-decoration: none; color: inherit; }
 .alert.success { background: #e1f7ed; color: var(--success); }
 
 .auth-foot { text-align: center; font-size: 13.5px; color: var(--gray); margin-top: 18px; }
-.auth-foot a { color: var(--primary); font-weight: 600; }
+.auth-foot a { color: var(--primary); font-weight: 600; cursor: pointer; }
 .auth-foot a:hover { text-decoration: underline; }
 
 .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0 16px; color: var(--gray); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
@@ -153,12 +153,16 @@ a { text-decoration: none; color: inherit; }
 
 <script>
 /* =====================================================
-   ADMIN LOGIN — same credentials as dashboard.html / 1.html
-   Uses localStorage key 'medicare_hms' with user:{username,passwordHash}
+   ADMIN LOGIN — uses 'medicare_hms' shared with dashboard
 ===================================================== */
 const SALT = 'medicare::hms::v2::salt';
 const DB_KEY = 'medicare_hms';
 const SESSION_KEY = 'medicare_session';
+
+/* 👇👇👇 CHANGE THIS to your actual dashboard filename 👇👇👇
+   Examples: 'admin.html'  |  'dashboard.html'  |  '1.html'      */
+const DASHBOARD_FILE = 'admin.html';
+/* 👆👆👆 — pick whichever file has the sidebar + patient records  */
 
 async function hashPassword(password) {
   const input = SALT + '|' + password;
@@ -185,7 +189,7 @@ function loadDB() {
   catch (e) { return null; }
 }
 
-// If admin already has session, go straight to dashboard
+/* If admin already has a session, skip straight to dashboard */
 (function () {
   const raw = sessionStorage.getItem(SESSION_KEY);
   if (!raw) return;
@@ -193,7 +197,7 @@ function loadDB() {
     const s = JSON.parse(raw);
     const db = loadDB();
     if (db && db.user && db.user.username === s.u) {
-      location.replace('dashboard.html');
+      location.replace(DASHBOARD_FILE);
     }
   } catch (e) {}
 })();
@@ -201,7 +205,7 @@ function loadDB() {
 const errBox = document.getElementById('err');
 const showErr = m => { errBox.querySelector('span').textContent = m; errBox.classList.add('show'); };
 
-// password visibility toggle
+/* Password visibility toggle */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.pass-toggle');
   if (!btn) return;
@@ -211,20 +215,50 @@ document.addEventListener('click', e => {
   btn.innerHTML = `<i class="fas fa-eye${show ? '-slash' : ''}"></i>`;
 });
 
-// setup link — if no account exists, dashboard handles the setup
+/* -------------------------------------------------------------
+   "Create admin account" — now works in every case
+------------------------------------------------------------- */
 document.getElementById('setupLink').addEventListener('click', e => {
   e.preventDefault();
+
   const db = loadDB();
-  const hasAccount = db && db.user && db.user.username && db.user.passwordHash;
-  if (hasAccount) {
-    alert('An admin account already exists for this device.\n\nIf you forgot the password, open the dashboard and click "Reset this device" on the login screen.');
+  const hasAccount = !!(db && db.user && db.user.username && db.user.passwordHash);
+
+  /* Case 1 — no account yet → open dashboard with ?setup=1 */
+  if (!hasAccount) {
+    location.href = DASHBOARD_FILE + '?setup=1';
     return;
   }
-  // No account — send them to the dashboard to run first-time setup
-  location.href = 'dashboard.html';
+
+  /* Case 2 — account exists → ask before resetting */
+  const sure = confirm(
+    'An admin account already exists on this device.\n\n' +
+    'Click OK to reset it and create a new one.\n' +
+    '(Hospital records will be KEPT.)\n\n' +
+    'Click Cancel to go back.'
+  );
+  if (!sure) return;
+
+  /* Wipe only the credentials, keep all hospital records */
+  try {
+    const fresh = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+    if (!fresh.user) fresh.user = {};
+    fresh.user.username     = null;
+    fresh.user.passwordHash = null;
+    fresh.user.initials     = 'AD';
+    fresh.user.name         = 'Administrator';
+    localStorage.setItem(DB_KEY, JSON.stringify(fresh));
+  } catch (err) {}
+
+  sessionStorage.removeItem(SESSION_KEY);
+
+  /* Open the dashboard — it will show the setup screen */
+  location.href = DASHBOARD_FILE + '?setup=1';
 });
 
-// submit
+/* -------------------------------------------------------------
+   Submit login
+------------------------------------------------------------- */
 document.getElementById('adminLoginForm').addEventListener('submit', async e => {
   e.preventDefault();
   errBox.classList.remove('show');
@@ -271,9 +305,9 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
     return showErr('Invalid username or password.');
   }
 
-  // set session — dashboard will accept this and skip its own login
+  /* Set session — dashboard will accept this and skip its own login */
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: db.user.username, t: Date.now() }));
-  location.replace('dashboard.html');
+  location.replace(DASHBOARD_FILE);
 });
 </script>
 </body>
