@@ -3,186 +3,118 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Bookings · MediCare Hospital</title>
+<title>My Appointments · MediCare</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --primary: #0d6e9e; --primary-dark: #0a5578; --primary-light: #e1f0f8;
-  --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
-  --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
-  --border: #e6f0f5; --white: #fff;
-  --shadow: 0 6px 18px rgba(0,30,45,0.06);
-  --shadow-lg: 0 20px 50px -12px rgba(0,80,110,0.15);
+* { margin:0; padding:0; box-sizing:border-box; }
+:root{
+  --primary:#0d6e9e; --primary-dark:#0a5578; --primary-light:#e1f0f8;
+  --success:#0e8b5e; --warning:#e8a33d; --danger:#e84a5f; --purple:#6c4bc9;
+  --dark:#0b3b4b; --gray:#5e7e8c; --light-gray:#f5f9fc;
+  --border:#e6f0f5; --white:#fff;
+  --shadow:0 6px 18px rgba(0,30,45,.06);
+  --shadow-lg:0 20px 50px -12px rgba(0,80,110,.15);
 }
-body { font-family: 'Inter', sans-serif; background: var(--light-gray); color: #1e293b; line-height: 1.6; }
-a { text-decoration: none; color: inherit; }
-.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+body{ font-family:'Inter',sans-serif; background:var(--light-gray); color:#1e293b; line-height:1.6; }
+a{ text-decoration:none; color:inherit; }
+.container{ max-width:1200px; margin:0 auto; padding:0 24px; }
 
-.btn { padding: 12px 22px; border-radius: 12px; border: none; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; white-space: nowrap; }
-.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3); }
-.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-.btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--border); }
-.btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
-.btn-lg { padding: 16px 30px; font-size: 15px; border-radius: 14px; }
-.btn-danger { background: #fdecef; color: var(--danger); border: 1.5px solid #fad4da; }
-.btn-danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
-.btn-sm { padding: 8px 14px; font-size: 12.5px; border-radius: 10px; gap: 6px; }
+.btn{ padding:12px 22px; border-radius:12px; border:none; font-family:inherit; font-size:14px; font-weight:600;
+  cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap; text-decoration:none; }
+.btn-primary{ background:var(--primary); color:#fff; box-shadow:0 8px 16px -4px rgba(13,110,158,.3); }
+.btn-primary:hover{ background:var(--primary-dark); transform:translateY(-1px); }
+.btn-success{ background:var(--success); color:#fff; }
+.btn-success:hover{ background:#0a6d4a; }
+.btn-danger{ background:#fdecef; color:var(--danger); border:1.5px solid #fad4da; }
+.btn-danger:hover{ background:var(--danger); color:#fff; border-color:var(--danger); }
+.btn-outline{ background:#fff; color:var(--primary); border:1.5px solid var(--border); }
+.btn-outline:hover{ background:var(--primary-light); border-color:var(--primary); }
+.btn-sm{ padding:8px 14px; font-size:12.5px; border-radius:10px; gap:6px; }
+.btn-lg{ padding:14px 28px; font-size:15px; }
 
-/* PAGE HERO */
-.page-hero {
-  background: linear-gradient(135deg, #0d6e9e 0%, #0b3b4b 100%);
-  color: #fff; padding: 60px 0;
-  position: relative; overflow: hidden;
-}
-.page-hero::before { content: ''; position: absolute; width: 500px; height: 500px; background: rgba(255,255,255,0.06); border-radius: 50%; top: -250px; right: -150px; }
-.page-hero-inner { position: relative; z-index: 2; text-align: center; }
-.page-hero h1 { font-size: 42px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
-.page-hero p { font-size: 17px; opacity: 0.9; max-width: 620px; margin: 0 auto; }
-.breadcrumb { display: flex; justify-content: center; gap: 8px; font-size: 13px; margin-bottom: 20px; opacity: 0.85; }
-.breadcrumb a { color: #7dd3fc; }
-.breadcrumb i { font-size: 10px; margin-top: 4px; }
+/* HERO */
+.admin-hero{ background:linear-gradient(135deg,#0b3b4b 0%,#0d6e9e 100%); color:#fff; padding:52px 0; position:relative; overflow:hidden; }
+.admin-hero::before{ content:''; position:absolute; width:480px; height:480px; background:rgba(255,255,255,.06); border-radius:50%; top:-240px; right:-140px; }
+.admin-hero-inner{ position:relative; z-index:2; }
+.admin-hero h1{ font-size:36px; font-weight:800; letter-spacing:-.5px; margin-bottom:8px; }
+.admin-hero p{ opacity:.9; font-size:16px; }
 
-/* FILTERS */
-.filter-section { padding: 40px 0 0; }
-.filter-bar {
-  background: #fff; border-radius: 20px; padding: 16px 20px;
-  box-shadow: var(--shadow); border: 1px solid var(--border);
-  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
-}
-.filter-chips { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
-.chip {
-  padding: 9px 18px; border-radius: 40px;
-  border: 1.5px solid var(--border); background: #fff;
-  font-family: inherit; font-size: 13px; font-weight: 600;
-  color: var(--gray); cursor: pointer; transition: all 0.15s;
-  display: inline-flex; align-items: center; gap: 6px;
-}
-.chip:hover { border-color: var(--primary); color: var(--primary); }
-.chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-.chip .count {
-  background: rgba(0,0,0,0.08); color: inherit;
-  font-size: 11px; font-weight: 700;
-  padding: 2px 8px; border-radius: 20px;
-}
-.chip.active .count { background: rgba(255,255,255,0.25); }
+/* STATS */
+.stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; margin:-32px 0 26px; position:relative; z-index:3; }
+.stat{ background:#fff; border:1px solid var(--border); border-radius:18px; padding:20px; box-shadow:var(--shadow); display:flex; align-items:center; gap:14px; }
+.stat .ico{ width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.stat .ico.blue{ background:var(--primary-light); color:var(--primary); }
+.stat .ico.orange{ background:#fff0e0; color:#c96f1e; }
+.stat .ico.green{ background:#e1f7ed; color:var(--success); }
+.stat .ico.red{ background:#fdecef; color:var(--danger); }
+.stat .num{ font-size:24px; font-weight:800; color:var(--dark); line-height:1.1; }
+.stat .lbl{ font-size:12px; font-weight:600; color:var(--gray); text-transform:uppercase; letter-spacing:.4px; }
 
-/* LIST */
-.section { padding: 40px 0 80px; }
-.bookings-list { display: flex; flex-direction: column; gap: 18px; }
+/* TOOLBAR */
+.toolbar{ background:#fff; border:1px solid var(--border); border-radius:20px; padding:14px 18px; box-shadow:var(--shadow);
+  display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:22px; }
+.chips{ display:flex; gap:8px; flex-wrap:wrap; flex:1; }
+.chip{ padding:9px 16px; border-radius:40px; border:1.5px solid var(--border); background:#fff; font-family:inherit;
+  font-size:13px; font-weight:600; color:var(--gray); cursor:pointer; transition:all .15s; display:inline-flex; align-items:center; gap:6px; }
+.chip:hover{ border-color:var(--primary); color:var(--primary); }
+.chip.active{ background:var(--primary); border-color:var(--primary); color:#fff; }
+.chip .count{ background:rgba(0,0,0,.08); font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; }
+.chip.active .count{ background:rgba(255,255,255,.25); }
+.search{ position:relative; }
+.search i{ position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--gray); font-size:13px; }
+.search input{ padding:11px 16px 11px 38px; border-radius:12px; border:1.5px solid var(--border); font-family:inherit;
+  font-size:13.5px; width:250px; outline:none; }
+.search input:focus{ border-color:var(--primary); }
 
-.booking-card {
-  background: #fff; border-radius: 20px;
-  padding: 24px; border: 1px solid var(--border);
-  box-shadow: var(--shadow); transition: all 0.2s;
-  position: relative; overflow: hidden;
-}
-.booking-card::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-  width: 4px; background: var(--primary);
-}
-.booking-card[data-status="Confirmed"]::before { background: var(--success); }
-.booking-card[data-status="Pending"]::before { background: var(--warning); }
-.booking-card[data-status="Cancelled"]::before { background: var(--danger); }
+/* BOOKING CARD */
+.list{ display:flex; flex-direction:column; gap:16px; padding-bottom:70px; }
+.bk{ background:#fff; border:1px solid var(--border); border-radius:20px; padding:22px; box-shadow:var(--shadow);
+  position:relative; overflow:hidden; transition:all .2s; }
+.bk::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--warning); }
+.bk[data-status="Confirmed"]::before{ background:var(--success); }
+.bk[data-status="Cancelled"]::before{ background:var(--danger); }
+.bk[data-status="Completed"]::before{ background:var(--primary); }
+.bk:hover{ transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+.bk-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
+.bk-patient{ font-size:17px; font-weight:700; color:var(--dark); }
+.bk-sub{ font-size:13px; color:var(--gray); }
+.bk-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; padding:16px 0;
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+.cell .lbl{ font-size:11px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px; }
+.cell .val{ font-size:13.5px; font-weight:600; color:var(--dark); }
+.bk-note{ padding-top:13px; font-size:13.5px; color:var(--gray); display:flex; gap:9px; align-items:flex-start; }
+.bk-note i{ color:var(--primary); margin-top:3px; }
+.bk-actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; padding-top:14px; }
+.badge{ display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:100px; font-size:11.5px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.3px; }
+.badge-success{ background:#e1f7ed; color:var(--success); }
+.badge-warning{ background:#fff0e0; color:#c96f1e; }
+.badge-danger{ background:#fdecef; color:var(--danger); }
+.badge-info{ background:var(--primary-light); color:var(--primary); }
 
-.booking-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+/* GATE / EMPTY */
+.gate{ background:#fff; border:1px dashed var(--border); border-radius:24px; padding:70px 30px; text-align:center; }
+.gate i.big{ font-size:60px; color:#c5d8e2; display:block; margin-bottom:18px; }
+.gate h3{ font-size:21px; font-weight:800; color:var(--dark); margin-bottom:8px; }
+.gate p{ color:var(--gray); max-width:440px; margin:0 auto 22px; font-size:15px; }
+.gate code{ background:var(--light-gray); padding:2px 7px; border-radius:6px; font-size:13px; color:var(--primary-dark); }
 
-.booking-header {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  gap: 16px; margin-bottom: 18px; flex-wrap: wrap;
-}
-.booking-doctor { display: flex; align-items: center; gap: 14px; }
-.booking-avatar {
-  width: 54px; height: 54px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--success));
-  color: #fff; display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 16px; flex-shrink: 0;
-  letter-spacing: 0.3px;
-}
-.booking-doctor-info h3 {
-  font-size: 17px; font-weight: 700; color: var(--dark);
-  margin-bottom: 4px; letter-spacing: -0.3px;
-}
-.booking-doctor-info p {
-  font-size: 13px; color: var(--primary); font-weight: 600;
-}
+/* TOAST */
+.toast{ position:fixed; top:24px; right:24px; z-index:9999; background:#fff; border-radius:14px; padding:14px 20px;
+  box-shadow:var(--shadow-lg); border:1px solid var(--border); border-left:4px solid var(--success);
+  display:flex; align-items:center; gap:11px; font-size:14px; font-weight:500; color:var(--dark);
+  animation:toastIn .3s cubic-bezier(.2,.9,.3,1.3); max-width:calc(100vw - 40px); }
+.toast.error{ border-left-color:var(--danger); }
+.toast i{ color:var(--success); font-size:16px; }
+.toast.error i{ color:var(--danger); }
+@keyframes toastIn{ from{ opacity:0; transform:translateX(60px); } to{ opacity:1; transform:translateX(0); } }
 
-.booking-body {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px; padding: 16px 0; border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-.booking-detail {
-  display: flex; align-items: flex-start; gap: 10px;
-}
-.booking-detail .bd-icon {
-  width: 34px; height: 34px; border-radius: 10px;
-  background: var(--primary-light); color: var(--primary);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; flex-shrink: 0;
-}
-.booking-detail .bd-icon.green { background: #e1f7ed; color: var(--success); }
-.booking-detail .bd-icon.orange { background: #fff0e0; color: #c96f1e; }
-.booking-detail .bd-icon.purple { background: #eee9fd; color: #6c4bc9; }
-.booking-detail .bd-lbl {
-  font-size: 11px; color: var(--gray); font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px;
-}
-.booking-detail .bd-val {
-  font-size: 13.5px; color: var(--dark); font-weight: 600;
-}
-
-.booking-footer {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 14px; flex-wrap: wrap; padding-top: 16px;
-}
-.booking-id {
-  font-size: 12px; color: var(--gray); font-weight: 600;
-  display: flex; align-items: center; gap: 6px;
-}
-.booking-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-.badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 6px 14px; border-radius: 100px;
-  font-size: 11.5px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.3px;
-}
-.badge-success { background: #e1f7ed; color: var(--success); }
-.badge-warning { background: #fff0e0; color: #c96f1e; }
-.badge-danger  { background: #fdecef; color: var(--danger); }
-
-/* EMPTY STATE */
-.empty-state {
-  background: #fff; border-radius: 24px; padding: 70px 30px;
-  text-align: center; border: 1px dashed var(--border);
-}
-.empty-state i {
-  font-size: 64px; color: #c5d8e2;
-  margin-bottom: 20px; display: block;
-}
-.empty-state h3 {
-  font-size: 22px; color: var(--dark);
-  margin-bottom: 8px; font-weight: 800;
-}
-.empty-state p {
-  font-size: 15px; color: var(--gray);
-  margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;
-}
-
-.toast { position: fixed; top: 90px; right: 24px; z-index: 9999; background: #fff; border-radius: 14px; padding: 14px 20px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); border-left: 4px solid var(--success); display: flex; align-items: center; gap: 11px; font-size: 14px; font-weight: 500; color: var(--dark); animation: toastIn .3s cubic-bezier(.2,.9,.3,1.3); max-width: calc(100vw - 40px); }
-.toast.error { border-left-color: var(--danger); }
-.toast i { font-size: 16px; color: var(--success); }
-.toast.error i { color: var(--danger); }
-@keyframes toastIn { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
-
-@media (max-width: 640px) {
-  .page-hero h1 { font-size: 30px; }
-  .booking-card { padding: 20px 18px; }
-  .booking-header { flex-direction: column; }
-  .booking-actions { width: 100%; }
-  .booking-actions .btn { flex: 1; }
+@media (max-width:640px){
+  .admin-hero h1{ font-size:26px; }
+  .search input{ width:100%; }
+  .search{ flex:1 1 100%; }
+  .bk-actions .btn{ flex:1; }
 }
 </style>
 </head>
@@ -190,47 +122,42 @@ a { text-decoration: none; color: inherit; }
 
 <div id="site-header"></div>
 
-<section class="page-hero">
-  <div class="container page-hero-inner">
-    <div class="breadcrumb">
-      <a href="index.html">Home</a>
-      <i class="fas fa-chevron-right"></i>
-      <a href="profile-user.html">My Profile</a>
-      <i class="fas fa-chevron-right"></i>
-      <span>My Bookings</span>
-    </div>
-    <h1>My Appointments</h1>
-    <p>View, manage, and cancel your scheduled appointments with our doctors.</p>
+<section class="admin-hero">
+  <div class="container admin-hero-inner">
+    <h1><i class="fas fa-calendar-check"></i> My Appointments</h1>
+    <p>View and manage your scheduled appointments at MediCare Hospital.</p>
   </div>
 </section>
 
-<div class="filter-section">
-  <div class="container">
-    <div class="filter-bar">
-      <div class="filter-chips" id="filterChips">
-        <button type="button" class="chip active" data-filter="all">
-          <i class="fas fa-th"></i> All <span class="count" id="cntAll">0</span>
-        </button>
-        <button type="button" class="chip" data-filter="Pending">
-          <i class="fas fa-clock"></i> Pending <span class="count" id="cntPending">0</span>
-        </button>
-        <button type="button" class="chip" data-filter="Confirmed">
-          <i class="fas fa-check-circle"></i> Confirmed <span class="count" id="cntConfirmed">0</span>
-        </button>
-        <button type="button" class="chip" data-filter="Cancelled">
-          <i class="fas fa-times-circle"></i> Cancelled <span class="count" id="cntCancelled">0</span>
-        </button>
-      </div>
-      <a href="doctorbook2.html" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New Booking</a>
-    </div>
+<div class="container">
+  <div class="stats">
+    <div class="stat"><div class="ico blue"><i class="fas fa-calendar-alt"></i></div>
+      <div><div class="num" id="stAll">0</div><div class="lbl">Total</div></div></div>
+    <div class="stat"><div class="ico orange"><i class="fas fa-clock"></i></div>
+      <div><div class="num" id="stPending">0</div><div class="lbl">Pending</div></div></div>
+    <div class="stat"><div class="ico green"><i class="fas fa-check-circle"></i></div>
+      <div><div class="num" id="stConfirmed">0</div><div class="lbl">Confirmed</div></div></div>
+    <div class="stat"><div class="ico red"><i class="fas fa-times-circle"></i></div>
+      <div><div class="num" id="stCancelled">0</div><div class="lbl">Cancelled</div></div></div>
   </div>
+
+  <div class="toolbar">
+    <div class="chips" id="chips">
+      <button class="chip active" data-filter="all"><i class="fas fa-th"></i> All <span class="count" id="cAll">0</span></button>
+      <button class="chip" data-filter="Pending"><i class="fas fa-clock"></i> Pending <span class="count" id="cPending">0</span></button>
+      <button class="chip" data-filter="Confirmed"><i class="fas fa-check-circle"></i> Confirmed <span class="count" id="cConfirmed">0</span></button>
+      <button class="chip" data-filter="Cancelled"><i class="fas fa-times-circle"></i> Cancelled <span class="count" id="cCancelled">0</span></button>
+      <button class="chip" data-filter="Completed"><i class="fas fa-flag-checkered"></i> Completed <span class="count" id="cCompleted">0</span></button>
+    </div>
+    <div class="search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search" placeholder="Search doctor, ID…">
+    </div>
+    <a href="doctorbook2.html" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New Booking</a>
+  </div>
+
+  <div class="list" id="list"></div>
 </div>
-
-<section class="section">
-  <div class="container">
-    <div class="bookings-list" id="bookingsList"></div>
-  </div>
-</section>
 
 <div id="site-footer"></div>
 
@@ -238,40 +165,56 @@ a { text-decoration: none; color: inherit; }
 <script>
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
-let currentFilter = 'all';
+let filter = 'all';
+let query  = '';
 
-/* ---------- render ---------- */
+/* ---------------- RENDER ---------------- */
 function render() {
-  const me = UserAuth.current();
-  const host = document.getElementById('bookingsList');
+  const host = document.getElementById('list');
+  const me   = UserAuth.current();
 
+  /* --- sign-in gate (patient version) --- */
   if (!me) {
+    renderStats([]);
     host.innerHTML = `
-      <div class="empty-state">
-        <i class="fas fa-user-lock"></i>
-        <h3>Sign in to view your bookings</h3>
-        <p>Please log in to see and manage your appointments.</p>
-        <button class="btn btn-primary btn-lg" onclick="window.openAuthPopup && window.openAuthPopup('login')">
+      <div class="gate">
+        <i class="fas fa-user-lock big"></i>
+        <h3>Sign in to view your appointments</h3>
+        <p>Please log in to see and manage your booked appointments.</p>
+        <button class="btn btn-primary btn-lg" id="gateLogin">
           <i class="fas fa-sign-in-alt"></i> Sign In
         </button>
       </div>`;
-    updateCounts([]);
+    const g = document.getElementById('gateLogin');
+    if (g) g.onclick = () => window.openAuthPopup && window.openAuthPopup('login');
     return;
   }
 
+  /* --- Get ONLY this patient's bookings --- */
   const all = UserAuth.getBookings();
+  renderStats(all);
   updateCounts(all);
 
-  const list = currentFilter === 'all'
-    ? all
-    : all.filter(b => b.status === currentFilter);
+  let list = filter === 'all' ? all : all.filter(b => b.status === filter);
+
+  if (query) {
+    const q = query.toLowerCase();
+    list = list.filter(b =>
+      ((b.doctorName || '') + ' ' + (b.id || '') + ' ' +
+       (b.department || '') + ' ' + (b.patientName || '')).toLowerCase().includes(q));
+  }
+
+  /* Newest first */
+  list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
   if (!list.length) {
-    const label = currentFilter === 'all' ? 'No appointments yet' : `No ${currentFilter.toLowerCase()} appointments`;
+    const emptyMsg = filter === 'all'
+      ? 'You have no appointments yet.'
+      : `You have no ${filter.toLowerCase()} appointments.`;
     host.innerHTML = `
-      <div class="empty-state">
-        <i class="fas fa-calendar-plus"></i>
-        <h3>${label}</h3>
+      <div class="gate">
+        <i class="fas fa-calendar-plus big"></i>
+        <h3>${emptyMsg}</h3>
         <p>Book a consultation with one of our specialists to get started.</p>
         <a href="doctorbook2.html" class="btn btn-primary btn-lg">
           <i class="fas fa-calendar-plus"></i> Book Appointment
@@ -280,144 +223,125 @@ function render() {
     return;
   }
 
-  // newest first
-  list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
   host.innerHTML = list.map(b => {
     const status = b.status || 'Pending';
     const cls = status === 'Confirmed' ? 'badge-success'
               : status === 'Cancelled' ? 'badge-danger'
+              : status === 'Completed' ? 'badge-info'
               : 'badge-warning';
-    const statusIcon = status === 'Confirmed' ? 'fa-check-circle'
-                     : status === 'Cancelled' ? 'fa-times-circle'
-                     : 'fa-clock';
+    const icon = status === 'Confirmed' ? 'fa-check-circle'
+               : status === 'Cancelled' ? 'fa-times-circle'
+               : status === 'Completed' ? 'fa-flag-checkered'
+               : 'fa-clock';
 
-    const doc = b.doctorName || b.doctor || 'Doctor';
-    const dept = b.department || b.dept || 'Department';
-    const date = b.date || '';
-    const time = b.time || '';
-    const type = b.consultationType || b.type || 'In-Person Visit';
-    const initials = doc.replace('Dr. ', '').split(/\s+/).map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'DR';
-
-    const typeIcon = type.includes('Video') ? 'fa-video'
-                   : type.includes('Phone') ? 'fa-phone'
-                   : 'fa-hospital';
+    const canCancel = status === 'Pending' || status === 'Confirmed';
 
     return `
-      <div class="booking-card" data-status="${status}">
-        <div class="booking-header">
-          <div class="booking-doctor">
-            <div class="booking-avatar">${esc(initials)}</div>
-            <div class="booking-doctor-info">
-              <h3>${esc(doc)}</h3>
-              <p>${esc(dept)}</p>
-            </div>
+      <div class="bk" data-status="${esc(status)}">
+        <div class="bk-top">
+          <div>
+            <div class="bk-patient">${esc(b.doctorName) || 'Appointment'}</div>
+            <div class="bk-sub">${esc(b.department) || '—'}${b.doctorSpecialty ? ' · ' + esc(b.doctorSpecialty) : ''}</div>
           </div>
-          <span class="badge ${cls}"><i class="fas ${statusIcon}"></i> ${status}</span>
+          <span class="badge ${cls}"><i class="fas ${icon}"></i> ${esc(status)}</span>
         </div>
 
-        <div class="booking-body">
-          <div class="booking-detail">
-            <div class="bd-icon"><i class="fas fa-calendar"></i></div>
-            <div>
-              <div class="bd-lbl">Date</div>
-              <div class="bd-val">${esc(date) || '—'}</div>
-            </div>
-          </div>
-          <div class="booking-detail">
-            <div class="bd-icon orange"><i class="fas fa-clock"></i></div>
-            <div>
-              <div class="bd-lbl">Time</div>
-              <div class="bd-val">${esc(time) || '—'}</div>
-            </div>
-          </div>
-          <div class="booking-detail">
-            <div class="bd-icon green"><i class="fas ${typeIcon}"></i></div>
-            <div>
-              <div class="bd-lbl">Type</div>
-              <div class="bd-val">${esc(type)}</div>
-            </div>
-          </div>
-          <div class="booking-detail">
-            <div class="bd-icon purple"><i class="fas fa-hashtag"></i></div>
-            <div>
-              <div class="bd-lbl">Booking ID</div>
-              <div class="bd-val">${esc(b.id)}</div>
-            </div>
-          </div>
+        <div class="bk-grid">
+          <div class="cell"><div class="lbl">Patient</div><div class="val">${esc(b.patientName) || '—'}</div></div>
+          <div class="cell"><div class="lbl">Date</div><div class="val">${esc(b.date) || '—'}</div></div>
+          <div class="cell"><div class="lbl">Time</div><div class="val">${esc(b.time) || '—'}</div></div>
+          <div class="cell"><div class="lbl">Type</div><div class="val">${esc(b.consultationType) || '—'}</div></div>
+          <div class="cell"><div class="lbl">Booking ID</div><div class="val">${esc(b.id)}</div></div>
+          <div class="cell"><div class="lbl">Booked On</div><div class="val">${b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</div></div>
         </div>
 
-        ${b.reason ? `
-          <div style="padding-top: 14px; font-size: 13.5px; color: var(--gray); display: flex; gap: 10px; align-items: flex-start;">
-            <i class="fas fa-comment-medical" style="color: var(--primary); margin-top: 3px;"></i>
-            <span>${esc(b.reason)}</span>
-          </div>` : ''}
+        ${b.reason ? `<div class="bk-note"><i class="fas fa-comment-medical"></i><span>${esc(b.reason)}</span></div>` : ''}
+        ${b.adminNote ? `<div class="bk-note"><i class="fas fa-user-shield"></i><span>Note from hospital: ${esc(b.adminNote)}</span></div>` : ''}
 
-        <div class="booking-footer">
-          <div class="booking-id">
-            <i class="fas fa-clock"></i>
-            Booked ${formatDateTime(b.createdAt)}
-          </div>
-          <div class="booking-actions">
-            ${status === 'Pending' || status === 'Confirmed' ? `
-              <button class="btn btn-danger btn-sm" data-cancel="${b.id}">
-                <i class="fas fa-times"></i> Cancel Booking
-              </button>` : ''}
-          </div>
+        <div class="bk-actions">
+          ${canCancel ? `<button class="btn btn-danger btn-sm" data-action="cancel" data-id="${esc(b.id)}">
+              <i class="fas fa-times"></i> Cancel Booking</button>` : ''}
         </div>
       </div>`;
   }).join('');
+}
 
-  host.querySelectorAll('[data-cancel]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (!confirm('Cancel this appointment?')) return;
-      UserAuth.cancelBooking(btn.dataset.cancel);
-      render();
-      toast('Appointment cancelled', 'error');
-    });
-  });
+function renderStats(list) {
+  const c = { all: list.length, Pending: 0, Confirmed: 0, Cancelled: 0, Completed: 0 };
+  list.forEach(b => { if (c[b.status] !== undefined) c[b.status]++; });
+  document.getElementById('stAll').textContent       = c.all;
+  document.getElementById('stPending').textContent   = c.Pending;
+  document.getElementById('stConfirmed').textContent = c.Confirmed;
+  document.getElementById('stCancelled').textContent = c.Cancelled;
+  document.getElementById('cAll').textContent        = c.all;
+  document.getElementById('cPending').textContent    = c.Pending;
+  document.getElementById('cConfirmed').textContent  = c.Confirmed;
+  document.getElementById('cCancelled').textContent  = c.Cancelled;
+  document.getElementById('cCompleted').textContent  = c.Completed;
 }
 
 function updateCounts(list) {
-  const counts = { all: list.length, Pending: 0, Confirmed: 0, Cancelled: 0 };
-  list.forEach(b => { if (counts[b.status] !== undefined) counts[b.status]++; });
-  document.getElementById('cntAll').textContent = counts.all;
-  document.getElementById('cntPending').textContent = counts.Pending;
-  document.getElementById('cntConfirmed').textContent = counts.Confirmed;
-  document.getElementById('cntCancelled').textContent = counts.Cancelled;
+  const c = { Pending: 0, Confirmed: 0, Cancelled: 0, Completed: 0 };
+  list.forEach(b => { if (c[b.status] !== undefined) c[b.status]++; });
+  document.getElementById('cAll').textContent        = list.length;
+  document.getElementById('cPending').textContent    = c.Pending;
+  document.getElementById('cConfirmed').textContent  = c.Confirmed;
+  document.getElementById('cCancelled').textContent  = c.Cancelled;
+  document.getElementById('cCompleted').textContent  = c.Completed;
 }
 
-function formatDateTime(dt) {
-  if (!dt) return '—';
-  const d = new Date(dt);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' +
-         d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-}
+/* ---------------- ACTIONS ---------------- */
+document.getElementById('list').addEventListener('click', e => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const { action, id } = btn.dataset;
 
-/* ---------- filters ---------- */
-document.querySelectorAll('#filterChips .chip').forEach(chip => {
+  if (action === 'cancel') {
+    if (!confirm('Cancel this appointment?')) return;
+    UserAuth.cancelBooking(id);
+    toast('Appointment cancelled', 'error');
+    render();
+  }
+});
+
+/* ---------------- FILTERS ---------------- */
+document.querySelectorAll('#chips .chip').forEach(chip => {
   chip.addEventListener('click', () => {
-    document.querySelectorAll('#filterChips .chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#chips .chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
-    currentFilter = chip.dataset.filter;
+    filter = chip.dataset.filter;
     render();
   });
 });
 
-/* ---------- toast ---------- */
+document.getElementById('search').addEventListener('input', e => {
+  query = e.target.value.trim();
+  render();
+});
+
+/* ---------------- TOAST ---------------- */
 function toast(msg, type = 'success') {
   const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle' };
   const el = document.createElement('div');
   el.className = 'toast ' + (type !== 'success' ? type : '');
-  el.innerHTML = `<i class="fas ${icons[type]}"></i> ${esc(msg)}`;
+  el.innerHTML = `<i class="fas ${icons[type] || icons.success}"></i> ${esc(msg)}`;
   document.body.appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'all .3s'; setTimeout(() => el.remove(), 300); }, 2800);
+  setTimeout(() => { el.style.transition = 'all .3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2600);
 }
 
-/* ---------- init & refresh on login state ---------- */
+/* ---------------- LIVE SYNC ---------------- */
 render();
 
-// Re-render when login state changes (user logs in/out via popup)
+window.addEventListener('bookings:changed', render);
+window.addEventListener('auth:changed', render);
+
+window.addEventListener('storage', e => {
+  if (['medicare_user_bookings', 'medicare_bookings', 'bookings',
+       'appointments', 'medicare_user_bookings_v1'].includes(e.key)) {
+    render();
+  }
+});
+
 window.addEventListener('focus', render);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
 </script>
