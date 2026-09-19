@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us · MediCare Hospital</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: #0d6e9e; --primary-dark: #0a5578; --primary-light: #e1f0f8;
+  --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
+  --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
+  --border: #e6f0f5; --white: #fff;
+  --shadow: 0 6px 18px rgba(0,30,45,0.06);
+  --shadow-lg: 0 20px 50px -12px rgba(0,80,110,0.15);
+}
+body { font-family: 'Inter', sans-serif; background: #fff; color: #1e293b; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* BUTTONS */
+.btn { padding: 12px 22px; border-radius: 12px; border: none; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; white-space: nowrap; }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3); }
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--border); }
+.btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
+
+/* SECTIONS */
+.section { padding: 90px 0; }
+.section-alt { background: var(--light-gray); }
+.section-header { text-align: center; max-width: 640px; margin: 0 auto 60px; }
+.section-tag { display: inline-block; background: var(--primary-light); color: var(--primary); padding: 6px 16px; border-radius: 40px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 16px; }
+.section-header h2 { font-size: 38px; font-weight: 800; color: var(--dark); letter-spacing: -0.6px; margin-bottom: 14px; line-height: 1.2; }
+.section-header p { font-size: 16px; color: var(--gray); }
+
+/* CONTACT */
+.contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 48px; }
+.contact-info h2 { font-size: 34px; font-weight: 800; color: var(--dark); margin-bottom: 14px; letter-spacing: -0.5px; }
+.contact-info > p { color: var(--gray); margin-bottom: 32px; font-size: 15px; }
+.contact-item { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--border); }
+.contact-item:last-child { border-bottom: none; }
+.contact-icon { width: 48px; height: 48px; border-radius: 14px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.contact-item h4 { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+.contact-item p { font-size: 14px; color: var(--gray); }
+.contact-form { background: #fff; border-radius: 24px; padding: 40px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); }
+
+/* FORMS */
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 8px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 14px; font-size: 14px; font-family: inherit; color: var(--dark); background: #f9fcfd; transition: all 0.2s; outline: none; }
+.form-group textarea { min-height: 130px; resize: vertical; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(13,110,158,0.08); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .section { padding: 60px 0; }
+  .section-header h2 { font-size: 28px; }
+  .form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<script src="user-auth.js"></script>
+<script src="shared.js"></script>
+<body>
+
+<div id="site-header"></div>
+
+<section class="section" style="padding-top:60px;">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <span class="section-tag">Get in Touch</span>
+        <h2>We're here to help you</h2>
+        <p>Have a question or need to book an appointment? Reach out to us through any of the following channels.</p>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div><h4>Visit Us</h4><p>123 Health Avenue, Medical District<br>New York, NY 10001</p></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-phone"></i></div>
+          <div><h4>Call Us</h4><p>+1 (555) 123-4567<br>Emergency: 24/7 available</p></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+          <div><h4>Email Us</h4><p>info@medicare.com<br>appointments@medicare.com</p></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-clock"></i></div>
+          <div><h4>Working Hours</h4><p>Mon - Fri: 8:00 AM - 8:00 PM<br>Sat - Sun: 9:00 AM - 5:00 PM</p></div>
+        </div>
+      </div>
+      <div class="contact-form">
+        <h3 style="font-size:22px;color:var(--dark);font-weight:800;margin-bottom:6px;">Send us a message</h3>
+        <p style="color:var(--gray);font-size:14px;margin-bottom:24px;">Fill out the form and we'll get back to you within 24 hours.</p>
+        <form id="contactForm">
+          <div class="form-row">
+            <div class="form-group"><label>Full Name</label><input type="text" required></div>
+            <div class="form-group"><label>Email</label><input type="email" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Phone</label><input type="text" required></div>
+            <div class="form-group">
+              <label>Department</label>
+              <select>
+                <option>General Inquiry</option>
+                <option>Cardiology</option>
+                <option>Neurology</option>
+                <option>Orthopedics</option>
+                <option>Pediatrics</option>
+                <option>Emergency</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label>Message</label><textarea required></textarea></div>
+          <button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-paper-plane"></i> Send Message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" style="padding:60px 0;">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Location</span>
+      <h2>Visit our hospital</h2>
+    </div>
+    <div style="background:#fff;border-radius:24px;border:1px solid var(--border);height:380px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e1f0f8,#c9e2f0);">
+      <div style="text-align:center;">
+        <i class="fas fa-map-marked-alt" style="font-size:64px;color:var(--primary);margin-bottom:16px;"></i>
+        <h3 style="font-size:20px;color:var(--dark);font-weight:700;">123 Health Avenue, Medical District</h3>
+        <p style="color:var(--gray);margin-top:8px;">New York, NY 10001</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="shared.js"></script>
+<script>
+document.getElementById('contactForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  alert('Message sent successfully! We will contact you soon.');
+  e.target.reset();
+});
+</script>
+</body>
+</html>

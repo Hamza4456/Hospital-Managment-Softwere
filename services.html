@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Doctors · MediCare Hospital</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: #0d6e9e; --primary-dark: #0a5578; --primary-light: #e1f0f8;
+  --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
+  --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
+  --border: #e6f0f5; --white: #fff;
+  --shadow: 0 6px 18px rgba(0,30,45,0.06);
+  --shadow-lg: 0 20px 50px -12px rgba(0,80,110,0.15);
+}
+body { font-family: 'Inter', sans-serif; background: #fff; color: #1e293b; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* BUTTONS */
+.btn { padding: 12px 22px; border-radius: 12px; border: none; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; white-space: nowrap; }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3); }
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--border); }
+.btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
+.btn-white { background: #fff; color: var(--primary); }
+.btn-white:hover { background: #f0f7fb; transform: translateY(-1px); }
+.btn-lg { padding: 16px 30px; font-size: 15px; border-radius: 14px; }
+
+/* SECTIONS */
+.section { padding: 90px 0; }
+.section-header { text-align: center; max-width: 640px; margin: 0 auto 60px; }
+.section-tag { display: inline-block; background: var(--primary-light); color: var(--primary); padding: 6px 16px; border-radius: 40px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 16px; }
+.section-header h2 { font-size: 38px; font-weight: 800; color: var(--dark); letter-spacing: -0.6px; margin-bottom: 14px; line-height: 1.2; }
+.section-header p { font-size: 16px; color: var(--gray); }
+
+/* DOCTORS */
+.doctors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+.doctor-card { background: #fff; border-radius: 22px; overflow: hidden; border: 1px solid var(--border); transition: all 0.25s; text-align: center; }
+.doctor-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.doctor-avatar-wrap { background: linear-gradient(135deg, #e1f0f8, #c9e2f0); padding: 32px 20px 24px; }
+.doctor-avatar { width: 88px; height: 88px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 30px; font-weight: 800; color: var(--primary); box-shadow: 0 8px 20px rgba(13,110,158,0.2); }
+.doctor-info { padding: 22px; }
+.doctor-info h3 { font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+.doctor-info .specialty { font-size: 13px; color: var(--primary); font-weight: 600; margin-bottom: 14px; }
+.doctor-info .doctor-meta { display: flex; justify-content: center; gap: 16px; font-size: 12px; color: var(--gray); }
+
+/* CTA */
+.cta-section { background: linear-gradient(135deg, #0d6e9e, #0b3b4b); color: #fff; padding: 80px 0; text-align: center; position: relative; overflow: hidden; }
+.cta-section::before { content: ''; position: absolute; width: 500px; height: 500px; background: rgba(255,255,255,0.06); border-radius: 50%; top: -250px; right: -150px; }
+.cta-inner { position: relative; z-index: 2; }
+.cta-section h2 { font-size: 40px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.5px; }
+.cta-section p { font-size: 17px; opacity: 0.9; margin-bottom: 32px; max-width: 600px; margin-left: auto; margin-right: auto; }
+.cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .section { padding: 60px 0; }
+  .section-header h2 { font-size: 28px; }
+  .cta-section h2 { font-size: 28px; }
+}
+</style>
+</head>
+<script src="user-auth.js"></script>
+<script src="shared.js"></script>
+<body>
+
+<div id="site-header"></div>
+
+<section class="section" style="padding-top:60px;">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Our Team</span>
+      <h2>Meet our medical experts</h2>
+      <p>Our team of board-certified doctors and specialists is dedicated to your health.</p>
+    </div>
+    <div class="doctors-grid">
+      <div class="doctor-card"><div class="doctor-avatar-wrap"><div class="doctor-avatar">AS</div></div><div class="doctor-info"><h3>Dr. A. Sharma</h3><p class="specialty">Interventional Cardiology</p><div class="doctor-meta"><span><i class="fas fa-briefcase"></i> 15+ years</span><span><i class="fas fa-users"></i> 24 patients</span></div></div></div>
+      <div class="doctor-card"><div class="doctor-avatar-wrap"><div class="doctor-avatar">MC</div></div><div class="doctor-info"><h3>Dr. M. Costa</h3><p class="specialty">Neurology Specialist</p><div class="doctor-meta"><span><i class="fas fa-briefcase"></i> 12+ years</span><span><i class="fas fa-users"></i> 18 patients</span></div></div></div>
+      <div class="doctor-card"><div class="doctor-avatar-wrap"><div class="doctor-avatar">LW</div></div><div class="doctor-info"><h3>Dr. L. Wong</h3><p class="specialty">Orthopedic Surgeon</p><div class="doctor-meta"><span><i class="fas fa-briefcase"></i> 18+ years</span><span><i class="fas fa-users"></i> 31 patients</span></div></div></div>
+      <div class="doctor-card"><div class="doctor-avatar-wrap"><div class="doctor-avatar">SP</div></div><div class="doctor-info"><h3>Dr. S. Patel</h3><p class="specialty">Pediatrician</p><div class="doctor-meta"><span><i class="fas fa-briefcase"></i> 10+ years</span><span><i class="fas fa-users"></i> 27 patients</span></div></div></div>
+      <div class="doctor-card"><div class="doctor-avatar-wrap"><div class="doctor-avatar">KM</div></div><div class="doctor-info"><h3>Dr. K. Mensah</h3><p class="specialty">Pulmonologist</p><div class="doctor-meta"><span><i class="fas fa-briefcase"></i> 14+ years</span><span><i class="fas fa-users"></i> 15 patients</span></div></div></div>
+      <div class="doctor-card"><div class="doctor-avatar-wrap"><div class="doctor-avatar">JR</div></div><div class="doctor-info"><h3>Dr. J. Rivera</h3><p class="specialty">Emergency Medicine</p><div class="doctor-meta"><span><i class="fas fa-briefcase"></i> 9+ years</span><span><i class="fas fa-users"></i> 12 patients</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container cta-inner">
+    <h2>Book an appointment today</h2>
+    <p>Schedule a consultation with one of our specialists.</p>
+    <div class="cta-actions">
+      <a href="doctorbook2.html" class="btn btn-white btn-lg"><i class="fas fa-calendar-plus"></i> Book Now</a>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="shared.js"></script>
+</body>
+</html>

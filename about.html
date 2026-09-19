@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us · MediCare Hospital</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: #0d6e9e; --primary-dark: #0a5578; --primary-light: #e1f0f8;
+  --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
+  --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
+  --border: #e6f0f5; --white: #fff;
+  --shadow: 0 6px 18px rgba(0,30,45,0.06);
+  --shadow-lg: 0 20px 50px -12px rgba(0,80,110,0.15);
+}
+body { font-family: 'Inter', sans-serif; background: #fff; color: #1e293b; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* ===== BUTTONS (needed for both header and page content) ===== */
+.btn { padding: 12px 22px; border-radius: 12px; border: none; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; white-space: nowrap; }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3); }
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--border); }
+.btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
+.btn-white { background: #fff; color: var(--primary); }
+.btn-white:hover { background: #f0f7fb; transform: translateY(-1px); }
+.btn-lg { padding: 16px 30px; font-size: 15px; border-radius: 14px; }
+
+/* ===== SECTIONS ===== */
+.section { padding: 90px 0; }
+.section-alt { background: var(--light-gray); }
+.section-header { text-align: center; max-width: 640px; margin: 0 auto 60px; }
+.section-tag { display: inline-block; background: var(--primary-light); color: var(--primary); padding: 6px 16px; border-radius: 40px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 16px; }
+.section-header h2 { font-size: 38px; font-weight: 800; color: var(--dark); letter-spacing: -0.6px; margin-bottom: 14px; line-height: 1.2; }
+.section-header p { font-size: 16px; color: var(--gray); }
+
+/* ===== FEATURES ===== */
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.feature-card { background: #fff; border-radius: 22px; padding: 32px 28px; border: 1px solid var(--border); transition: all 0.25s; }
+.feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
+.feature-icon { width: 58px; height: 58px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px; }
+.feature-icon.blue { background: #e1f0f8; color: #0d6e9e; }
+.feature-icon.green { background: #e1f7ed; color: #0e8b5e; }
+.feature-icon.orange { background: #fff0e0; color: #c96f1e; }
+.feature-icon.purple { background: #eee9fd; color: #6c4bc9; }
+.feature-card h3 { font-size: 19px; font-weight: 700; color: var(--dark); margin-bottom: 10px; }
+.feature-card p { font-size: 14px; color: var(--gray); }
+
+/* ===== ABOUT ===== */
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.about-visual { background: linear-gradient(135deg, #0d6e9e, #0b3b4b); border-radius: 28px; padding: 48px; color: #fff; position: relative; overflow: hidden; }
+.about-visual::before { content: ''; position: absolute; width: 300px; height: 300px; background: rgba(255,255,255,0.08); border-radius: 50%; top: -100px; right: -100px; }
+.about-visual-icon { width: 76px; height: 76px; background: rgba(255,255,255,0.15); border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 24px; position: relative; }
+.about-visual h3 { font-size: 26px; margin-bottom: 14px; position: relative; }
+.about-visual p { font-size: 15px; opacity: 0.9; line-height: 1.7; position: relative; margin-bottom: 28px; }
+.about-visual-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; position: relative; }
+.about-visual-stat { background: rgba(255,255,255,0.1); border-radius: 14px; padding: 16px; border: 1px solid rgba(255,255,255,0.15); }
+.about-visual-stat h4 { font-size: 24px; margin-bottom: 4px; }
+.about-visual-stat p { font-size: 12px; opacity: 0.85; margin: 0; }
+.about-content h2 { font-size: 36px; font-weight: 800; color: var(--dark); line-height: 1.2; margin-bottom: 20px; letter-spacing: -0.5px; }
+.about-content > p { font-size: 16px; color: var(--gray); line-height: 1.7; margin-bottom: 28px; }
+.about-list { list-style: none; margin-bottom: 32px; }
+.about-list li { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; font-size: 15px; color: var(--dark); }
+.about-list i { color: var(--success); font-size: 20px; margin-top: 2px; }
+
+/* ===== CTA ===== */
+.cta-section { background: linear-gradient(135deg, #0d6e9e, #0b3b4b); color: #fff; padding: 80px 0; text-align: center; position: relative; overflow: hidden; }
+.cta-section::before { content: ''; position: absolute; width: 500px; height: 500px; background: rgba(255,255,255,0.06); border-radius: 50%; top: -250px; right: -150px; }
+.cta-inner { position: relative; z-index: 2; }
+.cta-section h2 { font-size: 40px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.5px; }
+.cta-section p { font-size: 17px; opacity: 0.9; margin-bottom: 32px; max-width: 600px; margin-left: auto; margin-right: auto; }
+.cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .about-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 768px) {
+  .section { padding: 60px 0; }
+  .section-header h2 { font-size: 28px; }
+  .cta-section h2 { font-size: 28px; }
+}
+</style>
+</head>
+<script src="user-auth.js"></script>
+<script src="shared.js"></script>
+<body>
+
+<div id="site-header"></div>
+
+<section class="section" style="padding-top:60px;">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">About MediCare</span>
+      <h2>Two decades of healthcare excellence</h2>
+      <p>Committed to improving lives through exceptional medical care, innovation, and compassion.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-visual">
+        <div class="about-visual-icon"><i class="fas fa-hospital-alt"></i></div>
+        <h3>Our Mission</h3>
+        <p>To provide accessible, high-quality healthcare services that improve the health and well-being of every patient we serve, while advancing medical knowledge through research and education.</p>
+        <div class="about-visual-stats">
+          <div class="about-visual-stat"><h4>20+</h4><p>Years of service</p></div>
+          <div class="about-visual-stat"><h4>50K+</h4><p>Patients treated</p></div>
+          <div class="about-visual-stat"><h4>120</h4><p>Hospital beds</p></div>
+          <div class="about-visual-stat"><h4>98%</h4><p>Success rate</p></div>
+        </div>
+      </div>
+      <div class="about-content">
+        <span class="section-tag">Our Story</span>
+        <h2>Building healthier communities since 2005</h2>
+        <p>What started as a small clinic with just five doctors has grown into one of the region's most trusted healthcare institutions. Today, MediCare Hospital is a modern, fully equipped medical center serving thousands of patients every year.</p>
+        <p style="margin-top:16px;">Our commitment to excellence has earned us accreditation from leading healthcare organizations and the trust of our community.</p>
+        <ul class="about-list" style="margin-top:24px;">
+          <li><i class="fas fa-check-circle"></i> <span>Accredited by Joint Commission International</span></li>
+          <li><i class="fas fa-check-circle"></i> <span>ISO 9001:2015 certified for quality management</span></li>
+          <li><i class="fas fa-check-circle"></i> <span>Partnered with top medical universities</span></li>
+          <li><i class="fas fa-check-circle"></i> <span>Winner of Regional Healthcare Excellence Award 2024</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Our Values</span>
+      <h2>What drives us every day</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon blue"><i class="fas fa-heart"></i></div><h3>Compassion</h3><p>We treat every patient with empathy, dignity, and respect, understanding that healing goes beyond medicine.</p></div>
+      <div class="feature-card"><div class="feature-icon green"><i class="fas fa-award"></i></div><h3>Excellence</h3><p>We strive for the highest standards in clinical care, patient safety, and service delivery.</p></div>
+      <div class="feature-card"><div class="feature-icon purple"><i class="fas fa-lightbulb"></i></div><h3>Innovation</h3><p>We embrace new technologies and best practices to continuously improve patient outcomes.</p></div>
+      <div class="feature-card"><div class="feature-icon orange"><i class="fas fa-users"></i></div><h3>Community</h3><p>We're dedicated to serving our community through outreach, education, and accessible healthcare.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container cta-inner">
+    <h2>Experience healthcare excellence</h2>
+    <p>Join thousands of patients who trust MediCare Hospital with their health.</p>
+    <div class="cta-actions">
+      <a href="doctorbook2.html" class="btn btn-white btn-lg">Book Appointment</a>
+      <a href="services.html" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2);">Explore Services</a>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="shared.js"></script>
+</body>
+</html>

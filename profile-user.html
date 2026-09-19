@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile · MediCare Hospital</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: #0d6e9e; --primary-dark: #0a5578; --primary-light: #e1f0f8;
+  --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
+  --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
+  --border: #e6f0f5; --white: #fff;
+  --shadow: 0 6px 18px rgba(0,30,45,0.06);
+  --shadow-lg: 0 20px 50px -12px rgba(0,80,110,0.15);
+}
+body { font-family: 'Inter', sans-serif; background: var(--light-gray); color: #1e293b; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+.btn { padding: 12px 22px; border-radius: 12px; border: none; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; white-space: nowrap; }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3); }
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--border); }
+.btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
+.btn-white { background: #fff; color: var(--primary); }
+.btn-white:hover { background: #f0f7fb; transform: translateY(-1px); }
+.btn-lg { padding: 16px 30px; font-size: 15px; border-radius: 14px; }
+.btn-block { width: 100%; }
+
+.section { padding: 60px 0 80px; }
+
+/* HERO */
+.profile-hero {
+  background: linear-gradient(135deg, #0d6e9e, #0b3b4b);
+  border-radius: 24px; padding: 40px 36px;
+  color: #fff; margin-bottom: 28px; position: relative; overflow: hidden;
+}
+.profile-hero::before { content: ''; position: absolute; width: 400px; height: 400px; background: rgba(255,255,255,0.07); border-radius: 50%; top: -180px; right: -120px; }
+.profile-hero-inner { display: flex; align-items: center; gap: 24px; position: relative; z-index: 2; flex-wrap: wrap; }
+.profile-avatar {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  border: 2px solid rgba(255,255,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; font-weight: 800; flex-shrink: 0;
+}
+.profile-info h1 { font-size: 28px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px; }
+.profile-info p { font-size: 14px; opacity: 0.9; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.profile-info p i { width: 16px; opacity: 0.8; }
+.profile-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* QUICK STATS */
+.profile-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px; margin-bottom: 28px;
+}
+.stat-tile {
+  background: #fff; border-radius: 18px; padding: 20px;
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 14px;
+}
+.stat-tile .icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.stat-tile .icon.blue { background: #e1f0f8; color: #0d6e9e; }
+.stat-tile .icon.green { background: #e1f7ed; color: #0e8b5e; }
+.stat-tile .icon.orange { background: #fff0e0; color: #c96f1e; }
+.stat-tile .val { font-size: 22px; font-weight: 800; color: var(--dark); line-height: 1; }
+.stat-tile .lbl { font-size: 12px; color: var(--gray); font-weight: 500; margin-top: 4px; }
+
+/* CARDS */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.info-card {
+  background: #fff; border-radius: 20px; padding: 28px 26px;
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  margin-bottom: 24px;
+}
+.info-card h2 {
+  font-size: 17px; font-weight: 700; color: var(--dark);
+  margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+}
+.info-card h2 i { color: var(--primary); }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 7px; }
+.form-group input {
+  width: 100%; padding: 13px 15px;
+  border: 1.5px solid var(--border); border-radius: 12px;
+  font-family: inherit; font-size: 14px; color: var(--dark);
+  background: #f9fcfd; outline: none; transition: all .15s;
+}
+.form-group input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(13,110,158,0.08); }
+.form-group input[readonly] { background: #eef4f8; color: var(--gray); cursor: not-allowed; }
+
+.alert { display: none; align-items: flex-start; gap: 10px; padding: 12px 15px; border-radius: 12px; font-size: 13.5px; font-weight: 500; margin-bottom: 14px; background: #fdecef; color: var(--danger); }
+.alert.show { display: flex; }
+.alert.success { background: #e1f7ed; color: var(--success); }
+
+.recent-bookings { display: flex; flex-direction: column; gap: 14px; }
+.recent-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); gap: 14px; }
+.recent-item:last-child { border-bottom: none; padding-bottom: 0; }
+.recent-item:first-child { padding-top: 0; }
+.recent-item h4 { font-size: 14.5px; font-weight: 600; color: var(--dark); margin-bottom: 4px; }
+.recent-item p { font-size: 12.5px; color: var(--gray); }
+.recent-item p i { width: 13px; font-size: 11px; color: #9ba8bf; }
+
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 100px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2px; }
+.badge-success { background: #e1f7ed; color: var(--success); }
+.badge-warning { background: #fff0e0; color: #c96f1e; }
+.badge-danger  { background: #fdecef; color: var(--danger); }
+
+.empty-state { text-align: center; padding: 30px 20px; color: var(--gray); }
+.empty-state i { font-size: 40px; color: #c5d8e2; margin-bottom: 12px; display: block; }
+.empty-state h3 { font-size: 15px; color: var(--dark); margin-bottom: 6px; font-weight: 700; }
+.empty-state p { font-size: 13px; margin-bottom: 16px; }
+
+.toast { position: fixed; top: 90px; right: 24px; z-index: 9999; background: #fff; border-radius: 14px; padding: 14px 20px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); border-left: 4px solid var(--success); display: flex; align-items: center; gap: 11px; font-size: 14px; font-weight: 500; color: var(--dark); animation: toastIn .3s cubic-bezier(.2,.9,.3,1.3); max-width: calc(100vw - 40px); }
+.toast.error { border-left-color: var(--danger); }
+.toast i { font-size: 16px; color: var(--success); }
+.toast.error i { color: var(--danger); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+
+@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .profile-hero { padding: 28px 22px; }
+  .profile-avatar { width: 68px; height: 68px; font-size: 24px; }
+  .profile-info h1 { font-size: 22px; }
+  .info-card { padding: 22px 18px; }
+  .section { padding: 30px 0 50px; }
+}
+</style>
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="section">
+  <div class="container">
+
+    <div class="profile-hero">
+      <div class="profile-hero-inner">
+        <div class="profile-avatar" id="heroAvatar">U</div>
+        <div class="profile-info" style="flex:1; min-width:200px;">
+          <h1 id="heroName">User</h1>
+          <p><i class="fas fa-envelope"></i> <span id="heroEmail">—</span></p>
+          <p><i class="fas fa-phone"></i> <span id="heroPhone">—</span></p>
+        </div>
+        <div class="profile-actions">
+          <a href="doctorbook2.html" class="btn btn-white"><i class="fas fa-calendar-plus"></i> Book Appointment</a>
+          <a href="my-bookings.html" class="btn" style="background: rgba(255,255,255,.1); color: #fff; border: 1.5px solid rgba(255,255,255,.2);">
+            <i class="fas fa-list"></i> My Bookings
+          </a>
+          <button class="btn" id="logoutBtn" style="background: rgba(255,255,255,.1); color: #fff; border: 1.5px solid rgba(255,255,255,.2);">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-stats">
+      <div class="stat-tile">
+        <div class="icon blue"><i class="fas fa-calendar-check"></i></div>
+        <div>
+          <div class="val" id="statTotal">0</div>
+          <div class="lbl">Total Appointments</div>
+        </div>
+      </div>
+      <div class="stat-tile">
+        <div class="icon green"><i class="fas fa-check-circle"></i></div>
+        <div>
+          <div class="val" id="statConfirmed">0</div>
+          <div class="lbl">Confirmed</div>
+        </div>
+      </div>
+      <div class="stat-tile">
+        <div class="icon orange"><i class="fas fa-clock"></i></div>
+        <div>
+          <div class="val" id="statPending">0</div>
+          <div class="lbl">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="info-card">
+        <h2><i class="fas fa-user-edit"></i> Profile Information</h2>
+        <div class="alert success" id="okAlert"><i class="fas fa-check-circle"></i><span></span></div>
+        <div class="alert" id="errAlert"><i class="fas fa-exclamation-circle"></i><span></span></div>
+        <form id="profileForm">
+          <div class="form-group"><label>Full Name</label><input type="text" id="pName" required></div>
+          <div class="form-group"><label>Email</label><input type="email" id="pEmail" readonly></div>
+          <div class="form-group"><label>Phone</label><input type="tel" id="pPhone" required></div>
+          <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Changes</button>
+        </form>
+      </div>
+
+      <div class="info-card">
+        <h2><i class="fas fa-lock"></i> Change Password</h2>
+        <div class="alert" id="pwAlert"><i class="fas fa-exclamation-circle"></i><span></span></div>
+        <form id="pwForm">
+          <div class="form-group"><label>Current Password</label><input type="password" id="pwCurrent" required></div>
+          <div class="form-group"><label>New Password</label><input type="password" id="pwNew" required></div>
+          <div class="form-group"><label>Confirm New Password</label><input type="password" id="pwConfirm" required></div>
+          <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-key"></i> Update Password</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h2><i class="fas fa-history"></i> Recent Appointments</h2>
+      <div class="recent-bookings" id="recentBookings"></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="site-footer"></div>
+
+<script src="shared.js"></script>
+<script>
+const me = UserAuth.current();
+if (!me) {
+  // Not signed in — open the popup
+  setTimeout(() => window.openAuthPopup && window.openAuthPopup('login'), 200);
+}
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+function renderProfile() {
+  const u = UserAuth.current();
+  if (!u) return;
+  document.getElementById('heroAvatar').textContent = u.initials;
+  document.getElementById('heroName').textContent = u.name;
+  document.getElementById('heroEmail').textContent = u.email;
+  document.getElementById('heroPhone').textContent = u.phone || '—';
+  document.getElementById('pName').value = u.name;
+  document.getElementById('pEmail').value = u.email;
+  document.getElementById('pPhone').value = u.phone || '';
+}
+
+function renderStats() {
+  const list = UserAuth.getBookings();
+  document.getElementById('statTotal').textContent = list.length;
+  document.getElementById('statConfirmed').textContent = list.filter(b => b.status === 'Confirmed').length;
+  document.getElementById('statPending').textContent = list.filter(b => b.status === 'Pending').length;
+}
+
+function renderRecent() {
+  const list = UserAuth.getBookings();
+  const host = document.getElementById('recentBookings');
+
+  if (!list.length) {
+    host.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-calendar-plus"></i>
+        <h3>No appointments yet</h3>
+        <p>Book your first appointment and it will show up here.</p>
+        <a href="doctorbook2.html" class="btn btn-primary"><i class="fas fa-calendar-plus"></i> Book Appointment</a>
+      </div>`;
+    return;
+  }
+
+  const recent = list
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5);
+
+  host.innerHTML = recent.map(b => {
+    const cls = b.status === 'Confirmed' ? 'badge-success'
+              : b.status === 'Cancelled' ? 'badge-danger'
+              : 'badge-warning';
+    const doc = b.doctorName || b.doctor || 'Doctor';
+    const dept = b.department || b.dept || 'Department';
+    const date = b.date || '';
+    const time = b.time || '';
+    return `
+      <div class="recent-item">
+        <div>
+          <h4>${esc(doc)} · ${esc(dept)}</h4>
+          <p><i class="fas fa-calendar"></i> ${esc(date)} ${time ? '· ' + esc(time) : ''}</p>
+        </div>
+        <span class="badge ${cls}">${b.status}</span>
+      </div>`;
+  }).join('');
+}
+
+document.getElementById('profileForm').addEventListener('submit', e => {
+  e.preventDefault();
+  document.getElementById('okAlert').classList.remove('show');
+  document.getElementById('errAlert').classList.remove('show');
+
+  const name = document.getElementById('pName').value.trim();
+  const phone = document.getElementById('pPhone').value.trim();
+
+  if (name.length < 2) { showAlert('errAlert', 'Please enter a valid name.'); return; }
+  if (phone.length < 6) { showAlert('errAlert', 'Please enter a valid phone.'); return; }
+
+  const res = UserAuth.updateProfile({ name, phone });
+  if (!res.ok) { showAlert('errAlert', res.error); return; }
+
+  renderProfile();
+  if (window.refreshAuthChip) window.refreshAuthChip();
+  showAlert('okAlert', 'Profile updated');
+  toast('Profile updated');
+});
+
+document.getElementById('pwForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  document.getElementById('pwAlert').classList.remove('show');
+
+  const cur = document.getElementById('pwCurrent').value;
+  const nw  = document.getElementById('pwNew').value;
+  const cf  = document.getElementById('pwConfirm').value;
+
+  const rule = UserAuth.validatePassword(nw);
+  if (rule) { showAlert('pwAlert', rule); return; }
+  if (nw !== cf) { showAlert('pwAlert', 'Passwords do not match'); return; }
+  if (nw === cur) { showAlert('pwAlert', 'New password must differ from current'); return; }
+
+  const res = await UserAuth.changePassword(cur, nw);
+  if (!res.ok) { showAlert('pwAlert', res.error); return; }
+
+  e.target.reset();
+  toast('Password updated');
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  if (!confirm('Logout?')) return;
+  UserAuth.logout();
+  location.href = 'index.html';
+});
+
+function showAlert(id, msg) {
+  const el = document.getElementById(id);
+  el.querySelector('span').textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+function toast(msg, type = 'success') {
+  const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle' };
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type !== 'success' ? type : '');
+  el.innerHTML = `<i class="fas ${icons[type]}"></i> ${esc(msg)}`;
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'all .3s'; setTimeout(() => el.remove(), 300); }, 2800);
+}
+
+function refreshAll() {
+  const u = UserAuth.current();
+  if (!u) return;
+  renderProfile();
+  renderStats();
+  renderRecent();
+}
+
+refreshAll();
+// Re-render when login state changes
+window.addEventListener('focus', refreshAll);
+</script>
+</body>
+</html>

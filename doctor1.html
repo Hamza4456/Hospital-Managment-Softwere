@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Doctors · MediCare Hospital</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: #0d6e9e; --primary-dark: #0a5578; --primary-light: #e1f0f8;
+  --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
+  --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
+  --border: #e6f0f5; --white: #fff;
+  --shadow: 0 6px 18px rgba(0,30,45,0.06);
+  --shadow-lg: 0 20px 50px -12px rgba(0,80,110,0.15);
+}
+body { font-family: 'Inter', sans-serif; background: var(--light-gray); color: #1e293b; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* ===== PAGE HERO ===== */
+.page-hero { background: linear-gradient(135deg, #0d6e9e 0%, #0b3b4b 100%); color: #fff; padding: 60px 0 70px; position: relative; overflow: hidden; }
+.page-hero::before { content: ''; position: absolute; width: 500px; height: 500px; background: rgba(255,255,255,0.06); border-radius: 50%; top: -250px; right: -150px; }
+.page-hero::after { content: ''; position: absolute; width: 400px; height: 400px; background: rgba(255,255,255,0.04); border-radius: 50%; bottom: -200px; left: -100px; }
+.page-hero-inner { position: relative; z-index: 2; text-align: center; }
+.breadcrumb { display: flex; justify-content: center; gap: 8px; font-size: 13px; margin-bottom: 20px; opacity: 0.85; }
+.breadcrumb a { color: #7dd3fc; }
+.breadcrumb i { font-size: 10px; margin-top: 4px; }
+.page-hero h1 { font-size: 42px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
+.page-hero p { font-size: 17px; opacity: 0.9; max-width: 620px; margin: 0 auto; }
+
+.stats-bar { background: #fff; border-radius: 20px; padding: 28px; margin-top: -40px; position: relative; z-index: 3; box-shadow: var(--shadow-lg); display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.stat-item { text-align: center; padding: 8px; border-right: 1px solid var(--border); }
+.stat-item:last-child { border-right: none; }
+.stat-item h3 { font-size: 30px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+.stat-item p { font-size: 13px; color: var(--gray); font-weight: 500; }
+
+.filter-section { padding: 40px 0 20px; }
+.filter-bar { background: #fff; border-radius: 20px; padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.search-input { flex: 1; min-width: 220px; position: relative; }
+.search-input i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--gray); font-size: 15px; }
+.search-input input { width: 100%; padding: 13px 16px 13px 44px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 14px; font-family: inherit; color: var(--dark); background: #f9fcfd; outline: none; transition: all 0.2s; }
+.search-input input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(13,110,158,0.08); }
+.filter-select { padding: 13px 40px 13px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 14px; font-family: inherit; color: var(--dark); background: #f9fcfd url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235e7e8c' stroke-width='3'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 16px center; outline: none; cursor: pointer; transition: all 0.2s; appearance: none; -webkit-appearance: none; }
+.filter-select:focus { border-color: var(--primary); background-color: #fff; box-shadow: 0 0 0 4px rgba(13,110,158,0.08); }
+.dept-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.chip { padding: 10px 20px; border-radius: 40px; border: 1.5px solid var(--border); background: #fff; font-size: 13px; font-weight: 600; color: var(--gray); cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px; }
+.chip:hover { border-color: var(--primary); color: var(--primary); }
+.chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.chip i { font-size: 12px; }
+
+.section { padding: 40px 0 90px; }
+.results-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.results-info p { font-size: 14px; color: var(--gray); }
+.results-info p strong { color: var(--dark); font-weight: 700; }
+
+.doctors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.doctor-card { background: #fff; border-radius: 22px; overflow: hidden; border: 1px solid var(--border); transition: all 0.25s; position: relative; }
+.doctor-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
+.doctor-badge { position: absolute; top: 16px; right: 16px; padding: 5px 12px; border-radius: 40px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+.doctor-badge.available { background: #e1f7ed; color: #0e8b5e; }
+.doctor-badge.busy { background: #fff0e0; color: #c96f1e; }
+.doctor-avatar-wrap { background: linear-gradient(135deg, #e1f0f8, #c9e2f0); padding: 36px 20px 28px; text-align: center; position: relative; }
+.doctor-avatar { width: 96px; height: 96px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 32px; font-weight: 800; color: var(--primary); box-shadow: 0 10px 24px rgba(13,110,158,0.25); position: relative; }
+.doctor-avatar::after { content: ''; position: absolute; bottom: 4px; right: 4px; width: 18px; height: 18px; border-radius: 50%; background: #0e8b5e; border: 3px solid #fff; }
+.doctor-avatar.offline::after { background: #c96f1e; }
+.doctor-info { padding: 22px; }
+.doctor-info h3 { font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+.doctor-info .specialty { font-size: 13px; color: var(--primary); font-weight: 600; margin-bottom: 4px; }
+.doctor-info .dept-name { font-size: 12px; color: var(--gray); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+.doctor-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.doctor-meta .meta-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--gray); }
+.doctor-meta .meta-item i { color: var(--primary); font-size: 13px; width: 16px; }
+.doctor-meta .meta-item span strong { color: var(--dark); font-weight: 700; display: block; font-size: 13px; }
+.doctor-rating { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.stars { display: flex; gap: 2px; color: #f5b301; font-size: 13px; }
+.rating-text { font-size: 12px; color: var(--gray); font-weight: 600; }
+.doctor-actions { display: flex; gap: 8px; }
+.doctor-actions .btn { flex: 1; font-size: 13px; padding: 10px 12px; }
+.btn-icon-only { flex: 0 0 auto !important; padding: 10px 14px !important; }
+.no-results { text-align: center; padding: 60px 20px; grid-column: 1 / -1; }
+.no-results i { font-size: 56px; color: #c5d8e2; margin-bottom: 16px; }
+.no-results h3 { font-size: 20px; color: var(--dark); margin-bottom: 8px; font-weight: 700; }
+.no-results p { color: var(--gray); font-size: 14px; }
+
+.cta-section { background: linear-gradient(135deg, #0d6e9e, #0b3b4b); color: #fff; padding: 80px 0; text-align: center; position: relative; overflow: hidden; }
+.cta-section::before { content: ''; position: absolute; width: 500px; height: 500px; background: rgba(255,255,255,0.06); border-radius: 50%; top: -250px; right: -150px; }
+.cta-inner { position: relative; z-index: 2; }
+.cta-section h2 { font-size: 40px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.5px; }
+.cta-section p { font-size: 17px; opacity: 0.9; margin-bottom: 32px; max-width: 600px; margin-left: auto; margin-right: auto; }
+.cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+.btn { padding: 12px 22px; border-radius: 12px; border: none; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; white-space: nowrap; }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3); }
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--border); }
+.btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
+.btn-white { background: #fff; color: var(--primary); }
+.btn-white:hover { background: #f0f7fb; transform: translateY(-1px); }
+.btn-lg { padding: 16px 30px; font-size: 15px; border-radius: 14px; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(11,59,75,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: fadeIn 0.2s ease; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 24px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 36px; position: relative; animation: slideUp 0.3s ease; }
+.modal-close { position: absolute; top: 20px; right: 20px; width: 38px; height: 38px; border-radius: 10px; border: none; background: #f0f5f8; color: var(--gray); cursor: pointer; font-size: 16px; }
+.modal-close:hover { background: #fdecef; color: var(--danger); }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-hero { text-align: center; padding-bottom: 24px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.modal-hero .avatar { width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg,#e1f0f8,#c9e2f0); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 38px; font-weight: 800; color: var(--primary); box-shadow: 0 10px 24px rgba(13,110,158,0.2); position: relative; }
+.modal-hero .avatar::after { content: ''; position: absolute; bottom: 6px; right: 6px; width: 20px; height: 20px; border-radius: 50%; background: #0e8b5e; border: 3px solid #fff; }
+.modal-hero .avatar.offline::after { background: #c96f1e; }
+.modal-hero h2 { font-size: 24px; color: var(--dark); font-weight: 800; margin-bottom: 6px; }
+.modal-hero .specialty { color: var(--primary); font-weight: 600; font-size: 15px; margin-bottom: 12px; }
+.modal-hero .badge { display: inline-block; padding: 6px 16px; border-radius: 40px; font-size: 12px; font-weight: 700; }
+.modal-hero .badge.available { background: #e1f7ed; color: #0e8b5e; }
+.modal-hero .badge.busy { background: #fff0e0; color: #c96f1e; }
+.modal-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.modal-stat { background: #f5fafd; border-radius: 14px; padding: 16px 12px; text-align: center; }
+.modal-stat .label { font-size: 11px; color: var(--gray); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.modal-stat .value { font-size: 18px; color: var(--dark); font-weight: 800; }
+.modal-stat .value.gold { color: #f5b301; }
+.modal-section { margin-bottom: 24px; }
+.modal-section h4 { font-size: 14px; color: var(--dark); font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.modal-section h4 i { color: var(--primary); }
+.detail-row { display: flex; gap: 12px; padding: 10px 0; font-size: 14px; border-bottom: 1px solid var(--border); }
+.detail-row:last-child { border-bottom: none; }
+.detail-row .label { color: var(--gray); font-weight: 500; min-width: 130px; }
+.detail-row .value { color: var(--dark); font-weight: 600; flex: 1; }
+.expertise-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag { background: var(--primary-light); color: var(--primary); padding: 6px 14px; border-radius: 40px; font-size: 12px; font-weight: 600; }
+.edu-list { display: flex; flex-direction: column; gap: 12px; }
+.edu-item { display: flex; gap: 12px; padding: 12px; background: #f9fcfd; border-radius: 12px; border-left: 3px solid var(--primary); }
+.edu-item i { color: var(--primary); font-size: 16px; margin-top: 2px; }
+.edu-item .info h5 { font-size: 13px; color: var(--dark); font-weight: 700; margin-bottom: 2px; }
+.edu-item .info p { font-size: 12px; color: var(--gray); }
+.schedule-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.schedule-day { text-align: center; padding: 10px 4px; border-radius: 10px; background: #f9fcfd; border: 1px solid var(--border); }
+.schedule-day.active { background: var(--primary-light); border-color: var(--primary); }
+.schedule-day .day-name { font-size: 11px; color: var(--gray); font-weight: 600; margin-bottom: 4px; }
+.schedule-day .day-status { font-size: 10px; font-weight: 700; color: var(--success); }
+.schedule-day.active .day-status { color: var(--primary); }
+.schedule-day .day-status.off { color: #c5d8e2; }
+.modal-actions { display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid var(--border); }
+.modal-actions .btn { flex: 1; }
+
+@media (max-width: 1024px) {
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .stat-item:nth-child(2) { border-right: none; }
+}
+@media (max-width: 768px) {
+  .page-hero h1 { font-size: 30px; }
+  .stats-bar { grid-template-columns: 1fr 1fr; padding: 20px; }
+  .stat-item h3 { font-size: 24px; }
+  .section { padding: 30px 0 60px; }
+  .cta-section h2 { font-size: 28px; }
+  .modal-stats { grid-template-columns: repeat(2, 1fr); }
+  .schedule-grid { grid-template-columns: repeat(4, 1fr); }
+  .detail-row { flex-direction: column; gap: 4px; }
+  .detail-row .label { min-width: auto; }
+}
+</style>
+</head>
+<script src="user-auth.js"></script>
+<script src="shared.js"></script>
+<body>
+
+<div id="site-header"></div>
+
+<section class="page-hero">
+  <div class="container page-hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Our Doctors</span>
+    </div>
+    <h1>Meet Our Medical Experts</h1>
+    <p>World-class specialists committed to providing you with exceptional healthcare. Browse our team and book your consultation today.</p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="stats-bar">
+    <div class="stat-item"><h3 id="statTotal">0</h3><p>Expert Doctors</p></div>
+    <div class="stat-item"><h3>15</h3><p>Departments</p></div>
+    <div class="stat-item"><h3>50K+</h3><p>Patients Treated</p></div>
+    <div class="stat-item"><h3>4.9</h3><p>Average Rating</p></div>
+  </div>
+</div>
+
+<div class="filter-section">
+  <div class="container">
+    <div class="filter-bar">
+      <div class="search-input">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by doctor name or specialty...">
+      </div>
+      <select class="filter-select" id="availabilityFilter">
+        <option value="all">All Doctors</option>
+        <option value="available">Available Now</option>
+        <option value="busy">Busy</option>
+      </select>
+      <select class="filter-select" id="sortBy">
+        <option value="name">Sort: Name (A-Z)</option>
+        <option value="experience">Sort: Most Experienced</option>
+        <option value="rating">Sort: Highest Rated</option>
+        <option value="patients">Sort: Most Patients</option>
+      </select>
+    </div>
+    <div class="dept-chips" id="deptChips">
+      <button class="chip active" data-dept="all"><i class="fas fa-th"></i> All Departments</button>
+      <button class="chip" data-dept="Cardiology"><i class="fas fa-heartbeat"></i> Cardiology</button>
+      <button class="chip" data-dept="Neurology"><i class="fas fa-brain"></i> Neurology</button>
+      <button class="chip" data-dept="Orthopedics"><i class="fas fa-bone"></i> Orthopedics</button>
+      <button class="chip" data-dept="Pediatrics"><i class="fas fa-child"></i> Pediatrics</button>
+      <button class="chip" data-dept="Pulmonology"><i class="fas fa-lungs"></i> Pulmonology</button>
+      <button class="chip" data-dept="Emergency"><i class="fas fa-ambulance"></i> Emergency</button>
+      <button class="chip" data-dept="Oncology"><i class="fas fa-ribbon"></i> Oncology</button>
+      <button class="chip" data-dept="Dermatology"><i class="fas fa-hand-dots"></i> Dermatology</button>
+    </div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="results-info">
+      <p>Showing <strong id="resultCount">0</strong> doctors</p>
+    </div>
+    <div class="doctors-grid" id="doctorsGrid"></div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container cta-inner">
+    <h2>Book an Appointment Today</h2>
+    <p>Schedule a consultation with one of our specialists. Same-day appointments available.</p>
+    <div class="cta-actions">
+      <a href="doctorbook2.html" class="btn btn-white btn-lg"><i class="fas fa-calendar-plus"></i> Book Now</a>
+      <a href="contact.html" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2);"><i class="fas fa-phone"></i> Call Us</a>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<div class="modal-overlay" id="profileModal">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+const doctors = [
+  { id: 1, name: 'Dr. A. Sharma', initials: 'AS', dept: 'Cardiology', specialty: 'Interventional Cardiology', experience: '15 years', patients: 1240, rating: 4.9, reviews: 312, available: true, degree: 'MD, DM (Cardiology)', languages: 'English, Hindi', expertise: ['Angioplasty & Stenting', 'Heart Failure Management', 'Coronary Imaging', 'Preventive Cardiology', 'Echocardiography'], education: [{ degree: 'MD (Medicine)', school: 'AIIMS New Delhi', year: '2005' }, { degree: 'DM (Cardiology)', school: 'PGIMER Chandigarh', year: '2009' }, { degree: 'Fellowship in Interventional Cardiology', school: 'Cleveland Clinic, USA', year: '2011' }], schedule: [true, true, true, true, true, false, false], bio: 'A leading interventional cardiologist with 15+ years of experience in complex coronary interventions, structural heart disease, and preventive cardiology.' },
+  { id: 2, name: 'Dr. M. Costa', initials: 'MC', dept: 'Neurology', specialty: 'Neurology Specialist', experience: '12 years', patients: 980, rating: 4.8, reviews: 245, available: true, degree: 'MD, DM (Neurology)', languages: 'English, Spanish', expertise: ['Epilepsy Management', 'Stroke & Thrombolysis', 'Movement Disorders', 'Headache & Migraine', 'EEG Interpretation'], education: [{ degree: 'MD (Medicine)', school: 'University of Barcelona', year: '2008' }, { degree: 'DM (Neurology)', school: 'Hospital Clínic de Barcelona', year: '2012' }], schedule: [true, true, false, true, true, true, false], bio: 'Board-certified neurologist specializing in epilepsy, stroke management, and movement disorders with a patient-focused approach.' },
+  { id: 3, name: 'Dr. L. Wong', initials: 'LW', dept: 'Orthopedics', specialty: 'Orthopedic Surgeon', experience: '18 years', patients: 1560, rating: 4.9, reviews: 428, available: false, degree: 'MS (Ortho), FRCS', languages: 'English, Mandarin', expertise: ['Joint Replacement', 'Sports Injuries', 'Spine Surgery', 'Arthroscopy', 'Trauma Care'], education: [{ degree: 'MS (Orthopedics)', school: 'University of Hong Kong', year: '2002' }, { degree: 'FRCS (Orthopedics)', school: 'Royal College of Surgeons, Edinburgh', year: '2006' }, { degree: 'Fellowship in Joint Replacement', school: 'Mayo Clinic, USA', year: '2008' }], schedule: [true, true, true, true, true, true, false], bio: 'Renowned orthopedic surgeon with 18+ years of expertise in joint replacement, sports medicine, and complex trauma surgeries.' },
+  { id: 4, name: 'Dr. S. Patel', initials: 'SP', dept: 'Pediatrics', specialty: 'Pediatrician', experience: '10 years', patients: 1120, rating: 4.9, reviews: 380, available: true, degree: 'MD (Pediatrics)', languages: 'English, Hindi, Gujarati', expertise: ['Newborn Care', 'Vaccination', 'Child Nutrition', 'Growth Monitoring', 'Pediatric Emergency'], education: [{ degree: 'MD (Pediatrics)', school: 'BJ Medical College, Ahmedabad', year: '2010' }, { degree: 'Diploma in Child Health', school: 'Mumbai University', year: '2012' }], schedule: [true, true, true, true, true, true, true], bio: 'Compassionate pediatrician dedicated to child health, with special interest in newborn care and preventive pediatrics.' },
+  { id: 5, name: 'Dr. K. Mensah', initials: 'KM', dept: 'Pulmonology', specialty: 'Pulmonologist', experience: '14 years', patients: 890, rating: 4.8, reviews: 198, available: true, degree: 'MD (Pulmonology)', languages: 'English, French', expertise: ['Asthma & COPD', 'Sleep Medicine', 'Bronchoscopy', 'Respiratory Infections', 'Lung Function Testing'], education: [{ degree: 'MD (Pulmonology)', school: 'University of Ghana', year: '2006' }, { degree: 'Fellowship in Interventional Pulmonology', school: 'Hôpital Pitié-Salpêtrière, Paris', year: '2010' }], schedule: [true, true, true, false, true, true, false], bio: 'Pulmonologist with expertise in asthma, COPD, sleep disorders, and advanced bronchoscopic procedures.' },
+  { id: 6, name: 'Dr. J. Rivera', initials: 'JR', dept: 'Emergency', specialty: 'Emergency Medicine', experience: '9 years', patients: 2100, rating: 4.7, reviews: 456, available: true, degree: 'MD (Emergency Med)', languages: 'English, Spanish', expertise: ['Trauma Care', 'Cardiac Emergencies', 'Pediatric Emergency', 'Toxicology', 'Critical Care'], education: [{ degree: 'MD (Emergency Medicine)', school: 'Universidad de Buenos Aires', year: '2011' }, { degree: 'Fellowship in Critical Care', school: 'Massachusetts General Hospital', year: '2014' }], schedule: [true, true, true, true, true, true, true], bio: 'Emergency medicine specialist with advanced training in trauma, cardiac emergencies, and critical care.' },
+  { id: 7, name: 'Dr. R. Nakamura', initials: 'RN', dept: 'Oncology', specialty: 'Medical Oncologist', experience: '20 years', patients: 720, rating: 5.0, reviews: 289, available: true, degree: 'MD, DM (Oncology)', languages: 'English, Japanese', expertise: ['Chemotherapy', 'Immunotherapy', 'Targeted Therapy', 'Breast Cancer', 'Lung Cancer'], education: [{ degree: 'MD (Medicine)', school: 'University of Tokyo', year: '2000' }, { degree: 'DM (Medical Oncology)', school: 'National Cancer Center, Tokyo', year: '2005' }, { degree: 'Research Fellowship', school: 'MD Anderson Cancer Center, USA', year: '2008' }], schedule: [true, false, true, true, true, false, false], bio: 'Distinguished oncologist with 20 years of experience in precision oncology, immunotherapy, and patient-centered cancer care.' },
+  { id: 8, name: 'Dr. E. Okafor', initials: 'EO', dept: 'Cardiology', specialty: 'Cardiac Surgeon', experience: '16 years', patients: 640, rating: 4.9, reviews: 210, available: false, degree: 'MS, MCh (CVTS)', languages: 'English, Igbo', expertise: ['CABG Surgery', 'Valve Replacement', 'Aortic Surgery', 'Minimally Invasive Cardiac Surgery'], education: [{ degree: 'MS (General Surgery)', school: 'University of Lagos', year: '2004' }, { degree: 'MCh (Cardiothoracic Surgery)', school: 'University of Cape Town', year: '2009' }], schedule: [true, true, true, false, true, false, false], bio: 'Cardiothoracic surgeon specializing in coronary bypass, valve surgery, and minimally invasive cardiac procedures.' },
+  { id: 9, name: 'Dr. P. Silva', initials: 'PS', dept: 'Dermatology', specialty: 'Dermatologist', experience: '11 years', patients: 1450, rating: 4.8, reviews: 512, available: true, degree: 'MD (Dermatology)', languages: 'English, Portuguese', expertise: ['Cosmetic Dermatology', 'Skin Cancer Screening', 'Eczema & Psoriasis', 'Acne Treatment', 'Laser Therapy'], education: [{ degree: 'MD (Dermatology)', school: 'University of São Paulo', year: '2009' }, { degree: 'Fellowship in Dermatologic Surgery', school: 'NYU Langone, USA', year: '2013' }], schedule: [true, true, true, true, true, true, false], bio: 'Dermatologist with expertise in medical and cosmetic dermatology, skin cancer screening, and laser treatments.' },
+  { id: 10, name: 'Dr. N. Haddad', initials: 'NH', dept: 'Neurology', specialty: 'Neurosurgeon', experience: '17 years', patients: 580, rating: 4.9, reviews: 178, available: true, degree: 'MS, MCh (Neurosurgery)', languages: 'English, Arabic', expertise: ['Brain Tumor Surgery', 'Spinal Surgery', 'Epilepsy Surgery', 'Minimally Invasive Neurosurgery'], education: [{ degree: 'MS (General Surgery)', school: 'American University of Beirut', year: '2003' }, { degree: 'MCh (Neurosurgery)', school: "King's College London", year: '2008' }], schedule: [true, false, true, true, false, true, false], bio: 'Neurosurgeon with advanced expertise in brain tumor surgery, spinal procedures, and minimally invasive neurosurgery.' },
+  { id: 11, name: 'Dr. T. Andersson', initials: 'TA', dept: 'Orthopedics', specialty: 'Sports Medicine', experience: '13 years', patients: 1340, rating: 4.8, reviews: 398, available: true, degree: 'MD, PhD (Sports Med)', languages: 'English, Swedish', expertise: ['ACL Reconstruction', 'Shoulder Surgery', 'Cartilage Repair', 'Sports Injury Rehab'], education: [{ degree: 'MD (Orthopedics)', school: 'Karolinska Institute, Sweden', year: '2007' }, { degree: 'PhD in Sports Medicine', school: 'University of Gothenburg', year: '2012' }], schedule: [true, true, true, true, true, false, false], bio: 'Sports medicine specialist with PhD-level expertise in ACL reconstruction, shoulder surgery, and athletic rehabilitation.' },
+  { id: 12, name: 'Dr. H. Tanaka', initials: 'HT', dept: 'Pediatrics', specialty: 'Pediatric Neurologist', experience: '15 years', patients: 790, rating: 4.9, reviews: 265, available: true, degree: 'MD, DM (Ped Neuro)', languages: 'English, Japanese', expertise: ['Epilepsy in Children', 'Developmental Disorders', 'Autism Spectrum', 'Cerebral Palsy', 'Neuromuscular Disorders'], education: [{ degree: 'MD (Pediatrics)', school: 'University of Tokyo', year: '2005' }, { degree: 'DM (Pediatric Neurology)', school: 'National Center for Child Health, Tokyo', year: '2010' }], schedule: [true, true, false, true, true, true, false], bio: 'Pediatric neurologist with 15 years of experience in childhood epilepsy, developmental disorders, and neuromuscular conditions.' },
+  { id: 13, name: 'Dr. F. Rossi', initials: 'FR', dept: 'Pulmonology', specialty: 'Critical Care Specialist', experience: '12 years', patients: 1120, rating: 4.7, reviews: 224, available: false, degree: 'MD (Critical Care)', languages: 'English, Italian', expertise: ['ICU Management', 'Mechanical Ventilation', 'Sepsis Care', 'Respiratory Failure'], education: [{ degree: 'MD (Anesthesia & Critical Care)', school: 'University of Milan', year: '2008' }, { degree: 'Fellowship in Critical Care', school: 'Johns Hopkins Hospital, USA', year: '2012' }], schedule: [true, true, true, true, true, true, true], bio: 'Critical care specialist with extensive ICU experience in mechanical ventilation, sepsis management, and respiratory failure.' },
+  { id: 14, name: 'Dr. L. Fernández', initials: 'LF', dept: 'Emergency', specialty: 'Trauma Surgeon', experience: '14 years', patients: 1680, rating: 4.8, reviews: 342, available: true, degree: 'MS (Trauma Surgery)', languages: 'English, Spanish', expertise: ['Polytrauma', 'Emergency Surgery', 'Burn Management', 'Orthopedic Trauma'], education: [{ degree: 'MS (General Surgery)', school: 'Universidad de Madrid', year: '2005' }, { degree: 'Fellowship in Trauma Surgery', school: 'R Adams Cowley Shock Trauma Center, USA', year: '2010' }], schedule: [true, true, true, true, true, false, true], bio: 'Trauma surgeon with 14 years of experience in polytrauma, emergency surgery, and burn management.' },
+  { id: 15, name: 'Dr. A. Ivanova', initials: 'AI', dept: 'Oncology', specialty: 'Radiation Oncologist', experience: '16 years', patients: 660, rating: 4.9, reviews: 201, available: true, degree: 'MD (Radiation Oncology)', languages: 'English, Russian', expertise: ['IMRT & IGRT', 'Stereotactic Radiosurgery', 'Proton Therapy', 'Brachytherapy'], education: [{ degree: 'MD (Radiation Oncology)', school: 'Moscow State Medical University', year: '2004' }, { degree: 'Fellowship in Advanced Radiation', school: 'Memorial Sloan Kettering, USA', year: '2009' }], schedule: [true, false, true, true, false, true, false], bio: 'Radiation oncologist with advanced training in IMRT, stereotactic radiosurgery, and proton therapy.' }
+];
+
+let state = { search: '', dept: 'all', availability: 'all', sortBy: 'name' };
+
+function renderDoctors() {
+  let filtered = doctors.filter(d => {
+    if (state.search) {
+      const q = state.search.toLowerCase();
+      if (!d.name.toLowerCase().includes(q) && !d.specialty.toLowerCase().includes(q) && !d.dept.toLowerCase().includes(q)) return false;
+    }
+    if (state.dept !== 'all' && d.dept !== state.dept) return false;
+    if (state.availability === 'available' && !d.available) return false;
+    if (state.availability === 'busy' && d.available) return false;
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    if (state.sortBy === 'name') return a.name.localeCompare(b.name);
+    if (state.sortBy === 'experience') return parseInt(b.experience) - parseInt(a.experience);
+    if (state.sortBy === 'rating') return b.rating - a.rating;
+    if (state.sortBy === 'patients') return b.patients - a.patients;
+    return 0;
+  });
+
+  document.getElementById('resultCount').textContent = filtered.length;
+  const grid = document.getElementById('doctorsGrid');
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="no-results"><i class="fas fa-user-md"></i><h3>No doctors found</h3><p>Try adjusting your search or filters.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(d => `
+    <div class="doctor-card">
+      <div class="doctor-badge ${d.available ? 'available' : 'busy'}">${d.available ? '● Available' : '● Busy'}</div>
+      <div class="doctor-avatar-wrap">
+        <div class="doctor-avatar ${d.available ? '' : 'offline'}">${d.initials}</div>
+      </div>
+      <div class="doctor-info">
+        <h3>${d.name}</h3>
+        <p class="specialty">${d.specialty}</p>
+        <p class="dept-name"><i class="fas fa-building"></i> ${d.dept} Department</p>
+        <div class="doctor-rating">
+          <div class="stars">${'★'.repeat(Math.floor(d.rating))}${'☆'.repeat(5 - Math.floor(d.rating))}</div>
+          <span class="rating-text">${d.rating} (${d.reviews} reviews)</span>
+        </div>
+        <div class="doctor-meta">
+          <div class="meta-item"><i class="fas fa-briefcase"></i><span><strong>${d.experience}</strong>Experience</span></div>
+          <div class="meta-item"><i class="fas fa-users"></i><span><strong>${d.patients.toLocaleString()}</strong>Patients</span></div>
+        </div>
+        <div class="doctor-actions">
+          <a href="doctorbook2.html?doctor=${d.id}" class="btn btn-primary"><i class="fas fa-calendar-check"></i> Book</a>
+          <button class="btn btn-outline btn-icon-only" onclick="viewProfile(${d.id})" title="View Full Profile"><i class="fas fa-info-circle"></i></button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function viewProfile(id) {
+  const d = doctors.find(x => x.id === id);
+  if (!d) return;
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  document.getElementById('modalContent').innerHTML = `
+    <button class="modal-close" onclick="closeProfile()"><i class="fas fa-times"></i></button>
+    <div class="modal-hero">
+      <div class="avatar ${d.available ? '' : 'offline'}">${d.initials}</div>
+      <h2>${d.name}</h2>
+      <p class="specialty">${d.specialty}</p>
+      <span class="badge ${d.available ? 'available' : 'busy'}">${d.available ? '● Available for Consultation' : '● Currently Busy'}</span>
+    </div>
+    <div class="modal-stats">
+      <div class="modal-stat"><div class="label">Experience</div><div class="value">${d.experience}</div></div>
+      <div class="modal-stat"><div class="label">Patients</div><div class="value">${d.patients.toLocaleString()}</div></div>
+      <div class="modal-stat"><div class="label">Rating</div><div class="value gold">★ ${d.rating}</div></div>
+      <div class="modal-stat"><div class="label">Reviews</div><div class="value">${d.reviews}</div></div>
+    </div>
+    <div class="modal-section">
+      <h4><i class="fas fa-user-md"></i> About the Doctor</h4>
+      <p style="font-size:14px;color:var(--gray);line-height:1.7;">${d.bio}</p>
+    </div>
+    <div class="modal-section">
+      <h4><i class="fas fa-stethoscope"></i> Areas of Expertise</h4>
+      <div class="expertise-tags">${d.expertise.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    </div>
+    <div class="modal-section">
+      <h4><i class="fas fa-graduation-cap"></i> Education & Qualifications</h4>
+      <div class="edu-list">${d.education.map(e => `<div class="edu-item"><i class="fas fa-award"></i><div class="info"><h5>${e.degree}</h5><p>${e.school} · ${e.year}</p></div></div>`).join('')}</div>
+    </div>
+    <div class="modal-section">
+      <h4><i class="fas fa-info-circle"></i> Additional Information</h4>
+      <div class="detail-row"><span class="label"><i class="fas fa-building" style="color:var(--primary);margin-right:6px;"></i> Department</span><span class="value">${d.dept}</span></div>
+      <div class="detail-row"><span class="label"><i class="fas fa-certificate" style="color:var(--primary);margin-right:6px;"></i> Qualification</span><span class="value">${d.degree}</span></div>
+      <div class="detail-row"><span class="label"><i class="fas fa-language" style="color:var(--primary);margin-right:6px;"></i> Languages</span><span class="value">${d.languages}</span></div>
+    </div>
+    <div class="modal-section">
+      <h4><i class="fas fa-calendar-week"></i> Weekly Availability</h4>
+      <div class="schedule-grid">${d.schedule.map((active, i) => `<div class="schedule-day ${active ? 'active' : ''}"><div class="day-name">${dayNames[i]}</div><div class="day-status ${active ? '' : 'off'}">${active ? 'Open' : 'Off'}</div></div>`).join('')}</div>
+    </div>
+    <div class="modal-actions">
+      <a href="doctorbook2.html?doctor=${d.id}" class="btn btn-primary"><i class="fas fa-calendar-check"></i> Book Appointment</a>
+      <a href="tel:+15551234567" class="btn btn-outline"><i class="fas fa-phone"></i> Call</a>
+    </div>
+  `;
+  document.getElementById('profileModal').classList.add('show');
+}
+
+function closeProfile() { document.getElementById('profileModal').classList.remove('show'); }
+document.getElementById('profileModal').addEventListener('click', (e) => { if (e.target.id === 'profileModal') closeProfile(); });
+document.getElementById('searchInput').addEventListener('input', (e) => { state.search = e.target.value; renderDoctors(); });
+document.getElementById('availabilityFilter').addEventListener('change', (e) => { state.availability = e.target.value; renderDoctors(); });
+document.getElementById('sortBy').addEventListener('change', (e) => { state.sortBy = e.target.value; renderDoctors(); });
+document.querySelectorAll('#deptChips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#deptChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    state.dept = chip.dataset.dept;
+    renderDoctors();
+  });
+});
+document.getElementById('statTotal').textContent = doctors.length;
+renderDoctors();
+</script>
+
+<script src="shared.js"></script>
+</body>
+</html>
