@@ -231,12 +231,12 @@
       *, *::before, *::after { box-sizing: border-box; }
 
       /* ============================================================
-         STICKY LAYOUT  (with ultra-wide overflow safeguards)
+         STICKY LAYOUT  (sticky-safe: uses \`clip\`, not \`hidden\`)
       ============================================================ */
       html {
         height: 100%;
         max-width: 100%;
-        overflow-x: hidden;
+        overflow-x: clip;
       }
 
       body {
@@ -246,7 +246,7 @@
         min-height: 100dvh;
         margin: 0;
         max-width: 100%;
-        overflow-x: hidden;
+        overflow-x: clip;
       }
 
       body > *:not(#site-footer) { flex-shrink: 0; }
@@ -257,7 +257,6 @@
         z-index: 100;
         width: 100%;
         max-width: 100%;
-        overflow-x: clip;
         flex-shrink: 0;
       }
 
@@ -266,11 +265,10 @@
         flex-shrink: 0;
         width: 100%;
         max-width: 100%;
-        overflow-x: clip;
       }
 
       /* ============================================================
-         DESKTOP (default) — bigger text & buttons
+         DESKTOP (default)
       ============================================================ */
 
       /* ===== NAVBAR ===== */
@@ -286,8 +284,8 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 18px 28px;
-        gap: 24px;
+        padding: 16px 28px;
+        gap: 20px;
       }
 
       /* Logo */
@@ -305,9 +303,9 @@
       /* Desktop nav links */
       .nav-links { display: flex; align-items: center; gap: 6px; list-style: none; margin: 0 auto; padding: 0; }
       .nav-links a {
-        padding: 13px 22px;
+        padding: 12px 20px;
         border-radius: 11px;
-        font-size: 15px;
+        font-size: 14.5px;
         font-weight: 600;
         color: var(--gray, #5e7e8c);
         text-decoration: none;
@@ -322,14 +320,14 @@
       .nav-staff { position: relative; }
       .nav-staff-chip {
         display: inline-flex; align-items: center; gap: 9px;
-        padding: 12px 18px;
+        padding: 11px 16px;
         border-radius: 40px;
         background: #fff0e0; color: #c96f1e;
-        font-size: 13px; font-weight: 700;
+        font-size: 12.5px; font-weight: 700;
         text-transform: uppercase; letter-spacing: 0.4px;
         cursor: pointer; user-select: none; transition: all 0.15s;
         white-space: nowrap;
-        min-height: 50px;
+        min-height: 48px;
       }
       .nav-staff-chip:hover { background: #ffe4c8; }
       .nav-staff-chip .dot {
@@ -347,10 +345,10 @@
       }
       .nav-staff-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
       .nav-staff-menu a {
-        display: flex; align-items: center; gap: 11px;
-        padding: 13px 16px;
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px 15px;
         border-radius: 10px;
-        font-size: 14.5px; font-weight: 500;
+        font-size: 14px; font-weight: 500;
         color: var(--dark, #0b3b4b); cursor: pointer; text-decoration: none;
       }
       .nav-staff-menu a i { width: 16px; text-align: center; font-size: 13px; color: var(--gray, #5e7e8c); }
@@ -363,18 +361,18 @@
       /* ===== USER CHIP ===== */
       .nav-user { position: relative; }
       .nav-user-chip {
-        display: flex; align-items: center; gap: 11px;
+        display: flex; align-items: center; gap: 10px;
         background: #fff; border: 1.5px solid var(--border, #e6f0f5);
-        border-radius: 40px; padding: 6px 18px 6px 6px;
+        border-radius: 40px; padding: 5px 16px 5px 5px;
         cursor: pointer; transition: all 0.18s; user-select: none;
-        min-height: 50px;
+        min-height: 48px;
       }
       .nav-user-chip:hover { border-color: var(--primary, #0d6e9e); background: #f9fcfd; }
       .nav-user-avatar {
-        width: 40px; height: 40px; border-radius: 50%;
+        width: 38px; height: 38px; border-radius: 50%;
         background: linear-gradient(135deg, #0d6e9e, #0e8b5e); color: #fff;
         display: flex; align-items: center; justify-content: center;
-        font-weight: 700; font-size: 14px; flex-shrink: 0;
+        font-weight: 700; font-size: 13.5px; flex-shrink: 0;
       }
       .nav-user-name { font-size: 14px; font-weight: 600; color: var(--dark, #0b3b4b); line-height: 1.1; }
       .nav-user-role { font-size: 11px; color: var(--gray, #5e7e8c); margin-top: 1px; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 500; }
@@ -389,10 +387,10 @@
       }
       .nav-user-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
       .nav-user-menu a {
-        display: flex; align-items: center; gap: 11px;
-        padding: 13px 16px;
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px 15px;
         border-radius: 10px;
-        font-size: 14.5px; font-weight: 500;
+        font-size: 14px; font-weight: 500;
         color: var(--dark, #0b3b4b); cursor: pointer; text-decoration: none;
       }
       .nav-user-menu a i { width: 16px; text-align: center; font-size: 13px; color: var(--gray, #5e7e8c); }
@@ -404,15 +402,15 @@
       .nav-user-menu a.danger:hover i { color: var(--danger, #e84a5f); }
       .nav-user-menu hr { border: 0; border-top: 1px solid var(--border, #e6f0f5); margin: 6px 4px; }
 
-      /* ===== BUTTONS (desktop — BIGGER) ===== */
+      /* ===== BUTTONS (desktop) ===== */
       .btn {
-        padding: 14px 28px;
+        padding: 13px 26px;
         border-radius: 12px; border: none;
         font-family: inherit; font-size: 15px; font-weight: 600;
         cursor: pointer; transition: all 0.2s;
         display: inline-flex; align-items: center; justify-content: center;
         gap: 9px; text-decoration: none; white-space: nowrap;
-        min-height: 50px;
+        min-height: 48px;
       }
       .btn-primary { background: var(--primary, #0d6e9e); color: #fff; box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3); }
       .btn-primary:hover { background: var(--primary-dark, #0a5578); transform: translateY(-1px); }
@@ -780,12 +778,12 @@
 
       /* ============ ULTRA-WIDE (≥1600px) ============ */
       @media (min-width: 1600px) {
-        .navbar-inner { padding: 20px 40px; gap: 28px; }
-        .nav-links a { padding: 14px 26px; font-size: 15.5px; }
-        .btn { padding: 15px 30px; font-size: 15.5px; min-height: 52px; }
-        .nav-user-chip { padding: 7px 20px 7px 7px; min-height: 52px; }
-        .nav-user-avatar { width: 42px; height: 42px; font-size: 15px; }
-        .nav-staff-chip { padding: 13px 20px; min-height: 52px; }
+        .navbar-inner { padding: 16px 36px; gap: 24px; }
+        .nav-links a { padding: 13px 24px; font-size: 15px; }
+        .btn { padding: 14px 28px; font-size: 15px; min-height: 50px; }
+        .nav-user-chip { padding: 5px 18px 5px 5px; min-height: 50px; }
+        .nav-user-avatar { width: 40px; height: 40px; font-size: 14px; }
+        .nav-staff-chip { padding: 12px 18px; min-height: 50px; }
       }
 
       /* ============ EXTRA SAFETY ============ */
