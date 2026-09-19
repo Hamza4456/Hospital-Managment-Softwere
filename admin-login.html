@@ -13,6 +13,7 @@
   --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
   --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
   --border: #e6f0f5; --white: #fff;
+  --shadow-lg: 0 20px 50px -12px rgba(0,80,110,0.15);
 }
 body { font-family: 'Inter', sans-serif; background: var(--light-gray); color: #1e293b; line-height: 1.6; }
 a { text-decoration: none; color: inherit; }
@@ -25,8 +26,6 @@ a { text-decoration: none; color: inherit; }
 .btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
 .btn-lg { padding: 16px 30px; font-size: 15px; border-radius: 14px; }
 .btn-block { width: 100%; }
-.btn-success { background: var(--success); color: #fff; }
-.btn-success:hover { background: #0a6d4a; }
 
 .auth-wrap {
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
@@ -62,11 +61,14 @@ a { text-decoration: none; color: inherit; }
   font-size: 12px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.5px; margin-bottom: 14px;
 }
+.auth-badge i { font-size: 12px; }
 
+/* ---------- PANES ---------- */
 .pane { display: none; }
 .pane.active { display: block; animation: paneIn 0.3s ease; }
 @keyframes paneIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+/* ---------- FORM ---------- */
 .form-group { margin-bottom: 16px; }
 .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 7px; }
 .form-group input {
@@ -93,13 +95,14 @@ a { text-decoration: none; color: inherit; }
 .alert { display: none; align-items: flex-start; gap: 10px; padding: 12px 15px; border-radius: 12px; font-size: 13.5px; font-weight: 500; margin-bottom: 16px; background: #fdecef; color: var(--danger); }
 .alert.show { display: flex; }
 .alert.success { background: #e1f7ed; color: var(--success); }
+.alert.info    { background: #e1f0f8; color: var(--primary); }
 .alert i { margin-top: 2px; }
 
 .strength { height: 5px; border-radius: 5px; background: var(--border); margin-top: 9px; overflow: hidden; }
 .strength-fill { height: 100%; width: 0; transition: width .25s, background .25s; }
 .strength-text { font-size: 11.5px; font-weight: 600; margin-top: 6px; color: var(--gray); }
 
-.auth-foot { text-align: center; font-size: 13.5px; color: var(--gray); margin-top: 18px; display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.auth-foot { text-align: center; font-size: 13.5px; color: var(--gray); margin-top: 18px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
 .auth-foot a { color: var(--primary); font-weight: 600; cursor: pointer; }
 .auth-foot a:hover { text-decoration: underline; }
 .auth-foot .divider-dot { color: var(--border); }
@@ -115,6 +118,57 @@ a { text-decoration: none; color: inherit; }
 }
 .back-to-login:hover { color: var(--primary); }
 
+/* ---------- CAPTCHA ---------- */
+.captcha-box {
+  background: #f5fafd;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+.captcha-box.error { border-color: var(--danger); background: #fff7f8; }
+.captcha-label {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11px; font-weight: 700; color: var(--gray);
+  text-transform: uppercase; letter-spacing: 0.4px;
+  margin-bottom: 9px;
+}
+.captcha-label span:last-child { text-transform: none; letter-spacing: 0; font-size: 11.5px; }
+.captcha-row { display: flex; align-items: center; gap: 8px; }
+.captcha-question {
+  flex: 1; padding: 11px 14px;
+  background: #fff; border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 16px; font-weight: 800; color: var(--dark);
+  text-align: center; user-select: none;
+  letter-spacing: 2px; font-variant-numeric: tabular-nums;
+}
+.captcha-refresh {
+  width: 42px; height: 42px; flex-shrink: 0;
+  border: 1.5px solid var(--border); background: #fff;
+  border-radius: 10px; color: var(--gray);
+  cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.captcha-refresh:hover {
+  background: var(--primary-light); border-color: var(--primary);
+  color: var(--primary); transform: rotate(180deg);
+}
+.captcha-row input {
+  width: 110px; flex-shrink: 0;
+  padding: 11px 12px;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  color: var(--dark); background: #fff;
+  outline: none; text-align: center;
+}
+.captcha-row input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(13,110,158,0.08);
+}
+
+/* ---------- DIVIDER + LINKS ---------- */
 .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0 16px; color: var(--gray); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
@@ -124,32 +178,20 @@ a { text-decoration: none; color: inherit; }
 }
 .back-link:hover { color: var(--primary); }
 
-/* ---------- SUCCESS PANE ---------- */
-.success-icon-lg {
-  width: 84px; height: 84px; border-radius: 50%;
-  background: #e1f7ed; color: var(--success);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 40px; margin: 0 auto 20px;
-  animation: pop 0.5s cubic-bezier(.2,.9,.3,1.3);
-}
-@keyframes pop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-.success-title { text-align: center; margin-bottom: 22px; }
-.success-title h2 { font-size: 22px; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
-.success-title p { font-size: 14px; color: var(--gray); }
-
-.cred-box {
+/* ---------- FORGOT PASSWORD ---------- */
+.info-box {
   background: #f5fafd; border: 1.5px solid var(--border);
-  border-radius: 14px; padding: 16px; margin-bottom: 20px;
+  border-radius: 14px; padding: 16px;
+  font-size: 13px; color: var(--gray); line-height: 1.6;
+  margin-bottom: 20px;
 }
-.cred-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13.5px; border-bottom: 1px solid rgba(230,240,245,0.6); }
-.cred-row:last-child { border-bottom: none; }
-.cred-row .lbl { color: var(--gray); font-weight: 500; }
-.cred-row .val { color: var(--dark); font-weight: 700; word-break: break-all; text-align: right; }
+.info-box i { color: var(--primary); margin-right: 4px; }
+.info-box strong { color: var(--dark); }
 
+/* ---------- SUCCESS ---------- */
 .status-line {
   display: flex; align-items: center; gap: 8px;
-  font-size: 13px; color: var(--gray); padding: 8px 0;
+  font-size: 13px; color: var(--gray); padding: 10px 0;
 }
 .status-line .dot {
   width: 8px; height: 8px; border-radius: 50%;
@@ -158,39 +200,13 @@ a { text-decoration: none; color: inherit; }
 .status-line.ok .dot { background: var(--success); }
 .status-line.fail .dot { background: var(--danger); }
 
-.fallback-note {
-  background: #fff8e8; border: 1.5px solid #fce4b3;
-  border-radius: 12px; padding: 14px 16px;
-  font-size: 12.5px; color: #8a5a1c; line-height: 1.6;
-  margin-top: 14px;
-}
-.fallback-note strong { color: #6a4416; display: block; margin-bottom: 6px; }
-.fallback-note code {
-  background: #fff; padding: 2px 6px; border-radius: 4px;
-  font-size: 11.5px; color: var(--primary-dark);
-  border: 1px solid #f0d9a8;
-  cursor: pointer;
-  display: inline-block;
-  margin: 2px 2px;
-}
-.fallback-note code:hover { background: var(--primary-light); border-color: var(--primary); }
-
-.manual-list {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  margin-top: 10px;
-}
-.manual-list a {
-  padding: 8px 14px; border-radius: 10px;
-  background: #fff; border: 1.5px solid var(--border);
-  color: var(--primary); font-size: 12.5px; font-weight: 600;
-  transition: all .15s;
-}
-.manual-list a:hover { background: var(--primary-light); border-color: var(--primary); }
-
 @media (max-width: 640px) {
   .auth-wrap { padding: 30px 16px; }
   .auth-card { padding: 28px 22px; border-radius: 20px; }
   .auth-head h1 { font-size: 20px; }
+  .captcha-row { flex-wrap: wrap; }
+  .captcha-question { width: 100%; flex: 1 1 100%; }
+  .captcha-row input { flex: 1; width: auto; }
 }
 </style>
 </head>
@@ -209,7 +225,7 @@ a { text-decoration: none; color: inherit; }
     <div class="alert" id="err"><i class="fas fa-exclamation-circle"></i><span></span></div>
     <div class="alert success" id="ok"><i class="fas fa-check-circle"></i><span></span></div>
 
-    <!-- PANE 1 — LOGIN -->
+    <!-- ============ PANE 1 — LOGIN ============ -->
     <div class="pane active" id="paneLogin">
       <form id="adminLoginForm" novalidate>
         <div class="form-group">
@@ -223,6 +239,22 @@ a { text-decoration: none; color: inherit; }
             <button type="button" class="pass-toggle" data-target="adminPass"><i class="fas fa-eye"></i></button>
           </div>
         </div>
+
+        <!-- ============ CAPTCHA ============ -->
+        <div class="captcha-box" id="captchaBox">
+          <div class="captcha-label">
+            <span><i class="fas fa-shield-halved"></i> Verification</span>
+            <span id="captchaStatus">Not verified</span>
+          </div>
+          <div class="captcha-row">
+            <div class="captcha-question" id="captchaQuestion">— + —</div>
+            <button type="button" class="captcha-refresh" id="captchaRefresh" title="New question">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+            <input type="text" id="captchaAnswer" placeholder="Answer" inputmode="numeric" autocomplete="off" maxlength="3">
+          </div>
+        </div>
+
         <button type="submit" class="btn btn-primary btn-lg btn-block">
           <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
         </button>
@@ -235,9 +267,9 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <!-- PANE 2 — SETUP -->
+    <!-- ============ PANE 2 — SETUP ============ -->
     <div class="pane" id="paneSetup">
-      <span class="back-to-login" id="backToLogin">
+      <span class="back-to-login" id="backToLoginSetup">
         <i class="fas fa-arrow-left"></i> Back to sign in
       </span>
 
@@ -277,48 +309,73 @@ a { text-decoration: none; color: inherit; }
       </form>
     </div>
 
-    <!-- PANE 3 — SUCCESS with auto-detect -->
-    <div class="pane" id="paneSuccess">
-      <div class="success-icon-lg"><i class="fas fa-check-circle"></i></div>
-      <div class="success-title">
-        <h2 id="successTitle">Account Created!</h2>
-        <p id="successSubtitle">Searching for your dashboard file…</p>
+    <!-- ============ PANE 3 — FORGOT PASSWORD ============ -->
+    <div class="pane" id="paneForgot">
+      <span class="back-to-login" id="backToLoginForgot">
+        <i class="fas fa-arrow-left"></i> Back to sign in
+      </span>
+
+      <div class="pane-title">
+        <h2>Forgot Password?</h2>
+        <p>Reset the administrator password for this device.</p>
       </div>
 
-      <div class="cred-box">
-        <div class="cred-row">
-          <span class="lbl">Username</span>
-          <span class="val" id="credUsername">—</span>
+      <div class="info-box">
+        <i class="fas fa-info-circle"></i>
+        <strong>How this works:</strong>
+        This is a local system — credentials are stored only on this device, so no reset email can be sent.
+        Clicking the button below will <strong>clear the existing admin password</strong> so you can set a new one.
+        <br><br>
+        <strong>Your hospital records, patients, doctors, and bookings will NOT be affected.</strong>
+      </div>
+
+      <div class="form-group">
+        <label>Confirm Username</label>
+        <input type="text" id="forgotUser" placeholder="Type your admin username to confirm" autocomplete="username">
+      </div>
+
+      <button type="button" class="btn btn-primary btn-lg btn-block" id="forgotResetBtn">
+        <i class="fas fa-key"></i> Reset Password on This Device
+      </button>
+    </div>
+
+    <!-- ============ PANE 4 — SUCCESS ============ -->
+    <div class="pane" id="paneSuccess">
+      <div style="width:84px;height:84px;border-radius:50%;background:#e1f7ed;color:var(--success);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="pane-title">
+        <h2 id="successTitle">Account Created!</h2>
+        <p id="successSubtitle">Opening the dashboard…</p>
+      </div>
+
+      <div class="info-box">
+        <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13.5px;">
+          <span style="color:var(--gray);">Username</span>
+          <strong id="credUsername" style="color:var(--dark);">—</strong>
         </div>
-        <div class="cred-row">
-          <span class="lbl">Role</span>
-          <span class="val">Administrator</span>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13.5px;">
+          <span style="color:var(--gray);">Role</span>
+          <strong style="color:var(--dark);">Administrator</strong>
         </div>
       </div>
 
       <div class="status-line" id="detectStatus">
         <span class="dot"></span>
-        <span id="detectMsg">Checking for your dashboard file…</span>
+        <span id="detectMsg">Looking for your dashboard file…</span>
       </div>
 
-      <a href="#" id="goDashboardBtn" class="btn btn-success btn-lg btn-block" style="margin-top:14px; display:none;">
+      <a href="#" id="goDashboardBtn" class="btn btn-primary btn-lg btn-block" style="display:none;margin-top:10px;">
         <i class="fas fa-columns"></i> Open Dashboard
-      </a>
-
-      <div class="fallback-note" id="fallbackNote" style="display:none;">
-        <strong>Couldn't find your dashboard automatically.</strong>
-        Click one of these filenames to open your dashboard — whichever one works:
-        <div class="manual-list" id="manualList"></div>
-        <div style="margin-top:10px;">
-          Your account is created and saved. Any of these files, when opened, will let you in.
-        </div>
-      </div>
-
-      <a href="index.html" class="back-link" style="margin-top:20px;">
-        <i class="fas fa-arrow-left"></i> Back to Website
       </a>
     </div>
 
+    <div class="divider">Patient</div>
+    <a href="index.html" class="btn btn-outline btn-block"><i class="fas fa-user"></i> Patient Website</a>
+
+    <a href="index.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
   </div>
 </div>
 
@@ -335,10 +392,8 @@ const DASHBOARD_CANDIDATES = [
   '1.html',
   'dashboard.html',
   'admin.html',
-  'dashboard-doctors.html',
   'admin-dashboard.html',
-  'hms.html',
-  'index-dashboard.html'
+  'hms.html'
 ];
 
 /* =====================================================
@@ -402,7 +457,7 @@ function showPane(name) {
   const pane = document.getElementById('pane' + name);
   if (pane) pane.classList.add('active');
 
-  const head  = document.getElementById('authHead');
+  const head = document.getElementById('authHead');
   if (name === 'Success') {
     head.style.display = 'none';
   } else {
@@ -412,9 +467,12 @@ function showPane(name) {
     if (name === 'Login') {
       title.textContent = 'Hospital Dashboard';
       sub.textContent   = 'Sign in with your administrator credentials';
-    } else {
+    } else if (name === 'Setup') {
       title.textContent = 'Staff Setup';
       sub.textContent   = 'Configure administrator access for this device';
+    } else if (name === 'Forgot') {
+      title.textContent = 'Account Recovery';
+      sub.textContent   = 'Reset access to your administrator account';
     }
   }
   clearAlerts();
@@ -424,6 +482,7 @@ function clearAlerts() {
   document.getElementById('err').classList.remove('show');
   document.getElementById('ok').classList.remove('show');
   document.querySelectorAll('.form-group.error').forEach(g => g.classList.remove('error'));
+  document.getElementById('captchaBox').classList.remove('error');
 }
 
 function showErr(msg) {
@@ -432,9 +491,58 @@ function showErr(msg) {
   el.classList.add('show');
   document.getElementById('ok').classList.remove('show');
 }
+function showOk(msg) {
+  const el = document.getElementById('ok');
+  el.querySelector('span').textContent = msg;
+  el.classList.add('show');
+  document.getElementById('err').classList.remove('show');
+}
 
 /* =====================================================
-   PASSWORD TOGGLE
+   CAPTCHA
+===================================================== */
+let captchaAnswer = null;
+
+function newCaptcha() {
+  const a = Math.floor(Math.random() * 9) + 1;   /* 1..9  */
+  const b = Math.floor(Math.random() * 9) + 1;   /* 1..9  */
+  const ops = ['+', '×'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+
+  let q, ans;
+  if (op === '+') { q = a + ' + ' + b; ans = a + b; }
+  else            { q = a + ' × ' + b; ans = a * b; }
+
+  captchaAnswer = ans;
+  document.getElementById('captchaQuestion').textContent = q + ' = ?';
+  document.getElementById('captchaAnswer').value = '';
+  document.getElementById('captchaStatus').textContent = 'Not verified';
+  document.getElementById('captchaStatus').style.color = 'var(--gray)';
+  document.getElementById('captchaBox').classList.remove('error');
+}
+
+document.getElementById('captchaRefresh').addEventListener('click', newCaptcha);
+
+document.getElementById('captchaAnswer').addEventListener('input', function () {
+  const v = parseInt(this.value.trim(), 10);
+  const status = document.getElementById('captchaStatus');
+  if (!this.value.trim()) {
+    status.textContent = 'Not verified';
+    status.style.color = 'var(--gray)';
+    return;
+  }
+  if (v === captchaAnswer) {
+    status.textContent = '✓ Verified';
+    status.style.color = 'var(--success)';
+    document.getElementById('captchaBox').classList.remove('error');
+  } else {
+    status.textContent = 'Wrong answer';
+    status.style.color = 'var(--danger)';
+  }
+});
+
+/* =====================================================
+   PASSWORD VISIBILITY TOGGLE
 ===================================================== */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.pass-toggle');
@@ -456,29 +564,30 @@ document.getElementById('linkCreate').addEventListener('click', e => {
 
 document.getElementById('linkForgot').addEventListener('click', e => {
   e.preventDefault();
-  if (!hasAdminAccount()) { openSetup('create'); return; }
-  const sure = confirm(
-    'Reset the admin password?\n\n' +
-    'You will set a new username and password on the next screen.\n' +
-    'Hospital records will be KEPT.'
-  );
-  if (!sure) return;
-  try {
-    const db = loadDB() || {};
-    if (!db.user) db.user = {};
-    db.user.username     = null;
-    db.user.passwordHash = null;
-    saveDB(db);
-  } catch (err) {}
-  sessionStorage.removeItem(SESSION_KEY);
-  openSetup('reset');
+  showPane('Forgot');
+  document.getElementById('forgotUser').value = '';
+  setTimeout(() => document.getElementById('forgotUser').focus(), 250);
 });
 
+document.getElementById('backToLoginSetup').addEventListener('click', () => {
+  showPane('Login');
+  setTimeout(() => document.getElementById('adminUser').focus(), 250);
+});
+
+document.getElementById('backToLoginForgot').addEventListener('click', () => {
+  showPane('Login');
+  setTimeout(() => document.getElementById('adminUser').focus(), 250);
+});
+
+/* =====================================================
+   SETUP
+===================================================== */
 function openSetup(mode) {
   clearAlerts();
   const t   = document.getElementById('setupTitle');
   const s   = document.getElementById('setupSubtitle');
   const btn = document.getElementById('setupSubmitBtn');
+
   if (mode === 'reset') {
     t.textContent = 'Reset Administrator Credentials';
     s.textContent = 'Set a new username and password for this device.';
@@ -488,6 +597,7 @@ function openSetup(mode) {
     s.textContent = 'Set your name, username and a strong password for this device.';
     btn.innerHTML = '<i class="fas fa-user-shield"></i> Create Account';
   }
+
   const db = loadDB();
   if (db && db.user && db.user.name) {
     document.getElementById('suName').value = db.user.name;
@@ -496,18 +606,11 @@ function openSetup(mode) {
   document.getElementById('suPass').value  = '';
   document.getElementById('suPass2').value = '';
   updateStrengthMeter();
+
   showPane('Setup');
   setTimeout(() => document.getElementById('suName').focus(), 250);
 }
 
-document.getElementById('backToLogin').addEventListener('click', () => {
-  showPane('Login');
-  setTimeout(() => document.getElementById('adminUser').focus(), 250);
-});
-
-/* =====================================================
-   STRENGTH METER
-===================================================== */
 function updateStrengthMeter() {
   const pw = document.getElementById('suPass').value;
   const s = hashStrength(pw);
@@ -527,9 +630,6 @@ function updateStrengthMeter() {
 }
 document.getElementById('suPass').addEventListener('input', updateStrengthMeter);
 
-/* =====================================================
-   FIELD ERROR MARKER
-===================================================== */
 function markFieldError(id) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -541,67 +641,93 @@ function markFieldError(id) {
 }
 
 /* =====================================================
-   AUTO-DETECT DASHBOARD FILE
-   Tries each candidate via fetch(); first one that
-   returns 200 OK wins.
+   FORGOT PASSWORD — RESET
+===================================================== */
+document.getElementById('forgotResetBtn').addEventListener('click', () => {
+  const typed = document.getElementById('forgotUser').value.trim();
+
+  if (!hasAdminAccount()) {
+    showErr('No admin account exists on this device. Please create one.');
+    setTimeout(() => openSetup('create'), 1000);
+    return;
+  }
+
+  const db = loadDB();
+  const actualUser = db.user.username || '';
+
+  if (!typed) {
+    markFieldError('forgotUser');
+    return showErr('Please type your admin username to confirm.');
+  }
+  if (typed.toLowerCase() !== actualUser.toLowerCase()) {
+    markFieldError('forgotUser');
+    return showErr('Username does not match the account on this device.');
+  }
+
+  const sure = confirm(
+    'Reset the admin password on this device?\n\n' +
+    'Your hospital records, patients, doctors and bookings will be KEPT.\n' +
+    'You will set a new password on the next screen.'
+  );
+  if (!sure) return;
+
+  try {
+    db.user.passwordHash = null;
+    saveDB(db);
+  } catch (err) {}
+
+  sessionStorage.removeItem(SESSION_KEY);
+
+  openSetup('reset');
+});
+
+/* =====================================================
+   DETECT DASHBOARD FILE
 ===================================================== */
 async function detectDashboardFile() {
   const statusEl  = document.getElementById('detectStatus');
   const statusMsg = document.getElementById('detectMsg');
-  const noteBox   = document.getElementById('fallbackNote');
-  const manual    = document.getElementById('manualList');
   const btn       = document.getElementById('goDashboardBtn');
 
   statusEl.className = 'status-line';
-  statusEl.style.display = 'flex';
-  noteBox.style.display = 'none';
   btn.style.display = 'none';
 
   for (const file of DASHBOARD_CANDIDATES) {
-    statusMsg.textContent = 'Checking ' + file + '…';
+    statusMsg.textContent = 'Looking for ' + file + '…';
     try {
       const res = await fetch(file, { method: 'HEAD', cache: 'no-store' });
       if (res.ok) {
         statusEl.className = 'status-line ok';
         statusMsg.textContent = 'Found: ' + file;
         btn.href = file;
-        btn.innerHTML = '<i class="fas fa-columns"></i> Open Dashboard (' + file + ')';
+        btn.innerHTML = '<i class="fas fa-columns"></i> Open Dashboard';
         btn.style.display = 'inline-flex';
-
-        /* Auto-redirect after 1.2s */
-        setTimeout(() => { location.href = file; }, 1200);
+        setTimeout(() => { location.href = file; }, 900);
         return file;
       }
-    } catch (e) {
-      /* ignore and try next */
-    }
+    } catch (e) { /* try next */ }
   }
 
-  /* Nothing found — show manual picker */
   statusEl.className = 'status-line fail';
-  statusMsg.textContent = 'Could not auto-detect the dashboard file.';
-  noteBox.style.display = 'block';
-  manual.innerHTML = DASHBOARD_CANDIDATES
-    .map(f => '<a href="' + f + '">' + f + '</a>')
-    .join('');
+  statusMsg.textContent = 'Could not find the dashboard file. Click the button to try manually.';
+  btn.href = DASHBOARD_CANDIDATES[0];
+  btn.innerHTML = '<i class="fas fa-columns"></i> Try Opening Dashboard';
+  btn.style.display = 'inline-flex';
   return null;
 }
 
 /* =====================================================
-   SHOW SUCCESS PANE
+   SUCCESS PANE
 ===================================================== */
 function showSuccess(username, isNew) {
   document.getElementById('successTitle').textContent =
     isNew ? 'Account Created!' : 'Signed In!';
   document.getElementById('successSubtitle').textContent =
-    isNew ? 'Your administrator account is ready.' 
-          : 'You are now signed in.';
-
+    isNew ? 'Your administrator account is ready. Opening the dashboard…'
+          : 'You are now signed in. Opening the dashboard…';
   document.getElementById('credUsername').textContent = username;
 
   showPane('Success');
-
-  /* Kick off detection right after the pane is visible */
   detectDashboardFile();
 }
 
@@ -614,9 +740,23 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
 
   const username = document.getElementById('adminUser').value.trim();
   const password = document.getElementById('adminPass').value;
+  const captchaTyped = document.getElementById('captchaAnswer').value.trim();
 
+  /* Basic validation */
   if (!username) { markFieldError('adminUser'); return showErr('Please enter your username.'); }
   if (!password) { markFieldError('adminPass'); return showErr('Please enter your password.'); }
+
+  /* Captcha validation */
+  if (!captchaTyped) {
+    document.getElementById('captchaBox').classList.add('error');
+    return showErr('Please solve the verification question.');
+  }
+  if (parseInt(captchaTyped, 10) !== captchaAnswer) {
+    document.getElementById('captchaBox').classList.add('error');
+    newCaptcha();
+    document.getElementById('captchaBox').classList.add('error');
+    return showErr('Incorrect verification answer. A new question has been generated.');
+  }
 
   const db = loadDB();
   if (!db.user.username || !db.user.passwordHash) {
@@ -627,6 +767,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
   if (username.toLowerCase() !== db.user.username.toLowerCase()) {
     markFieldError('adminUser');
     markFieldError('adminPass');
+    newCaptcha();
     return showErr('Invalid username or password.');
   }
 
@@ -645,6 +786,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
     document.getElementById('adminPass').value = '';
     markFieldError('adminUser');
     markFieldError('adminPass');
+    newCaptcha();
     return showErr('Invalid username or password.');
   }
 
@@ -687,12 +829,9 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
   const db = loadDB() || {};
   db.user = {
     ...(db.user || {}),
-    name,
-    username: user,
-    passwordHash,
-    initials,
-    email:     (db.user && db.user.email) || '',
-    role:      'Administrator',
+    name, username: user, passwordHash, initials,
+    email:  (db.user && db.user.email) || '',
+    role:   'Administrator',
     createdAt: new Date().toISOString()
   };
   saveDB(db);
@@ -705,11 +844,12 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
 });
 
 /* =====================================================
-   AUTO-BOOT
+   BOOT
 ===================================================== */
 (function boot() {
   const params = new URLSearchParams(location.search);
 
+  /* Already signed in? */
   if (!params.has('setup')) {
     const raw = sessionStorage.getItem(SESSION_KEY);
     if (raw) {
@@ -732,6 +872,9 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
   if (!hasAdminAccount()) {
     showErr('No admin account set up yet. Click "Create admin account" below.');
   }
+
+  /* Generate captcha on load */
+  newCaptcha();
 
   setTimeout(() => document.getElementById('adminUser').focus(), 200);
 })();
