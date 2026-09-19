@@ -176,7 +176,7 @@ a { text-decoration: none; color: inherit; }
     </div>
 
     <!-- ============================================================
-         PANE 2 — SETUP / RESET (Create admin account OR forgot password)
+         PANE 2 — SETUP / RESET
     ============================================================ -->
     <div class="pane" id="paneSetup">
       <span class="back-to-login" id="backToLogin">
@@ -232,15 +232,15 @@ a { text-decoration: none; color: inherit; }
 /* =====================================================
    CONFIG
 ===================================================== */
-const SALT          = 'medicare::hms::v2::salt';
-const DB_KEY        = 'medicare_hms';
-const SESSION_KEY   = 'medicare_session';
+const SALT        = 'medicare::hms::v2::salt';
+const DB_KEY      = 'medicare_hms';
+const SESSION_KEY = 'medicare_session';
 
 /* 👇👇👇 SET THIS TO YOUR DASHBOARD FILENAME 👇👇👇
-   Look at the URL bar when your dashboard is open. Common names:
-   'admin.html'  |  'dashboard.html'  |  '1.html'              */
-const DASHBOARD_FILE = 'admin.html';
-/* 👆👆👆 — must match the actual file on disk               */
+   Look at the URL bar when your dashboard is open.
+   Based on your shared.js it's either 'dashboard.html' or '1.html'. */
+const DASHBOARD_FILE = '1.html';
+/* 👆👆👆 — change if your dashboard is named differently */
 
 /* =====================================================
    HELPERS
@@ -268,12 +268,11 @@ async function hashPassword(password) {
 function loadDB() {
   try {
     const raw = localStorage.getItem(DB_KEY);
-    if (!raw) return null;
-    const d = JSON.parse(raw);
-    /* Fill in missing keys so we never crash */
+    if (!raw) return { user: {} };
+    const d = JSON.parse(raw) || {};
     if (!d.user) d.user = {};
     return d;
-  } catch (e) { return null; }
+  } catch (e) { return { user: {} }; }
 }
 
 function saveDB(data) {
@@ -301,9 +300,9 @@ function hashStrength(pw) {
 ===================================================== */
 function showPane(name) {
   document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
-  document.getElementById('pane' + name).classList.add('active');
+  const pane = document.getElementById('pane' + name);
+  if (pane) pane.classList.add('active');
 
-  /* Tweak the header based on which pane */
   const title = document.getElementById('mainTitle');
   const sub   = document.getElementById('mainSubtitle');
   if (name === 'Login') {
@@ -350,7 +349,7 @@ document.addEventListener('click', e => {
 });
 
 /* =====================================================
-   SETUP LINK — "Create admin account"
+   "Create admin account" LINK
 ===================================================== */
 document.getElementById('linkCreate').addEventListener('click', e => {
   e.preventDefault();
@@ -358,13 +357,12 @@ document.getElementById('linkCreate').addEventListener('click', e => {
 });
 
 /* =====================================================
-   FORGOT PASSWORD LINK
+   "Forgot password?" LINK
 ===================================================== */
 document.getElementById('linkForgot').addEventListener('click', e => {
   e.preventDefault();
 
   if (!hasAdminAccount()) {
-    /* No account to reset — jump straight to setup */
     openSetup('create');
     return;
   }
@@ -376,7 +374,7 @@ document.getElementById('linkForgot').addEventListener('click', e => {
   );
   if (!sure) return;
 
-  /* Wipe only the credentials */
+  /* Wipe only the credentials, keep all hospital records */
   try {
     const db = loadDB() || {};
     if (!db.user) db.user = {};
@@ -391,13 +389,13 @@ document.getElementById('linkForgot').addEventListener('click', e => {
 });
 
 /* =====================================================
-   OPEN SETUP PANE (create or reset)
+   OPEN SETUP PANE
 ===================================================== */
 function openSetup(mode) {
   clearAlerts();
 
-  const t = document.getElementById('setupTitle');
-  const s = document.getElementById('setupSubtitle');
+  const t   = document.getElementById('setupTitle');
+  const s   = document.getElementById('setupSubtitle');
   const btn = document.getElementById('setupSubmitBtn');
 
   if (mode === 'reset') {
@@ -410,15 +408,15 @@ function openSetup(mode) {
     btn.innerHTML = '<i class="fas fa-user-shield"></i> Create Account';
   }
 
-  /* Pre-fill from existing user if any (helps when resetting) */
+  /* Pre-fill name from existing user */
   const db = loadDB();
   if (db && db.user && db.user.name) {
     document.getElementById('suName').value = db.user.name;
   }
 
-  /* Clear password fields */
-  document.getElementById('suUser').value = '';
-  document.getElementById('suPass').value = '';
+  /* Clear other fields */
+  document.getElementById('suUser').value  = '';
+  document.getElementById('suPass').value  = '';
   document.getElementById('suPass2').value = '';
   updateStrengthMeter();
 
@@ -441,11 +439,11 @@ function updateStrengthMeter() {
   const pw = document.getElementById('suPass').value;
   const s = hashStrength(pw);
   const map = [
-    { w: '0%',   c: 'transparent',    t: 'Use 8+ characters with letters, numbers & a symbol', col: '#5e7e8c' },
-    { w: '25%',  c: '#e84a5f',        t: 'Weak password',   col: '#e84a5f' },
-    { w: '50%',  c: '#e8a33d',        t: 'Fair password',   col: '#e8a33d' },
-    { w: '75%',  c: '#0d6e9e',        t: 'Good password',   col: '#0d6e9e' },
-    { w: '100%', c: '#0e8b5e',        t: 'Strong password', col: '#0e8b5e' }
+    { w: '0%',   c: 'transparent', t: 'Use 8+ characters with letters, numbers & a symbol', col: '#5e7e8c' },
+    { w: '25%',  c: '#e84a5f',     t: 'Weak password',   col: '#e84a5f' },
+    { w: '50%',  c: '#e8a33d',     t: 'Fair password',   col: '#e8a33d' },
+    { w: '75%',  c: '#0d6e9e',     t: 'Good password',   col: '#0d6e9e' },
+    { w: '100%', c: '#0e8b5e',     t: 'Strong password', col: '#0e8b5e' }
   ][s];
   const bar = document.getElementById('suStrength');
   const txt = document.getElementById('suStrengthText');
@@ -458,7 +456,7 @@ function updateStrengthMeter() {
 document.getElementById('suPass').addEventListener('input', updateStrengthMeter);
 
 /* =====================================================
-   MARK FIELD ERROR HELPER
+   FIELD ERROR MARKER
 ===================================================== */
 function markFieldError(id) {
   const el = document.getElementById(id);
@@ -485,8 +483,8 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
 
   const db = loadDB();
 
-  /* No account yet — send to setup */
-  if (!db || !db.user || !db.user.username || !db.user.passwordHash) {
+  /* No account yet → send to setup */
+  if (!db.user.username || !db.user.passwordHash) {
     showErr('No admin account exists yet. Opening setup…');
     setTimeout(() => openSetup('create'), 800);
     return;
@@ -530,10 +528,10 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
   e.preventDefault();
   clearAlerts();
 
-  const name  = document.getElementById('suName').value.trim();
-  const user  = document.getElementById('suUser').value.trim();
-  const pw    = document.getElementById('suPass').value;
-  const pw2   = document.getElementById('suPass2').value;
+  const name = document.getElementById('suName').value.trim();
+  const user = document.getElementById('suUser').value.trim();
+  const pw   = document.getElementById('suPass').value;
+  const pw2  = document.getElementById('suPass2').value;
 
   if (name.length < 2) {
     markFieldError('suName');
@@ -564,21 +562,21 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
   const passwordHash = await hashPassword(pw);
   const initials = (name.split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
 
-  /* Save to medicare_hms (same key the dashboard uses) */
+  /* Save into medicare_hms — the key the dashboard uses */
   const db = loadDB() || {};
   db.user = {
     ...(db.user || {}),
     name,
-    username:     user,
+    username: user,
     passwordHash,
     initials,
-    email:        (db.user && db.user.email) || '',
-    role:         'Administrator',
-    createdAt:    new Date().toISOString()
+    email:     (db.user && db.user.email) || '',
+    role:      'Administrator',
+    createdAt: new Date().toISOString()
   };
   saveDB(db);
 
-  /* Set the session so the dashboard goes straight in */
+  /* Also set the session so the dashboard skips its own login */
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: user, t: Date.now() }));
 
   btn.disabled = false;
@@ -590,13 +588,11 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
 
 /* =====================================================
    AUTO-BOOT
-   - If ?setup=1 in URL → open Setup pane
-   - If already signed in → skip to dashboard
 ===================================================== */
 (function boot() {
   const params = new URLSearchParams(location.search);
 
-  /* Redirect to dashboard if already signed in and not forcing setup */
+  /* If already signed in and no ?setup=1 → skip to dashboard */
   if (!params.has('setup')) {
     const raw = sessionStorage.getItem(SESSION_KEY);
     if (raw) {
@@ -611,13 +607,13 @@ document.getElementById('setupForm').addEventListener('submit', async e => {
     }
   }
 
-  /* Force setup view if ?setup=1 */
+  /* Force setup view */
   if (params.has('setup')) {
     openSetup('create');
     return;
   }
 
-  /* Default — if no account exists, nudge the user toward setup */
+  /* No account exists → nudge toward setup */
   if (!hasAdminAccount()) {
     showErr('No admin account set up yet. Click "Create admin account" below.');
   }
