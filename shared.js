@@ -284,7 +284,7 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 16px 28px;
+        padding: 10px 20px;
         gap: 20px;
       }
 
