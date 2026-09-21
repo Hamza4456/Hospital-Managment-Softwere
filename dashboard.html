@@ -1303,7 +1303,6 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- PAGE: DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="stats-grid">
         <div class="stat-card">
@@ -1358,7 +1357,6 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- PAGE: PATIENTS -->
     <div class="page" id="page-patients">
       <div class="card">
         <div class="card-header">
@@ -1376,7 +1374,6 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- PAGE: APPOINTMENTS -->
     <div class="page" id="page-appointments">
       <div class="card">
         <div class="card-header">
@@ -1394,7 +1391,6 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- PAGE: BOOKINGS -->
     <div class="page" id="page-bookings">
       <div class="filter-bar">
         <div class="chips" id="bookingChips">
@@ -1413,7 +1409,6 @@ input:-webkit-autofill:active {
       <div class="bk-list" id="bookingsList"></div>
     </div>
 
-    <!-- PAGE: DOCTORS -->
     <div class="page" id="page-doctors">
       <div class="card">
         <div class="card-header">
@@ -1424,7 +1419,6 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- PAGE: DEPARTMENTS -->
     <div class="page" id="page-departments">
       <div class="card">
         <div class="card-header">
@@ -1435,7 +1429,6 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- PAGE: SERVICES -->
     <div class="page" id="page-services">
       <div class="card">
         <div class="card-header">
@@ -1446,7 +1439,6 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- PAGE: BILLING -->
     <div class="page" id="page-billing">
       <div class="stats-grid">
         <div class="stat-card">
@@ -1498,7 +1490,6 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- PAGE: REPORTS -->
     <div class="page" id="page-reports">
       <div class="stats-grid">
         <div class="stat-card">
@@ -1530,7 +1521,6 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- PAGE: SETTINGS -->
     <div class="page" id="page-settings">
       <div class="grid-2">
         <div class="card">
@@ -1607,17 +1597,12 @@ input:-webkit-autofill:active {
   </main>
 </div>
 
-<!-- MODALS -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="modalContent"></div>
 </div>
 
-<!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- =========================================================
-     SCRIPTS
-========================================================= -->
 <script src="shared.js"></script>
 <script src="global-support.js"></script>
 <link rel="stylesheet" href="admin-extras.css">
@@ -1634,12 +1619,8 @@ const money = (n) => (window.GlobalSupport && window.GlobalSupport.money)
     : ('$' + (Number(n) || 0).toFixed(2));
 
 /* =====================================================
-   CREDENTIALS STORE (separate from data!)
-   medicare_admin → credentials (username, passwordHash, name, ...)
-   medicare_hms   → patients, doctors, appointments, etc.
+   AUTH — credentials live in 'medicare_admin' (isolated)
 ===================================================== */
-const AUTH_KEY = 'medicare_admin';
-
 const Auth = {
   SALT: 'medicare::hms::v2::salt',
   SESSION_KEY: 'medicare_session',
@@ -1652,7 +1633,6 @@ const Auth = {
   saveAuth(obj) {
     localStorage.setItem(this.AUTH_KEY, JSON.stringify(obj));
   },
-
   async hash(password) {
     const input = this.SALT + '|' + password;
     if (window.crypto && window.crypto.subtle && window.isSecureContext) {
@@ -1671,12 +1651,10 @@ const Auth = {
     h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
     return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
   },
-
   hasAccount() {
     const a = this.loadAuth();
     return !!(a && a.username && a.passwordHash);
   },
-
   async register({ name, username, password }) {
     const passwordHash = await this.hash(password);
     const initials = (name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
@@ -1690,14 +1668,12 @@ const Auth = {
       createdAt: new Date().toISOString()
     });
   },
-
   async login(username, password) {
     const a = this.loadAuth();
     if (!a || !a.username) return false;
     if (a.username.toLowerCase() !== String(username).trim().toLowerCase()) return false;
     return (await this.hash(password)) === a.passwordHash;
   },
-
   async changePassword(current, next) {
     const a = this.loadAuth();
     if (!a || (await this.hash(current)) !== a.passwordHash) return false;
@@ -1705,14 +1681,12 @@ const Auth = {
     this.saveAuth(a);
     return true;
   },
-
   setSession() {
     const a = this.loadAuth();
+    if (!a) return;
     sessionStorage.setItem(this.SESSION_KEY, JSON.stringify({ u: a.username, t: Date.now() }));
   },
-
   clearSession() { sessionStorage.removeItem(this.SESSION_KEY); },
-
   isLoggedIn() {
     const raw = sessionStorage.getItem(this.SESSION_KEY);
     if (!raw) return false;
@@ -1725,7 +1699,7 @@ const Auth = {
 };
 
 /* =====================================================
-   DATA LAYER (unchanged — dummy data lives here)
+   DATA LAYER — dummy data lives in 'medicare_hms'
 ===================================================== */
 const DB = {
   key: 'medicare_hms',
@@ -1737,15 +1711,13 @@ const DB = {
     try {
       const d = JSON.parse(localStorage.getItem(this.key));
       let changed = false;
-      // Make sure all required arrays exist; never delete user data
       if (!d.patients)     { d.patients = [];     changed = true; }
       if (!d.doctors)      { d.doctors = [];      changed = true; }
       if (!d.appointments) { d.appointments = []; changed = true; }
       if (!d.departments)  { d.departments = [];  changed = true; }
       if (!d.services)     { d.services = [];     changed = true; }
       if (!d.invoices)     { d.invoices = [];     changed = true; }
-      // Remove any stray user field from older versions (credentials live in medicare_admin now)
-      if ('user' in d) { delete d.user; changed = true; }
+      if ('user' in d)     { delete d.user;       changed = true; }
       if (changed) localStorage.setItem(this.key, JSON.stringify(d));
     } catch (e) {
       localStorage.removeItem(this.key);
@@ -1827,6 +1799,7 @@ function getAllAppointments() {
   return merged.concat(fromBookings);
 }
 
+/* ---------- UI helpers ---------- */
 function showScreen(id) {
   document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('show'));
   const el = document.getElementById(id);
@@ -1839,10 +1812,11 @@ function hideScreens() {
 }
 function showAuthError(elId, message) {
   const el = document.getElementById(elId);
+  if (!el) return;
   el.querySelector('span').textContent = message;
   el.classList.add('show');
 }
-function clearAuthError(elId) { document.getElementById(elId).classList.remove('show'); }
+function clearAuthError(elId) { const el = document.getElementById(elId); if (el) el.classList.remove('show'); }
 function markFieldError(inputEl) {
   if (!inputEl) return;
   const group = inputEl.closest('.form-group');
@@ -1870,6 +1844,7 @@ function scorePassword(pw) {
   return Math.min(s, 4);
 }
 function updateStrength(inputEl, barEl, labelEl) {
+  if (!inputEl || !barEl || !labelEl) return;
   const map = [
     { w: '0%', c: 'transparent', t: 'Use 8+ characters with letters, numbers & a symbol', col: 'var(--gray)' },
     { w: '25%', c: 'var(--danger)', t: 'Weak password', col: 'var(--danger)' },
@@ -1902,6 +1877,7 @@ document.addEventListener('click', (e) => {
   });
 })();
 
+/* ---------- Setup form ---------- */
 document.getElementById('setupForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   clearAuthError('setupError');
@@ -1925,6 +1901,7 @@ document.getElementById('setupForm').addEventListener('submit', async (e) => {
   showToast('Account created. Welcome to MediCare!', 'success');
 });
 
+/* ---------- Login form ---------- */
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   clearAuthError('loginError');
@@ -1954,20 +1931,35 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   showToast('Welcome back!', 'success');
 });
 
+/* ---------- Reset device ---------- */
 document.getElementById('resetLink').addEventListener('click', () => {
-  const sure = confirm('Reset the login for this device?\n\nYou will be asked to create a new username and password.\nHospital records (patients, appointments, invoices) will be KEPT.');
+  const sure = confirm('Reset the login for this device?\n\nYou will be asked to create a new username and password.\nHospital records will be KEPT.');
   if (!sure) return;
-  // Only clear credentials — dummy data in medicare_hms stays untouched
   localStorage.removeItem(Auth.AUTH_KEY);
   Auth.clearSession();
   document.getElementById('appContainer').style.display = 'none';
   showScreen('setupScreen');
 });
 
+/* ---------- Bootstrap + Init ---------- */
 function bootstrap() {
   const app = document.getElementById('appContainer');
-  if (!Auth.hasAccount()) { app.style.display = 'none'; showScreen('setupScreen'); return; }
-  if (!Auth.isLoggedIn()) { app.style.display = 'none'; showScreen('loginScreen'); setTimeout(() => document.getElementById('loginUser').focus(), 100); return; }
+  if (!app) { console.error('[bootstrap] appContainer missing'); return; }
+
+  if (!Auth.hasAccount()) {
+    console.log('[bootstrap] No account — showing setup screen');
+    app.style.display = 'none';
+    showScreen('setupScreen');
+    return;
+  }
+  if (!Auth.isLoggedIn()) {
+    console.log('[bootstrap] Not logged in — showing login screen');
+    app.style.display = 'none';
+    showScreen('loginScreen');
+    setTimeout(() => { const el = document.getElementById('loginUser'); if (el) el.focus(); }, 100);
+    return;
+  }
+  console.log('[bootstrap] Logged in — showing app');
   hideScreens();
   app.style.display = '';
   initApp();
@@ -1975,29 +1967,48 @@ function bootstrap() {
 
 function initApp() {
   const me = Auth.loadAuth() || { name: 'Administrator', role: 'Administrator', initials: 'AD', email: '', username: '' };
-  document.getElementById('userName').textContent = me.name || 'Administrator';
-  document.getElementById('userRole').textContent = me.role || 'Administrator';
-  document.getElementById('userAvatar').textContent = me.initials || 'AD';
-  document.getElementById('pageSubtitle').textContent = `Welcome back, ${me.name || 'Administrator'}`;
-  const su = document.getElementById('settingUsername'); if (su) su.value = me.username || '';
-  const sn = document.getElementById('settingName'); if (sn) sn.value = me.name || '';
-  const se = document.getElementById('settingEmail'); if (se) se.value = me.email || '';
-  const sr = document.getElementById('settingRole'); if (sr) sr.value = me.role || 'Administrator';
-  renderDashboard();
-  renderPatients();
-  renderAppointments();
-  renderDoctors();
-  renderDepartments();
-  renderServices();
-  renderBilling();
-  renderReports();
-  updateNavCounts();
-  renderBookingRequests();
+
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setVal  = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+
+  setText('userName',     me.name || 'Administrator');
+  setText('userRole',     me.role || 'Administrator');
+  setText('userAvatar',   me.initials || 'AD');
+  setText('pageSubtitle', `Welcome back, ${me.name || 'Administrator'}`);
+  setVal('settingUsername', me.username || '');
+  setVal('settingName',     me.name || '');
+  setVal('settingEmail',    me.email || '');
+  setVal('settingRole',     me.role || 'Administrator');
+
+  // Each renderer runs independently — one failure won't block the app from opening
+  [
+    ['dashboard',    renderDashboard],
+    ['patients',     renderPatients],
+    ['appointments', renderAppointments],
+    ['doctors',      renderDoctors],
+    ['departments',  renderDepartments],
+    ['services',     renderServices],
+    ['billing',      renderBilling],
+    ['reports',      renderReports],
+    ['navCounts',    updateNavCounts],
+    ['bookingReqs',  renderBookingRequests]
+  ].forEach(([name, fn]) => {
+    try { fn(); }
+    catch (err) { console.error('[initApp] Step "' + name + '" failed:', err); }
+  });
 }
 
 (function safeBoot() {
-  try { bootstrap(); }
-  catch (err) { console.error('Bootstrap error:', err); const app = document.getElementById('appContainer'); if (app) app.style.display = ''; }
+  try {
+    bootstrap();
+  } catch (err) {
+    console.error('[safeBoot] Fatal error:', err);
+    const app = document.getElementById('appContainer');
+    if (app) app.style.display = '';
+    const msg = 'Dashboard failed to load.\n\nError: ' + (err && err.message ? err.message : err) + '\n\nOpen DevTools (F12) → Console for details.';
+    if (typeof showToast === 'function') showToast(msg, 'error');
+    else alert(msg);
+  }
 })();
 
 function logout() {
@@ -2011,7 +2022,7 @@ function logout() {
   clearAuthError('loginError');
   clearFieldErrors(document.getElementById('loginForm'));
   showScreen('loginScreen');
-  setTimeout(() => document.getElementById('loginUser').focus(), 100);
+  setTimeout(() => { const el = document.getElementById('loginUser'); if (el) el.focus(); }, 100);
 }
 
 function goToPage(page) {
@@ -2034,8 +2045,8 @@ function goToPage(page) {
     settings: ['Settings', 'System configuration']
   };
   const [title, subtitle] = titles[page] || ['Dashboard', ''];
-  document.getElementById('pageTitle').textContent = title;
-  document.getElementById('pageSubtitle').textContent = subtitle;
+  const pt = document.getElementById('pageTitle'); if (pt) pt.textContent = title;
+  const ps = document.getElementById('pageSubtitle'); if (ps) ps.textContent = subtitle;
   closeSidebar();
   const drop = document.getElementById('userDropdown');
   if (drop) drop.classList.remove('show');
@@ -2044,20 +2055,20 @@ function goToPage(page) {
 }
 
 function openSidebar() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarBackdrop').classList.add('show');
+  const sb = document.getElementById('sidebar'); if (sb) sb.classList.add('open');
+  const bd = document.getElementById('sidebarBackdrop'); if (bd) bd.classList.add('show');
   document.body.style.overflow = 'hidden';
 }
 function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarBackdrop').classList.remove('show');
+  const sb = document.getElementById('sidebar'); if (sb) sb.classList.remove('open');
+  const bd = document.getElementById('sidebarBackdrop'); if (bd) bd.classList.remove('show');
   document.body.style.overflow = '';
 }
 
 document.addEventListener('click', () => { const drop = document.getElementById('userDropdown'); if (drop) drop.classList.remove('show'); });
-document.getElementById('userProfileBtn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
-document.getElementById('notifBtn').addEventListener('click', () => {
-  const pending = (typeof UserAuth !== 'undefined') ? UserAuth.getAllBookings().filter(b => b.status === 'Pending').length : 0;
+const upb = document.getElementById('userProfileBtn'); if (upb) upb.addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
+const nb = document.getElementById('notifBtn'); if (nb) nb.addEventListener('click', () => {
+  const pending = (typeof UserAuth !== 'undefined' && UserAuth.getAllBookings) ? UserAuth.getAllBookings().filter(b => b.status === 'Pending').length : 0;
   if (pending) showToast(`You have ${pending} pending booking request(s)`, 'warning');
   else showToast('No new notifications', 'info');
 });
@@ -2066,23 +2077,29 @@ window.addEventListener('resize', () => { if (window.innerWidth > 1024) closeSid
 function renderDashboard() {
   const data = DB.get();
   const allAppts = getAllAppointments();
-  document.getElementById('statPatients').textContent = data.patients.length;
-  document.getElementById('statDoctors').textContent = data.doctors.filter(d => d.available).length;
-  document.getElementById('statAppts').textContent = allAppts.filter(a => a.status !== 'Cancelled').length;
-  document.getElementById('dashboardDepts').innerHTML = data.departments.slice(0, 5).map(d => {
-    const cls = d.capacity >= 85 ? 'danger' : d.capacity >= 70 ? 'warn' : '';
-    return `<div class="dept-item"><div class="dept-info"><div class="dept-icon"><i class="fas ${d.icon}"></i></div><div class="dept-name"><h4>${d.name}</h4><span>${d.head} · ${d.doctors} doctors</span></div></div><div class="dept-stats"><span class="badge badge-info">${d.patients} patients</span><div class="capacity-bar"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div><span style="font-size:12px;font-weight:600;color:#1f5f74;width:40px;">${d.capacity}%</span></div></div>`;
-  }).join('');
-  const appts = allAppts.filter(a => a.status !== 'Cancelled').slice(0, 5);
-  document.getElementById('dashboardAppts').innerHTML = appts.length ? appts.map(a => {
-    const initials = (a.patient || 'U').split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
-    return `<div class="appt-item"><div class="appt-left"><div class="appt-avatar">${initials}</div><div class="appt-details"><h4>${a.patient}</h4><p><i class="fas fa-stethoscope" style="font-size:10px;"></i> ${a.dept} · ${a.doctor}</p></div></div><div class="appt-time">${formatTime(a.datetime)}</div></div>`;
-  }).join('') : '<div class="empty-state"><i class="fas fa-calendar-times"></i><h3>No upcoming appointments</h3></div>';
+  const sp = document.getElementById('statPatients'); if (sp) sp.textContent = data.patients.length;
+  const sd = document.getElementById('statDoctors'); if (sd) sd.textContent = data.doctors.filter(d => d.available).length;
+  const sa = document.getElementById('statAppts'); if (sa) sa.textContent = allAppts.filter(a => a.status !== 'Cancelled').length;
+  const dd = document.getElementById('dashboardDepts');
+  if (dd) {
+    dd.innerHTML = data.departments.slice(0, 5).map(d => {
+      const cls = d.capacity >= 85 ? 'danger' : d.capacity >= 70 ? 'warn' : '';
+      return `<div class="dept-item"><div class="dept-info"><div class="dept-icon"><i class="fas ${d.icon}"></i></div><div class="dept-name"><h4>${d.name}</h4><span>${d.head} · ${d.doctors} doctors</span></div></div><div class="dept-stats"><span class="badge badge-info">${d.patients} patients</span><div class="capacity-bar"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div><span style="font-size:12px;font-weight:600;color:#1f5f74;width:40px;">${d.capacity}%</span></div></div>`;
+    }).join('');
+  }
+  const da = document.getElementById('dashboardAppts');
+  if (da) {
+    const appts = allAppts.filter(a => a.status !== 'Cancelled').slice(0, 5);
+    da.innerHTML = appts.length ? appts.map(a => {
+      const initials = (a.patient || 'U').split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+      return `<div class="appt-item"><div class="appt-left"><div class="appt-avatar">${initials}</div><div class="appt-details"><h4>${a.patient}</h4><p><i class="fas fa-stethoscope" style="font-size:10px;"></i> ${a.dept} · ${a.doctor}</p></div></div><div class="appt-time">${formatTime(a.datetime)}</div></div>`;
+    }).join('') : '<div class="empty-state"><i class="fas fa-calendar-times"></i><h3>No upcoming appointments</h3></div>';
+  }
 }
 
 function renderPatients() {
   const data = DB.get();
-  const tbody = document.getElementById('patientsTableBody');
+  const tbody = document.getElementById('patientsTableBody'); if (!tbody) return;
   if (!data.patients.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-user-injured"></i><h3>No patients yet</h3></div></td></tr>`; return; }
   tbody.innerHTML = data.patients.map(p => `<tr><td><strong>${p.id}</strong></td><td>${p.name}</td><td>${p.age}</td><td>${p.gender}</td><td>${p.phone}</td><td>${p.dept}</td><td>${statusBadge(p.status)}</td><td><button class="btn btn-outline btn-sm" onclick="editPatient('${p.id}')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deletePatient('${p.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
   updateNavCounts();
@@ -2127,7 +2144,7 @@ function deletePatient(id) {
 
 function renderAppointments() {
   const all = getAllAppointments();
-  const tbody = document.getElementById('apptTableBody');
+  const tbody = document.getElementById('apptTableBody'); if (!tbody) return;
   if (!all.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-calendar-check"></i><h3>No appointments</h3></div></td></tr>`; return; }
   tbody.innerHTML = all.map(a => `<tr><td><strong>${a.id}</strong></td><td>${a.patient}</td><td>${a.doctor}</td><td>${a.dept}</td><td>${formatDateTime(a.datetime)}</td><td>${statusBadge(a.status)}</td><td><button class="btn btn-outline btn-sm" onclick="editAppt('${a.id}')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteAppt('${a.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
   updateNavCounts();
@@ -2174,7 +2191,8 @@ function deleteAppt(id) {
 
 function renderDoctors() {
   const data = DB.get();
-  document.getElementById('doctorsGrid').innerHTML = data.doctors.map(d => `<div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:14px;"><div style="display:flex;align-items:center;gap:14px;width:100%;"><div class="appt-avatar" style="width:52px;height:52px;font-size:17px;">${d.initials}</div><div style="flex:1;min-width:0;"><h4 style="font-size:15px;color:var(--dark);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.name}</h4><p style="font-size:12px;color:var(--gray);">${d.dept}</p></div><span class="badge ${d.available ? 'badge-success' : 'badge-gray'}">${d.available ? 'Available' : 'Busy'}</span></div><div style="display:flex;justify-content:space-between;width:100%;border-top:1px solid var(--border);padding-top:12px;"><div><p style="font-size:11px;color:var(--gray);">Patients</p><strong style="font-size:15px;color:var(--dark);">${d.patients}</strong></div><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" onclick="editDoctor('${d.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteDoctor('${d.id}')"><i class="fas fa-trash"></i></button></div></div></div>`).join('');
+  const grid = document.getElementById('doctorsGrid'); if (!grid) return;
+  grid.innerHTML = data.doctors.map(d => `<div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:14px;"><div style="display:flex;align-items:center;gap:14px;width:100%;"><div class="appt-avatar" style="width:52px;height:52px;font-size:17px;">${d.initials}</div><div style="flex:1;min-width:0;"><h4 style="font-size:15px;color:var(--dark);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.name}</h4><p style="font-size:12px;color:var(--gray);">${d.dept}</p></div><span class="badge ${d.available ? 'badge-success' : 'badge-gray'}">${d.available ? 'Available' : 'Busy'}</span></div><div style="display:flex;justify-content:space-between;width:100%;border-top:1px solid var(--border);padding-top:12px;"><div><p style="font-size:11px;color:var(--gray);">Patients</p><strong style="font-size:15px;color:var(--dark);">${d.patients}</strong></div><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" onclick="editDoctor('${d.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteDoctor('${d.id}')"><i class="fas fa-trash"></i></button></div></div></div>`).join('');
 }
 function openDoctorModal(editId = null) {
   const data = DB.get();
@@ -2205,7 +2223,8 @@ function deleteDoctor(id) {
 
 function renderDepartments() {
   const data = DB.get();
-  document.getElementById('deptFullList').innerHTML = data.departments.map(d => {
+  const list = document.getElementById('deptFullList'); if (!list) return;
+  list.innerHTML = data.departments.map(d => {
     const cls = d.capacity >= 85 ? 'danger' : d.capacity >= 70 ? 'warn' : '';
     return `<div class="dept-item"><div class="dept-info"><div class="dept-icon"><i class="fas ${d.icon}"></i></div><div class="dept-name"><h4>${d.name}</h4><span>${d.head} · ${d.doctors} doctors · ${d.patients} patients</span></div></div><div class="dept-stats"><div class="capacity-bar" style="width:140px;"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div><span style="font-size:13px;font-weight:700;color:var(--dark);width:45px;">${d.capacity}%</span><button class="btn btn-outline btn-sm" onclick="editDept(${d.id})"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteDept(${d.id})"><i class="fas fa-trash"></i></button></div></div>`;
   }).join('');
@@ -2239,7 +2258,8 @@ function deleteDept(id) {
 
 function renderServices() {
   const data = DB.get();
-  document.getElementById('servicesGrid').innerHTML = data.services.map(s => `<div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:12px;"><div class="dept-icon" style="width:52px;height:52px;font-size:24px;"><i class="fas ${s.icon}"></i></div><div><h4 style="font-size:15px;color:var(--dark);font-weight:700;">${s.name}</h4><p style="font-size:12px;color:var(--gray);margin-top:4px;">${s.desc}</p></div><div style="display:flex;gap:8px;width:100%;border-top:1px solid var(--border);padding-top:12px;"><button class="btn btn-outline btn-sm" style="flex:1;" onclick="editService(${s.id})"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-danger btn-sm" onclick="deleteService(${s.id})"><i class="fas fa-trash"></i></button></div></div>`).join('');
+  const grid = document.getElementById('servicesGrid'); if (!grid) return;
+  grid.innerHTML = data.services.map(s => `<div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:12px;"><div class="dept-icon" style="width:52px;height:52px;font-size:24px;"><i class="fas ${s.icon}"></i></div><div><h4 style="font-size:15px;color:var(--dark);font-weight:700;">${s.name}</h4><p style="font-size:12px;color:var(--gray);margin-top:4px;">${s.desc}</p></div><div style="display:flex;gap:8px;width:100%;border-top:1px solid var(--border);padding-top:12px;"><button class="btn btn-outline btn-sm" style="flex:1;" onclick="editService(${s.id})"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-danger btn-sm" onclick="deleteService(${s.id})"><i class="fas fa-trash"></i></button></div></div>`).join('');
 }
 function openServiceModal(editId = null) {
   const data = DB.get();
@@ -2272,11 +2292,12 @@ function renderBilling() {
   const pending = data.invoices.filter(i => i.status === 'Pending').reduce((s, i) => s + i.amount, 0);
   const paid = data.invoices.filter(i => i.status === 'Paid').length;
   const overdue = data.invoices.filter(i => i.status === 'Overdue').length;
-  document.getElementById('billingTotal').textContent   = money(total);
-  document.getElementById('billingPending').textContent = money(pending);
-  document.getElementById('billingPaid').textContent    = paid;
-  document.getElementById('billingOverdue').textContent = overdue;
-  document.getElementById('billingTableBody').innerHTML = data.invoices.map(inv => `<tr><td><strong>${inv.id}</strong></td><td>${inv.patient}</td><td>${inv.date}</td><td>${money(inv.amount)}</td><td>${statusBadge(inv.status)}</td><td><button class="btn btn-outline btn-sm" onclick="markInvoicePaid('${inv.id}')" ${inv.status === 'Paid' ? 'disabled style="opacity:0.5;"' : ''}><i class="fas fa-check"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${inv.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+  const bt = document.getElementById('billingTotal'); if (bt) bt.textContent = money(total);
+  const bp = document.getElementById('billingPending'); if (bp) bp.textContent = money(pending);
+  const bpd = document.getElementById('billingPaid'); if (bpd) bpd.textContent = paid;
+  const bo = document.getElementById('billingOverdue'); if (bo) bo.textContent = overdue;
+  const tbody = document.getElementById('billingTableBody'); if (!tbody) return;
+  tbody.innerHTML = data.invoices.map(inv => `<tr><td><strong>${inv.id}</strong></td><td>${inv.patient}</td><td>${inv.date}</td><td>${money(inv.amount)}</td><td>${statusBadge(inv.status)}</td><td><button class="btn btn-outline btn-sm" onclick="markInvoicePaid('${inv.id}')" ${inv.status === 'Paid' ? 'disabled style="opacity:0.5;"' : ''}><i class="fas fa-check"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${inv.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 }
 function openInvoiceModal() {
   const data = DB.get();
@@ -2307,38 +2328,47 @@ function deleteInvoice(id) {
 
 function renderReports() {
   const data = DB.get();
-  document.getElementById('reportsDeptLoad').innerHTML = data.departments.map(d => {
-    const cls = d.capacity >= 85 ? 'danger' : d.capacity >= 70 ? 'warn' : '';
-    return `<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;font-weight:600;color:var(--dark);">${d.name}</span><span style="font-size:13px;font-weight:700;color:var(--primary);">${d.capacity}%</span></div><div class="capacity-bar" style="width:100%;height:8px;"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div></div>`;
-  }).join('');
-  const allAppts = getAllAppointments();
-  const apptStatus = { Confirmed: 0, Pending: 0, Cancelled: 0, Completed: 0 };
-  allAppts.forEach(a => { if (apptStatus[a.status] !== undefined) apptStatus[a.status]++; });
-  const total = allAppts.length || 1;
-  document.getElementById('reportsApptStatus').innerHTML = Object.entries(apptStatus).map(([k, v]) => {
-    const pct = Math.round((v / total) * 100);
-    const colors = { Confirmed: 'var(--success)', Pending: 'var(--warning)', Cancelled: 'var(--danger)', Completed: 'var(--primary)' };
-    return `<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;font-weight:600;color:var(--dark);">${k}</span><span style="font-size:13px;font-weight:700;color:var(--dark);">${v} (${pct}%)</span></div><div class="capacity-bar" style="width:100%;height:8px;"><div class="capacity-fill" style="width:${pct}%;background:${colors[k]};"></div></div></div>`;
-  }).join('');
+  const rdl = document.getElementById('reportsDeptLoad');
+  if (rdl) {
+    rdl.innerHTML = data.departments.map(d => {
+      const cls = d.capacity >= 85 ? 'danger' : d.capacity >= 70 ? 'warn' : '';
+      return `<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;font-weight:600;color:var(--dark);">${d.name}</span><span style="font-size:13px;font-weight:700;color:var(--primary);">${d.capacity}%</span></div><div class="capacity-bar" style="width:100%;height:8px;"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div></div>`;
+    }).join('');
+  }
+  const ras = document.getElementById('reportsApptStatus');
+  if (ras) {
+    const allAppts = getAllAppointments();
+    const apptStatus = { Confirmed: 0, Pending: 0, Cancelled: 0, Completed: 0 };
+    allAppts.forEach(a => { if (apptStatus[a.status] !== undefined) apptStatus[a.status]++; });
+    const total = allAppts.length || 1;
+    ras.innerHTML = Object.entries(apptStatus).map(([k, v]) => {
+      const pct = Math.round((v / total) * 100);
+      const colors = { Confirmed: 'var(--success)', Pending: 'var(--warning)', Cancelled: 'var(--danger)', Completed: 'var(--primary)' };
+      return `<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;font-weight:600;color:var(--dark);">${k}</span><span style="font-size:13px;font-weight:700;color:var(--dark);">${v} (${pct}%)</span></div><div class="capacity-bar" style="width:100%;height:8px;"><div class="capacity-fill" style="width:${pct}%;background:${colors[k]};"></div></div></div>`;
+    }).join('');
+  }
 }
 
 function saveSettings() {
-  const name = document.getElementById('settingName').value.trim();
-  const email = document.getElementById('settingEmail').value.trim();
-  const role = document.getElementById('settingRole').value.trim();
+  const nameEl = document.getElementById('settingName');
+  const emailEl = document.getElementById('settingEmail');
+  const roleEl = document.getElementById('settingRole');
+  if (!nameEl) return;
+  const name = nameEl.value.trim();
+  const email = emailEl ? emailEl.value.trim() : '';
+  const role = roleEl ? roleEl.value.trim() : 'Administrator';
   if (name.length < 2) { showToast('Please enter a valid name', 'error'); return; }
   const initials = (name.replace('Dr. ', '').split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
-  // Update only credentials in medicare_admin
   const a = Auth.loadAuth() || {};
   a.name = name;
   a.email = email;
   a.role = role;
   a.initials = initials;
   Auth.saveAuth(a);
-  document.getElementById('userName').textContent = name;
-  document.getElementById('userRole').textContent = role;
-  document.getElementById('userAvatar').textContent = initials;
-  document.getElementById('pageSubtitle').textContent = `Welcome back, ${name}`;
+  const un = document.getElementById('userName'); if (un) un.textContent = name;
+  const ur = document.getElementById('userRole'); if (ur) ur.textContent = role;
+  const ua = document.getElementById('userAvatar'); if (ua) ua.textContent = initials;
+  const ps = document.getElementById('pageSubtitle'); if (ps) ps.textContent = `Welcome back, ${name}`;
   showToast('Settings saved', 'success');
 }
 
@@ -2370,8 +2400,8 @@ async function changePassword() {
 function updateNavCounts() {
   const data = DB.get();
   const allAppts = getAllAppointments();
-  document.getElementById('navPatientCount').textContent = data.patients.length;
-  document.getElementById('navApptCount').textContent = allAppts.filter(a => a.status !== 'Cancelled').length;
+  const np = document.getElementById('navPatientCount'); if (np) np.textContent = data.patients.length;
+  const na = document.getElementById('navApptCount'); if (na) na.textContent = allAppts.filter(a => a.status !== 'Cancelled').length;
 }
 function formatTime(dt) {
   if (!dt) return '—';
@@ -2409,7 +2439,7 @@ function showToast(message, type = 'info') {
     setTimeout(() => toast.remove(), 300);
   }, 3200);
 }
-document.getElementById('globalSearch').addEventListener('input', (e) => {
+const gs = document.getElementById('globalSearch'); if (gs) gs.addEventListener('input', (e) => {
   const q = e.target.value.toLowerCase().trim();
   if (!q) return;
   const data = DB.get();
@@ -2448,7 +2478,7 @@ function renderBookingRequests() {
   const host = document.getElementById('bookingsList');
   if (!host) return;
   if (typeof UserAuth === 'undefined') {
-    host.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>shared.js not loaded</h3><p>Make sure shared.js sits next to dashboard.html.</p></div>`;
+    host.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>shared.js not loaded</h3><p>Make sure shared.js sits next to this file.</p></div>`;
     return;
   }
   const all = UserAuth.getAllBookings();
@@ -2576,7 +2606,6 @@ window.addEventListener('focus', () => {
   renderBookingRequests(); renderDashboard(); renderAppointments(); renderReports(); updateNavCounts();
 });
 window.addEventListener('medicare:settings-changed', () => { try { renderBilling(); } catch (e) {} });
-
 </script>
 
 <script>
