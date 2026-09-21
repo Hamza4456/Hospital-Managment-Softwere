@@ -109,10 +109,7 @@ a { text-decoration: none; color: inherit; }
 
 .hidden { display: none !important; }
 
-/* ---- CREATE ADMIN FORM STYLES ---- */
-.create-head {
-  text-align: center; margin-bottom: 22px;
-}
+.create-head { text-align: center; margin-bottom: 22px; }
 .create-head .logo-icon {
   background: linear-gradient(135deg, #0e8b5e, #0d6e9e); color: #fff;
   width: 60px; height: 60px; border-radius: 16px;
@@ -139,9 +136,7 @@ a { text-decoration: none; color: inherit; }
 <div class="auth-wrap">
   <div class="auth-card">
 
-    <!-- ============================== -->
-    <!-- VIEW 1: LOGIN                  -->
-    <!-- ============================== -->
+    <!-- LOGIN VIEW -->
     <div id="loginView">
       <div class="auth-head">
         <div class="logo-icon"><i class="fas fa-user-md"></i></div>
@@ -188,9 +183,7 @@ a { text-decoration: none; color: inherit; }
       </a>
     </div>
 
-    <!-- ============================== -->
-    <!-- VIEW 2: CREATE ADMIN (INLINE)  -->
-    <!-- ============================== -->
+    <!-- CREATE ADMIN VIEW -->
     <div id="createView" class="hidden">
       <div class="create-head">
         <div class="logo-icon"><i class="fas fa-user-plus"></i></div>
@@ -236,9 +229,7 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <!-- ============================== -->
-    <!-- VIEW 3: FORGOT PASSWORD        -->
-    <!-- ============================== -->
+    <!-- FORGOT PASSWORD VIEW -->
     <div id="forgotView" class="hidden">
       <div class="auth-head">
         <div class="logo-icon"><i class="fas fa-key"></i></div>
@@ -268,14 +259,15 @@ a { text-decoration: none; color: inherit; }
 
 <script>
 /* =====================================================
-   ⚠️ CHANGE THIS to your actual dashboard filename
+   CONFIG
+   ⚠️ Set DASHBOARD_URL to your real dashboard filename
 ===================================================== */
 const DASHBOARD_URL = 'dashboard.html';
 const SALT        = 'medicare::hms::v2::salt';
-const DB_KEY      = 'medicare_hms';
+const AUTH_KEY    = 'medicare_admin';   // ← credentials ONLY (dashboard data stays in medicare_hms)
 const SESSION_KEY = 'medicare_session';
 
-/* ---------- HASH FUNCTION ---------- */
+/* ---------- HASH ---------- */
 async function hashPassword(password) {
   const input = SALT + '|' + password;
   if (window.crypto && window.crypto.subtle && window.isSecureContext) {
@@ -296,12 +288,16 @@ async function hashPassword(password) {
   return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
 }
 
-function loadDB() {
-  try { return JSON.parse(localStorage.getItem(DB_KEY)); }
+/* ---------- Credentials store ---------- */
+function loadAuth() {
+  try { return JSON.parse(localStorage.getItem(AUTH_KEY)); }
   catch (e) { return null; }
 }
+function saveAuth(obj) {
+  localStorage.setItem(AUTH_KEY, JSON.stringify(obj));
+}
 
-/* ---------- UI REFS ---------- */
+/* ---------- UI ---------- */
 const loginView  = document.getElementById('loginView');
 const createView = document.getElementById('createView');
 const forgotView = document.getElementById('forgotView');
@@ -316,7 +312,6 @@ const hideErr = box => box.classList.remove('show');
 const hideAll = () => {
   [errBox, okBox, cErrBox, fErrBox].forEach(b => b && b.classList.remove('show'));
 };
-
 const showView = (which) => {
   [loginView, createView, forgotView].forEach(v => v.classList.add('hidden'));
   which.classList.remove('hidden');
@@ -324,7 +319,7 @@ const showView = (which) => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-/* ---------- PASSWORD TOGGLE ---------- */
+/* ---------- Password toggle ---------- */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.pass-toggle');
   if (!btn) return;
@@ -335,84 +330,70 @@ document.addEventListener('click', e => {
   btn.innerHTML = `<i class="fas fa-eye${show ? '-slash' : ''}"></i>`;
 });
 
-/* ---------- AUTO-REDIRECT IF LOGGED IN ---------- */
+/* ---------- Auto-redirect if logged in ---------- */
 (function () {
   const raw = sessionStorage.getItem(SESSION_KEY);
   if (!raw) return;
   try {
     const s = JSON.parse(raw);
-    const db = loadDB();
-    if (db && db.user && db.user.username === s.u) {
+    const a = loadAuth();
+    if (a && a.username === s.u) {
       location.replace(DASHBOARD_URL);
     }
   } catch (e) {}
 })();
 
-/* ---------- CREATE ADMIN LINK ---------- */
+/* ---------- Create admin link ---------- */
 document.getElementById('setupLink').addEventListener('click', e => {
   e.preventDefault();
-  const db = loadDB();
-  const hasAccount = !!(db && db.user && db.user.username && db.user.passwordHash);
-
+  const a = loadAuth();
+  const hasAccount = !!(a && a.username && a.passwordHash);
   if (hasAccount) {
     showErr(errBox, 'An admin account already exists. Please sign in, or use "Forgot password?".');
     return;
   }
-
-  // Show the inline create-admin form
   showView(createView);
   setTimeout(() => document.getElementById('cName').focus(), 100);
 });
 
-/* ---------- BACK TO LOGIN ---------- */
+/* ---------- Back to login ---------- */
 document.getElementById('backToLogin').addEventListener('click', e => {
-  e.preventDefault();
-  showView(loginView);
+  e.preventDefault(); showView(loginView);
 });
 document.getElementById('backToLogin2').addEventListener('click', e => {
-  e.preventDefault();
-  showView(loginView);
+  e.preventDefault(); showView(loginView);
 });
 
-/* ---------- FORGOT PASSWORD LINK ---------- */
+/* ---------- Forgot password ---------- */
 document.getElementById('forgotLink').addEventListener('click', e => {
   e.preventDefault();
-  const db = loadDB();
-  const hasAccount = !!(db && db.user && db.user.username && db.user.passwordHash);
-
+  const a = loadAuth();
+  const hasAccount = !!(a && a.username && a.passwordHash);
   if (!hasAccount) {
     showErr(errBox, 'No admin account exists yet. Click "Create admin account" below.');
     return;
   }
-
   showView(forgotView);
 });
 
-/* ---------- RESET CREDENTIALS BUTTON ---------- */
+/* ---------- Reset credentials ---------- */
 document.getElementById('resetBtn').addEventListener('click', () => {
   const sure = confirm(
     'Reset admin credentials?\n\n' +
     '• Username & password will be cleared\n' +
-    '• All other data (patients, appointments, invoices) will be KEPT\n\n' +
+    '• All dashboard data (patients, appointments, invoices) will be KEPT\n\n' +
     'Continue?'
   );
   if (!sure) return;
 
-  const db = loadDB();
-  if (db && db.user) {
-    db.user.username = null;
-    db.user.passwordHash = null;
-    db.user.createdAt = null;
-    localStorage.setItem(DB_KEY, JSON.stringify(db));
-  }
+  localStorage.removeItem(AUTH_KEY);
   sessionStorage.removeItem(SESSION_KEY);
 
-  // Go straight to the create-admin form
   showView(createView);
   setTimeout(() => document.getElementById('cName').focus(), 100);
 });
 
-/* ---------- PASSWORD STRENGTH METER ---------- */
+/* ---------- Strength meter ---------- */
 function scorePassword(pw) {
   if (!pw) return 0;
   let s = 0;
@@ -425,11 +406,11 @@ function scorePassword(pw) {
 }
 function updateStrength(input, bar, label) {
   const map = [
-    { w: '0%',   c: 'transparent',    t: 'Use 8+ characters with letters, numbers & a symbol', col: '#5e7e8c' },
-    { w: '25%',  c: '#e84a5f',        t: 'Weak password',   col: '#e84a5f' },
-    { w: '50%',  c: '#e8a33d',        t: 'Fair password',   col: '#e8a33d' },
-    { w: '75%',  c: '#0d6e9e',        t: 'Good password',   col: '#0d6e9e' },
-    { w: '100%', c: '#0e8b5e',        t: 'Strong password', col: '#0e8b5e' }
+    { w: '0%',   c: 'transparent', t: 'Use 8+ characters with letters, numbers & a symbol', col: '#5e7e8c' },
+    { w: '25%',  c: '#e84a5f',     t: 'Weak password',   col: '#e84a5f' },
+    { w: '50%',  c: '#e8a33d',     t: 'Fair password',   col: '#e8a33d' },
+    { w: '75%',  c: '#0d6e9e',     t: 'Good password',   col: '#0d6e9e' },
+    { w: '100%', c: '#0e8b5e',     t: 'Strong password', col: '#0e8b5e' }
   ][scorePassword(input.value)];
   bar.style.width = map.w;
   bar.style.background = map.c;
@@ -440,7 +421,7 @@ document.getElementById('cPass').addEventListener('input', function () {
   updateStrength(this, document.getElementById('cStrength'), document.getElementById('cStrengthText'));
 });
 
-/* ---------- VALIDATION HELPERS ---------- */
+/* ---------- Validation helpers ---------- */
 function markError(input) {
   const g = input.closest('.form-group');
   if (!g) return;
@@ -455,7 +436,7 @@ function validatePassword(pw) {
   return null;
 }
 
-/* ---------- CREATE ADMIN SUBMIT ---------- */
+/* ---------- Create admin submit ---------- */
 document.getElementById('createAdminForm').addEventListener('submit', async e => {
   e.preventDefault();
   hideErr(cErrBox);
@@ -466,27 +447,14 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
   const pw       = document.getElementById('cPass').value;
   const pw2      = document.getElementById('cPass2').value;
 
-  if (name.length < 2) {
-    markError(document.getElementById('cName'));
-    return showErr(cErrBox, 'Please enter your full name.');
-  }
-  if (!/^[A-Za-z0-9._-]{4,20}$/.test(username)) {
-    markError(document.getElementById('cUser'));
-    return showErr(cErrBox, 'Username must be 4–20 characters (letters, numbers, . _ -).');
-  }
+  if (name.length < 2) { markError(document.getElementById('cName')); return showErr(cErrBox, 'Please enter your full name.'); }
+  if (!/^[A-Za-z0-9._-]{4,20}$/.test(username)) { markError(document.getElementById('cUser')); return showErr(cErrBox, 'Username must be 4–20 characters (letters, numbers, . _ -).'); }
   const rule = validatePassword(pw);
-  if (rule) {
-    markError(document.getElementById('cPass'));
-    return showErr(cErrBox, rule);
-  }
-  if (pw !== pw2) {
-    markError(document.getElementById('cPass2'));
-    return showErr(cErrBox, 'Passwords do not match.');
-  }
+  if (rule) { markError(document.getElementById('cPass')); return showErr(cErrBox, rule); }
+  if (pw !== pw2) { markError(document.getElementById('cPass2')); return showErr(cErrBox, 'Passwords do not match.'); }
 
-  // Check no existing account (extra safety)
-  const existing = loadDB();
-  if (existing && existing.user && existing.user.username) {
+  const existing = loadAuth();
+  if (existing && existing.username) {
     return showErr(cErrBox, 'An admin account already exists. Please sign in instead.');
   }
 
@@ -498,17 +466,8 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
   const passwordHash = await hashPassword(pw);
   const initials = (name.split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
 
-  // Load existing data if present; if not, seed a fresh object.
-  // IMPORTANT: only set/overwrite the `user` field — never touch patients/appointments/etc.
-  let db = loadDB();
-  if (!db || typeof db !== 'object') {
-    db = {
-      user: {},
-      patients: [], doctors: [], appointments: [],
-      departments: [], services: [], invoices: []
-    };
-  }
-  db.user = Object.assign({}, db.user, {
+  // ✅ Save ONLY credentials — dashboard data in medicare_hms is UNTOUCHED
+  saveAuth({
     name,
     username,
     passwordHash,
@@ -517,12 +476,10 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
     email: '',
     createdAt: new Date().toISOString()
   });
-  localStorage.setItem(DB_KEY, JSON.stringify(db));
 
   btn.disabled = false;
   btn.innerHTML = orig;
 
-  // Auto-fill login form and switch back
   document.getElementById('adminUser').value = username;
   document.getElementById('adminPass').value = '';
   showView(loginView);
@@ -532,7 +489,7 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
   setTimeout(() => document.getElementById('adminPass').focus(), 100);
 });
 
-/* ---------- LOGIN SUBMIT ---------- */
+/* ---------- Login submit ---------- */
 document.getElementById('adminLoginForm').addEventListener('submit', async e => {
   e.preventDefault();
   hideAll();
@@ -541,21 +498,14 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
   const username = document.getElementById('adminUser').value.trim();
   const password = document.getElementById('adminPass').value;
 
-  if (!username) {
-    markError(document.getElementById('adminUser'));
-    return showErr(errBox, 'Please enter your username.');
-  }
-  if (!password) {
-    markError(document.getElementById('adminPass'));
-    return showErr(errBox, 'Please enter your password.');
-  }
+  if (!username) { markError(document.getElementById('adminUser')); return showErr(errBox, 'Please enter your username.'); }
+  if (!password) { markError(document.getElementById('adminPass')); return showErr(errBox, 'Please enter your password.'); }
 
-  const db = loadDB();
-  if (!db || !db.user || !db.user.username) {
+  const a = loadAuth();
+  if (!a || !a.username) {
     return showErr(errBox, 'No admin account found. Click "Create admin account" below.');
   }
-
-  if (username.toLowerCase() !== db.user.username.toLowerCase()) {
+  if (username.toLowerCase() !== a.username.toLowerCase()) {
     markError(document.getElementById('adminUser'));
     markError(document.getElementById('adminPass'));
     return showErr(errBox, 'Invalid username or password.');
@@ -567,7 +517,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
 
   const hash = await hashPassword(password);
-  const ok = hash === db.user.passwordHash;
+  const ok = hash === a.passwordHash;
 
   btn.disabled = false;
   btn.innerHTML = orig;
@@ -579,7 +529,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
     return showErr(errBox, 'Invalid username or password.');
   }
 
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: db.user.username, t: Date.now() }));
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: a.username, t: Date.now() }));
   okBox.querySelector('span').textContent = 'Signed in! Opening dashboard…';
   okBox.classList.add('show');
   setTimeout(() => { window.location.href = DASHBOARD_URL; }, 350);
