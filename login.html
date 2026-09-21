@@ -226,6 +226,7 @@ body {
 const Auth = {
   SALT: 'medicare::hms::v2::salt',
   SESSION_KEY: 'medicare_session',
+  BACKUP_KEY: 'medicare_session_backup',
   AUTH_KEY: 'medicare_admin',
 
   loadAuth() {
@@ -271,14 +272,40 @@ const Auth = {
     if (a.username.toLowerCase() !== String(username).trim().toLowerCase()) return false;
     return (await this.hash(password)) === a.passwordHash;
   },
+
+  /* ⭐ UPDATED: Write to BOTH sessionStorage AND localStorage */
   setSession() {
     const a = this.loadAuth();
     if (!a) return;
-    sessionStorage.setItem(this.SESSION_KEY, JSON.stringify({ u: a.username, t: Date.now() }));
+    const payload = JSON.stringify({ u: a.username, t: Date.now() });
+    try { sessionStorage.setItem(this.SESSION_KEY, payload); } catch (e) {}
+    try { localStorage.setItem(this.BACKUP_KEY, payload); } catch (e) {}
   },
-  clearSession() { sessionStorage.removeItem(this.SESSION_KEY); },
+
+  /* ⭐ UPDATED: Clear all three keys on logout */
+  clearSession() {
+    try { sessionStorage.removeItem(this.SESSION_KEY); } catch (e) {}
+    try { localStorage.removeItem(this.BACKUP_KEY); } catch (e) {}
+  },
+
+  /* ⭐ UPDATED: Read from sessionStorage → backup → localStorage direct */
+  getSessionRaw() {
+    try {
+      const raw = sessionStorage.getItem(this.SESSION_KEY);
+      if (raw) return raw;
+    } catch (e) {}
+    try {
+      const raw = localStorage.getItem(this.BACKUP_KEY);
+      if (raw) {
+        try { sessionStorage.setItem(this.SESSION_KEY, raw); } catch (e) {}
+        return raw;
+      }
+    } catch (e) {}
+    return null;
+  },
+
   isLoggedIn() {
-    const raw = sessionStorage.getItem(this.SESSION_KEY);
+    const raw = this.getSessionRaw();
     if (!raw) return false;
     try {
       const s = JSON.parse(raw);
@@ -327,6 +354,14 @@ function validatePassword(pw) {
   return null;
 }
 
+/* ⭐ UPDATED: Safe navigation — lets the browser commit storage first */
+function goToDashboard() {
+  // Small delay ensures storage writes finish before navigation
+  setTimeout(() => {
+    window.location.href = 'admin.html';
+  }, 200);
+}
+
 /* ---------- PASSWORD TOGGLE ---------- */
 document.addEventListener('click', (e) => {
   const btn = e.target.closest('.pass-toggle');
@@ -356,7 +391,7 @@ document.getElementById('setupForm').addEventListener('submit', async (e) => {
 
   await Auth.register({ name, username, password: pw });
   Auth.setSession();
-  window.location.replace('admin.html');
+  goToDashboard();
 });
 
 /* ---------- LOGIN FORM ---------- */
@@ -388,7 +423,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   }
 
   Auth.setSession();
-  window.location.replace('admin.html');
+  goToDashboard();
 });
 
 /* ---------- RESET DEVICE ---------- */
@@ -404,7 +439,8 @@ document.getElementById('resetLink').addEventListener('click', () => {
 /* ---------- BOOTSTRAP ---------- */
 (function boot() {
   if (Auth.isLoggedIn()) {
-    window.location.replace('admin.html');
+    // Already logged in → go straight to dashboard
+    goToDashboard();
     return;
   }
   if (!Auth.hasAccount()) {
