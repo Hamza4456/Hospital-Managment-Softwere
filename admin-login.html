@@ -86,7 +86,6 @@ a { text-decoration: none; color: inherit; }
 .alert { display: none; align-items: flex-start; gap: 10px; padding: 12px 15px; border-radius: 12px; font-size: 13.5px; font-weight: 500; margin-bottom: 16px; background: #fdecef; color: var(--danger); }
 .alert.show { display: flex; }
 .alert.success { background: #e1f7ed; color: var(--success); }
-.alert.warning { background: #fff0e0; color: #c96f1e; }
 
 .auth-foot { text-align: center; font-size: 13.5px; color: var(--gray); margin-top: 18px; }
 .auth-foot a { color: var(--primary); font-weight: 600; cursor: pointer; }
@@ -148,17 +147,16 @@ a { text-decoration: none; color: inherit; }
 
       <div class="alert" id="err"><i class="fas fa-exclamation-circle"></i><span></span></div>
       <div class="alert success" id="ok"><i class="fas fa-check-circle"></i><span></span></div>
-      <div class="alert warning" id="warn"><i class="fas fa-info-circle"></i><span></span></div>
 
       <form id="adminLoginForm" novalidate>
         <div class="form-group">
           <label>Username</label>
-          <input type="text" id="adminUser" autocomplete="username" placeholder="e.g. hamza.admin">
+          <input type="text" id="adminUser" autocomplete="username" placeholder="e.g. hamza.admin" required>
         </div>
         <div class="form-group">
           <label>Password</label>
           <div class="pass-wrap">
-            <input type="password" id="adminPass" autocomplete="current-password" placeholder="••••••••">
+            <input type="password" id="adminPass" autocomplete="current-password" placeholder="••••••••" required>
             <button type="button" class="pass-toggle" data-target="adminPass"><i class="fas fa-eye"></i></button>
           </div>
         </div>
@@ -168,7 +166,7 @@ a { text-decoration: none; color: inherit; }
           <a id="forgotLink">Forgot password?</a>
         </div>
 
-        <button type="submit" id="loginBtn" class="btn btn-primary btn-lg btn-block" style="margin-top:14px;">
+        <button type="submit" class="btn btn-primary btn-lg btn-block" style="margin-top:14px;">
           <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
         </button>
       </form>
@@ -198,16 +196,16 @@ a { text-decoration: none; color: inherit; }
       <form id="createAdminForm" novalidate>
         <div class="form-group">
           <label>Full Name</label>
-          <input type="text" id="cName" autocomplete="name" placeholder="e.g. Hamza Saeed">
+          <input type="text" id="cName" autocomplete="name" placeholder="e.g. Hamza Saeed" required>
         </div>
         <div class="form-group">
           <label>Username</label>
-          <input type="text" id="cUser" autocomplete="username" placeholder="e.g. hamza.admin">
+          <input type="text" id="cUser" autocomplete="username" placeholder="e.g. hamza.admin" required>
         </div>
         <div class="form-group">
           <label>Password</label>
           <div class="pass-wrap">
-            <input type="password" id="cPass" autocomplete="new-password" placeholder="Min 8 characters">
+            <input type="password" id="cPass" autocomplete="new-password" placeholder="Min 8 characters" required>
             <button type="button" class="pass-toggle" data-target="cPass"><i class="fas fa-eye"></i></button>
           </div>
           <div class="strength"><div class="strength-fill" id="cStrength"></div></div>
@@ -216,7 +214,7 @@ a { text-decoration: none; color: inherit; }
         <div class="form-group">
           <label>Confirm Password</label>
           <div class="pass-wrap">
-            <input type="password" id="cPass2" autocomplete="new-password" placeholder="Repeat password">
+            <input type="password" id="cPass2" autocomplete="new-password" placeholder="Repeat password" required>
             <button type="button" class="pass-toggle" data-target="cPass2"><i class="fas fa-eye"></i></button>
           </div>
         </div>
@@ -261,23 +259,16 @@ a { text-decoration: none; color: inherit; }
 
 <script>
 /* =====================================================
-   IMMEDIATE DIAGNOSTIC — tells us if JS even loads
-===================================================== */
-console.log('=== admin-login.html script STARTED ===');
-window.addEventListener('error', e => console.error('❌ SCRIPT ERROR:', e.message, 'at', e.filename + ':' + e.lineno));
-window.addEventListener('unhandledrejection', e => console.error('❌ PROMISE ERROR:', e.reason));
-
-/* =====================================================
    CONFIG
+   ⚠️ SET THIS TO YOUR DASHBOARD FILE'S EXACT NAME
 ===================================================== */
 const DASHBOARD_URL = 'dashboard.html';
+
 const SALT        = 'medicare::hms::v2::salt';
 const AUTH_KEY    = 'medicare_admin';
 const SESSION_KEY = 'medicare_session';
 
-console.log('[cfg] DASHBOARD_URL =', DASHBOARD_URL);
-console.log('[cfg] Current URL    =', location.href);
-console.log('[cfg] Protocol       =', location.protocol);
+console.log('✅ admin-login.html script loaded');
 
 /* ---------- HASH ---------- */
 async function hashPassword(password) {
@@ -287,7 +278,7 @@ async function hashPassword(password) {
       const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
       return 'sha256:' + Array.from(new Uint8Array(buf))
         .map(b => b.toString(16).padStart(2, '0')).join('');
-    } catch (e) { console.warn('crypto.subtle failed, using fallback:', e); }
+    } catch (e) {}
   }
   let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
   for (let i = 0; i < input.length; i++) {
@@ -308,43 +299,33 @@ function saveAuth(obj) {
   localStorage.setItem(AUTH_KEY, JSON.stringify(obj));
 }
 
-/* ---------- UI ---------- */
+/* ---------- UI REFS ---------- */
 const loginView  = document.getElementById('loginView');
 const createView = document.getElementById('createView');
 const forgotView = document.getElementById('forgotView');
 
 const errBox  = document.getElementById('err');
 const okBox   = document.getElementById('ok');
-const warnBox = document.getElementById('warn');
 const cErrBox = document.getElementById('cErr');
 const fErrBox = document.getElementById('fErr');
 
-console.log('[ui] loginView =', !!loginView);
-console.log('[ui] errBox =', !!errBox);
-console.log('[ui] adminLoginForm =', !!document.getElementById('adminLoginForm'));
-
-function showAlert(box, msg, kind) {
+function showMsg(box, msg, kind) {
   if (!box) { alert(msg); return; }
   box.querySelector('span').textContent = msg;
   box.classList.add('show');
   if (kind === 'success') box.classList.add('success');
-  if (kind === 'warning') box.classList.add('warning');
-  setTimeout(() => { if (!box.classList.contains('success')) box.classList.remove('show'); }, 5000);
 }
-const showErr  = m => showAlert(errBox, m);
-const showOk   = m => showAlert(okBox, m, 'success');
-const showWarn = m => showAlert(warnBox, m, 'warning');
-const hideAll = () => {
-  [errBox, okBox, warnBox, cErrBox, fErrBox].forEach(b => b && b.classList.remove('show'));
-};
-const showView = (which) => {
-  [loginView, createView, forgotView].forEach(v => v && v.classList.add('hidden'));
-  if (which) which.classList.remove('hidden');
+function hideAll() {
+  [errBox, okBox, cErrBox, fErrBox].forEach(b => b && b.classList.remove('show'));
+}
+function showView(which) {
+  [loginView, createView, forgotView].forEach(v => v.classList.add('hidden'));
+  which.classList.remove('hidden');
   hideAll();
   window.scrollTo({ top: 0, behavior: 'smooth' });
-};
+}
 
-/* ---------- Password toggle ---------- */
+/* ---------- PASSWORD TOGGLE ---------- */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.pass-toggle');
   if (!btn) return;
@@ -355,39 +336,33 @@ document.addEventListener('click', e => {
   btn.innerHTML = `<i class="fas fa-eye${show ? '-slash' : ''}"></i>`;
 });
 
-/* ---------- Auto-redirect if already logged in ---------- */
+/* ---------- AUTO-REDIRECT IF ALREADY LOGGED IN ---------- */
 (function () {
   const raw = sessionStorage.getItem(SESSION_KEY);
-  if (!raw) {
-    console.log('[auto] No session found');
-    return;
-  }
+  if (!raw) return;
   try {
     const s = JSON.parse(raw);
     const a = loadAuth();
-    console.log('[auto] Session:', s, 'Auth:', a);
     if (a && a.username === s.u) {
-      console.log('[auto] Already logged in → redirecting to', DASHBOARD_URL);
+      console.log('[auto] Already signed in → redirecting');
       location.replace(DASHBOARD_URL);
     }
-  } catch (e) { console.warn('[auto] Failed:', e); }
+  } catch (e) {}
 })();
 
-/* ---------- Create admin link ---------- */
+/* ---------- CREATE ADMIN LINK ---------- */
 document.getElementById('setupLink').addEventListener('click', e => {
   e.preventDefault();
-  console.log('[setup] Clicked');
   const a = loadAuth();
-  const hasAccount = !!(a && a.username && a.passwordHash);
-  if (hasAccount) {
-    showErr('An admin account already exists. Please sign in, or use "Forgot password?".');
+  if (a && a.username && a.passwordHash) {
+    showMsg(errBox, 'An admin account already exists. Please sign in, or use "Forgot password?".');
     return;
   }
   showView(createView);
   setTimeout(() => document.getElementById('cName').focus(), 100);
 });
 
-/* ---------- Back to login ---------- */
+/* ---------- BACK TO LOGIN ---------- */
 document.getElementById('backToLogin').addEventListener('click', e => {
   e.preventDefault(); showView(loginView);
 });
@@ -395,37 +370,33 @@ document.getElementById('backToLogin2').addEventListener('click', e => {
   e.preventDefault(); showView(loginView);
 });
 
-/* ---------- Forgot password ---------- */
+/* ---------- FORGOT PASSWORD ---------- */
 document.getElementById('forgotLink').addEventListener('click', e => {
   e.preventDefault();
-  console.log('[forgot] Clicked');
   const a = loadAuth();
-  const hasAccount = !!(a && a.username && a.passwordHash);
-  if (!hasAccount) {
-    showErr('No admin account exists yet. Click "Create admin account" below.');
+  if (!a || !a.username || !a.passwordHash) {
+    showMsg(errBox, 'No admin account exists yet. Click "Create admin account" below.');
     return;
   }
   showView(forgotView);
 });
 
-/* ---------- Reset credentials ---------- */
+/* ---------- RESET CREDENTIALS ---------- */
 document.getElementById('resetBtn').addEventListener('click', () => {
   const sure = confirm(
     'Reset admin credentials?\n\n' +
     '• Username & password will be cleared\n' +
-    '• All dashboard data (patients, appointments, invoices) will be KEPT\n\n' +
+    '• All dashboard data will be KEPT\n\n' +
     'Continue?'
   );
   if (!sure) return;
-
   localStorage.removeItem(AUTH_KEY);
   sessionStorage.removeItem(SESSION_KEY);
-
   showView(createView);
   setTimeout(() => document.getElementById('cName').focus(), 100);
 });
 
-/* ---------- Strength meter ---------- */
+/* ---------- STRENGTH METER ---------- */
 function scorePassword(pw) {
   if (!pw) return 0;
   let s = 0;
@@ -437,7 +408,6 @@ function scorePassword(pw) {
   return Math.min(s, 4);
 }
 function updateStrength(input, bar, label) {
-  if (!input || !bar || !label) return;
   const map = [
     { w: '0%',   c: 'transparent', t: 'Use 8+ characters with letters, numbers & a symbol', col: '#5e7e8c' },
     { w: '25%',  c: '#e84a5f',     t: 'Weak password',   col: '#e84a5f' },
@@ -454,9 +424,8 @@ document.getElementById('cPass').addEventListener('input', function () {
   updateStrength(this, document.getElementById('cStrength'), document.getElementById('cStrengthText'));
 });
 
-/* ---------- Validation helpers ---------- */
+/* ---------- VALIDATION HELPERS ---------- */
 function markError(input) {
-  if (!input) return;
   const g = input.closest('.form-group');
   if (!g) return;
   g.classList.add('error');
@@ -470,12 +439,9 @@ function validatePassword(pw) {
   return null;
 }
 
-/* =====================================================
-   CREATE ADMIN SUBMIT
-===================================================== */
+/* ---------- CREATE ADMIN SUBMIT ---------- */
 document.getElementById('createAdminForm').addEventListener('submit', async e => {
   e.preventDefault();
-  console.log('[create] Submit fired');
   cErrBox.classList.remove('show');
   document.querySelectorAll('#createView .form-group.error').forEach(g => g.classList.remove('error'));
 
@@ -484,15 +450,15 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
   const pw       = document.getElementById('cPass').value;
   const pw2      = document.getElementById('cPass2').value;
 
-  if (name.length < 2) { markError(document.getElementById('cName')); return showAlert(cErrBox, 'Please enter your full name.'); }
-  if (!/^[A-Za-z0-9._-]{4,20}$/.test(username)) { markError(document.getElementById('cUser')); return showAlert(cErrBox, 'Username must be 4–20 characters (letters, numbers, . _ -).'); }
+  if (name.length < 2) { markError(document.getElementById('cName')); return showMsg(cErrBox, 'Please enter your full name.'); }
+  if (!/^[A-Za-z0-9._-]{4,20}$/.test(username)) { markError(document.getElementById('cUser')); return showMsg(cErrBox, 'Username must be 4–20 characters (letters, numbers, . _ -).'); }
   const rule = validatePassword(pw);
-  if (rule) { markError(document.getElementById('cPass')); return showAlert(cErrBox, rule); }
-  if (pw !== pw2) { markError(document.getElementById('cPass2')); return showAlert(cErrBox, 'Passwords do not match.'); }
+  if (rule) { markError(document.getElementById('cPass')); return showMsg(cErrBox, rule); }
+  if (pw !== pw2) { markError(document.getElementById('cPass2')); return showMsg(cErrBox, 'Passwords do not match.'); }
 
   const existing = loadAuth();
   if (existing && existing.username) {
-    return showAlert(cErrBox, 'An admin account already exists. Please sign in instead.');
+    return showMsg(cErrBox, 'An admin account already exists. Please sign in instead.');
   }
 
   const btn = e.target.querySelector('button[type="submit"]');
@@ -505,16 +471,10 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
     const initials = (name.split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
 
     saveAuth({
-      name,
-      username,
-      passwordHash,
-      initials,
-      role: 'Administrator',
-      email: '',
+      name, username, passwordHash, initials,
+      role: 'Administrator', email: '',
       createdAt: new Date().toISOString()
     });
-
-    console.log('[create] Saved credentials for', username);
 
     btn.disabled = false;
     btn.innerHTML = orig;
@@ -522,105 +482,62 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
     document.getElementById('adminUser').value = username;
     document.getElementById('adminPass').value = '';
     showView(loginView);
-    showOk('Admin account created! Please sign in with your new password.');
+    showMsg(okBox, 'Admin account created! Please sign in with your new password.', 'success');
     setTimeout(() => document.getElementById('adminPass').focus(), 100);
   } catch (err) {
-    console.error('[create] Failed:', err);
     btn.disabled = false;
     btn.innerHTML = orig;
-    showAlert(cErrBox, 'Error creating account: ' + err.message);
+    showMsg(cErrBox, 'Error creating account: ' + err.message);
   }
 });
 
-/* =====================================================
-   LOGIN SUBMIT — with extra diagnostics
-===================================================== */
-const loginForm = document.getElementById('adminLoginForm');
-const loginBtn  = document.getElementById('loginBtn');
-
-console.log('[login] form =', !!loginForm, 'button =', !!loginBtn);
-
-loginForm.addEventListener('submit', async e => {
+/* ---------- LOGIN SUBMIT ---------- */
+document.getElementById('adminLoginForm').addEventListener('submit', async e => {
   e.preventDefault();
-  console.log('=== [login] Submit handler FIRED ===');
-
   hideAll();
   document.querySelectorAll('#loginView .form-group.error').forEach(g => g.classList.remove('error'));
 
   const username = document.getElementById('adminUser').value.trim();
   const password = document.getElementById('adminPass').value;
 
-  console.log('[login] username =', JSON.stringify(username));
-  console.log('[login] password length =', password.length);
-
-  if (!username) { markError(document.getElementById('adminUser')); return showErr('Please enter your username.'); }
-  if (!password) { markError(document.getElementById('adminPass')); return showErr('Please enter your password.'); }
+  if (!username) { markError(document.getElementById('adminUser')); return showMsg(errBox, 'Please enter your username.'); }
+  if (!password) { markError(document.getElementById('adminPass')); return showMsg(errBox, 'Please enter your password.'); }
 
   const a = loadAuth();
-  console.log('[login] Stored account =', a ? a.username : 'NONE');
-
   if (!a || !a.username) {
-    return showErr('No admin account found. Click "Create admin account" below.');
+    return showMsg(errBox, 'No admin account found. Click "Create admin account" below.');
   }
   if (username.toLowerCase() !== a.username.toLowerCase()) {
     markError(document.getElementById('adminUser'));
     markError(document.getElementById('adminPass'));
-    return showErr('Invalid username or password.');
+    return showMsg(errBox, 'Invalid username or password.');
   }
 
-  const btn = loginBtn;
+  const btn = e.target.querySelector('button[type="submit"]');
   const orig = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
 
-  try {
-    const hash = await hashPassword(password);
-    console.log('[login] Hash computed. Match:', hash === a.passwordHash);
+  const hash = await hashPassword(password);
+  const ok = hash === a.passwordHash;
 
-    btn.disabled = false;
-    btn.innerHTML = orig;
+  btn.disabled = false;
+  btn.innerHTML = orig;
 
-    if (hash !== a.passwordHash) {
-      document.getElementById('adminPass').value = '';
-      markError(document.getElementById('adminUser'));
-      markError(document.getElementById('adminPass'));
-      return showErr('Invalid username or password.');
-    }
-
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: a.username, t: Date.now() }));
-    console.log('[login] ✅ SUCCESS. Session saved:', sessionStorage.getItem(SESSION_KEY));
-    console.log('[login] Redirecting to:', DASHBOARD_URL);
-
-    showOk('Signed in! Opening dashboard…');
-
-    setTimeout(() => {
-      console.log('[login] NOW redirecting...');
-      window.location.href = DASHBOARD_URL;
-    }, 500);
-  } catch (err) {
-    console.error('[login] ERROR:', err);
-    btn.disabled = false;
-    btn.innerHTML = orig;
-    showErr('Login error: ' + err.message);
+  if (!ok) {
+    document.getElementById('adminPass').value = '';
+    markError(document.getElementById('adminUser'));
+    markError(document.getElementById('adminPass'));
+    return showMsg(errBox, 'Invalid username or password.');
   }
+
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: a.username, t: Date.now() }));
+  showMsg(okBox, 'Signed in! Opening dashboard…', 'success');
+
+  setTimeout(() => {
+    window.location.href = DASHBOARD_URL;
+  }, 500);
 });
-
-/* Fallback — also handle button click directly in case submit event fails */
-if (loginBtn) {
-  loginBtn.addEventListener('click', (e) => {
-    if (!loginForm.checkValidity()) return;
-    console.log('[login] Button clicked directly');
-  });
-}
-
-/* Double-check the form will submit on Enter */
-document.getElementById('adminPass').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    console.log('[login] Enter pressed in password field');
-  }
-});
-
-console.log('=== admin-login.html script READY ===');
 </script>
 </body>
 </html>
