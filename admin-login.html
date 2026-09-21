@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="public-extras.css">
-<!-- ...existing shared.js include... -->
 <script src="public-extras.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,6 +27,7 @@ a { text-decoration: none; color: inherit; }
 .btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
 .btn-lg { padding: 16px 30px; font-size: 15px; border-radius: 14px; }
 .btn-block { width: 100%; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 .auth-wrap {
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
@@ -92,7 +92,7 @@ a { text-decoration: none; color: inherit; }
 .alert.success { background: #e1f7ed; color: var(--success); }
 
 .auth-foot { text-align: center; font-size: 13.5px; color: var(--gray); margin-top: 18px; }
-.auth-foot a { color: var(--primary); font-weight: 600; }
+.auth-foot a { color: var(--primary); font-weight: 600; cursor: pointer; }
 .auth-foot a:hover { text-decoration: underline; }
 
 .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0 16px; color: var(--gray); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
@@ -103,6 +103,8 @@ a { text-decoration: none; color: inherit; }
   margin-top: 18px; font-size: 13px; color: var(--gray); font-weight: 600;
 }
 .back-link:hover { color: var(--primary); }
+
+.hidden { display: none !important; }
 
 @media (max-width: 640px) {
   .auth-wrap { padding: 30px 16px; }
@@ -115,48 +117,93 @@ a { text-decoration: none; color: inherit; }
 
 <div class="auth-wrap">
   <div class="auth-card">
-    <div class="auth-head">
-      <div class="logo-icon"><i class="fas fa-user-md"></i></div>
-      <div class="auth-badge"><i class="fas fa-shield-alt"></i> Staff Area</div>
-      <h1>Hospital Dashboard</h1>
-      <p>Sign in with your administrator credentials</p>
-    </div>
 
-    <div class="alert" id="err"><i class="fas fa-exclamation-circle"></i><span></span></div>
-
-    <form id="adminLoginForm" novalidate>
-      <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="adminUser" autocomplete="username" placeholder="e.g. hamza.admin" required>
+    <!-- ============ LOGIN VIEW ============ -->
+    <div id="loginView">
+      <div class="auth-head">
+        <div class="logo-icon"><i class="fas fa-user-md"></i></div>
+        <div class="auth-badge"><i class="fas fa-shield-alt"></i> Staff Area</div>
+        <h1>Hospital Dashboard</h1>
+        <p>Sign in with your administrator credentials</p>
       </div>
-      <div class="form-group">
-        <label>Password</label>
-        <div class="pass-wrap">
-          <input type="password" id="adminPass" autocomplete="current-password" placeholder="••••••••" required>
-          <button type="button" class="pass-toggle" data-target="adminPass"><i class="fas fa-eye"></i></button>
+
+      <div class="alert" id="err"><i class="fas fa-exclamation-circle"></i><span></span></div>
+
+      <form id="adminLoginForm" novalidate>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="adminUser" autocomplete="username" placeholder="e.g. hamza.admin" required>
         </div>
-      </div>
-      <button type="submit" class="btn btn-primary btn-lg btn-block">
-        <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
-      </button>
-    </form>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="adminPass" autocomplete="current-password" placeholder="••••••••" required>
+            <button type="button" class="pass-toggle" data-target="adminPass"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">
+          <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+        </button>
+      </form>
 
-    <div class="auth-foot">
-      First time here? <a id="setupLink">Create admin account</a>
+      <div class="auth-foot">
+        First time here? <a id="setupLink">Create admin account</a>
+      </div>
+
+      <div class="divider">Patient</div>
+      <a href="index.html" class="btn btn-outline btn-block"><i class="fas fa-user"></i> Patient Website</a>
+
+      <a href="index.html" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Home
+      </a>
     </div>
 
-    <div class="divider">Patient</div>
-    <a href="index.html" class="btn btn-outline btn-block"><i class="fas fa-user"></i> Patient Website</a>
+    <!-- ============ CREATE ADMIN VIEW ============ -->
+    <div id="createView" class="hidden">
+      <div class="auth-head">
+        <div class="logo-icon"><i class="fas fa-user-plus"></i></div>
+        <div class="auth-badge"><i class="fas fa-cog"></i> First-Time Setup</div>
+        <h1>Create Admin Account</h1>
+        <p>Set up your administrator credentials for this device</p>
+      </div>
 
-    <a href="index.html" class="back-link">
-      <i class="fas fa-arrow-left"></i> Back to Home
-    </a>
+      <div class="alert" id="createErr"><i class="fas fa-exclamation-circle"></i><span></span></div>
+
+      <form id="createAdminForm" novalidate>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="newUser" autocomplete="username" placeholder="e.g. hamza.admin" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="newPass" autocomplete="new-password" placeholder="Min 6 characters" required>
+            <button type="button" class="pass-toggle" data-target="newPass"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="newPass2" autocomplete="new-password" placeholder="Repeat password" required>
+            <button type="button" class="pass-toggle" data-target="newPass2"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">
+          <i class="fas fa-check"></i> Create Admin Account
+        </button>
+      </form>
+
+      <div class="auth-foot">
+        Already have an account? <a id="backToLogin">Back to login</a>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
 /* =====================================================
-   ADMIN LOGIN — same credentials as dashboard.html / 1.html
+   ADMIN LOGIN + CREATE ADMIN ACCOUNT
    Uses localStorage key 'medicare_hms' with user:{username,passwordHash}
 ===================================================== */
 const SALT = 'medicare::hms::v2::salt';
@@ -172,6 +219,7 @@ async function hashPassword(password) {
         .map(b => b.toString(16).padStart(2, '0')).join('');
     } catch (e) {}
   }
+  // Fallback for file:// or insecure contexts
   let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
   for (let i = 0; i < input.length; i++) {
     const ch = input.charCodeAt(i);
@@ -201,10 +249,33 @@ function loadDB() {
   } catch (e) {}
 })();
 
-const errBox = document.getElementById('err');
-const showErr = m => { errBox.querySelector('span').textContent = m; errBox.classList.add('show'); };
+/* ---------- Elements ---------- */
+const loginView  = document.getElementById('loginView');
+const createView = document.getElementById('createView');
 
-// password visibility toggle
+const errBox       = document.getElementById('err');
+const createErrBox = document.getElementById('createErr');
+
+const showErr = (box, m) => {
+  box.querySelector('span').textContent = m;
+  box.classList.add('show');
+};
+const hideErr = box => box.classList.remove('show');
+
+const showLogin = () => {
+  createView.classList.add('hidden');
+  loginView.classList.remove('hidden');
+  hideErr(errBox);
+  hideErr(createErrBox);
+};
+const showCreate = () => {
+  loginView.classList.add('hidden');
+  createView.classList.remove('hidden');
+  hideErr(errBox);
+  hideErr(createErrBox);
+};
+
+/* ---------- Password visibility toggle ---------- */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.pass-toggle');
   if (!btn) return;
@@ -214,46 +285,51 @@ document.addEventListener('click', e => {
   btn.innerHTML = `<i class="fas fa-eye${show ? '-slash' : ''}"></i>`;
 });
 
-// setup link — if no account exists, dashboard handles the setup
+/* ---------- "Create admin account" link ---------- */
 document.getElementById('setupLink').addEventListener('click', e => {
   e.preventDefault();
   const db = loadDB();
   const hasAccount = db && db.user && db.user.username && db.user.passwordHash;
   if (hasAccount) {
-    alert('An admin account already exists for this device.\n\nIf you forgot the password, open the dashboard and click "Reset this device" on the login screen.');
+    showErr(errBox, 'An admin account already exists on this device. Please sign in.');
     return;
   }
-  // No account — send them to the dashboard to run first-time setup
-  location.href = 'dashboard.html';
+  showCreate();
 });
 
-// submit
+/* ---------- "Back to login" link ---------- */
+document.getElementById('backToLogin').addEventListener('click', e => {
+  e.preventDefault();
+  showLogin();
+});
+
+/* ---------- LOGIN submit ---------- */
 document.getElementById('adminLoginForm').addEventListener('submit', async e => {
   e.preventDefault();
-  errBox.classList.remove('show');
-  document.querySelectorAll('.form-group.error').forEach(g => g.classList.remove('error'));
+  hideErr(errBox);
+  document.querySelectorAll('#loginView .form-group.error').forEach(g => g.classList.remove('error'));
 
   const username = document.getElementById('adminUser').value.trim();
   const password = document.getElementById('adminPass').value;
 
   if (!username) {
     document.getElementById('adminUser').closest('.form-group').classList.add('error');
-    return showErr('Please enter your username.');
+    return showErr(errBox, 'Please enter your username.');
   }
   if (!password) {
     document.getElementById('adminPass').closest('.form-group').classList.add('error');
-    return showErr('Please enter your password.');
+    return showErr(errBox, 'Please enter your password.');
   }
 
   const db = loadDB();
   if (!db || !db.user || !db.user.username) {
-    return showErr('No admin account found. Click "Create admin account" below.');
+    return showErr(errBox, 'No admin account found. Click "Create admin account" below.');
   }
 
   if (username.toLowerCase() !== db.user.username.toLowerCase()) {
     document.getElementById('adminUser').closest('.form-group').classList.add('error');
     document.getElementById('adminPass').closest('.form-group').classList.add('error');
-    return showErr('Invalid username or password.');
+    return showErr(errBox, 'Invalid username or password.');
   }
 
   const btn = e.target.querySelector('button[type="submit"]');
@@ -271,12 +347,72 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
     document.getElementById('adminPass').value = '';
     document.getElementById('adminUser').closest('.form-group').classList.add('error');
     document.getElementById('adminPass').closest('.form-group').classList.add('error');
-    return showErr('Invalid username or password.');
+    return showErr(errBox, 'Invalid username or password.');
   }
 
   // set session — dashboard will accept this and skip its own login
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: db.user.username, t: Date.now() }));
   location.replace('dashboard.html');
+});
+
+/* ---------- CREATE ADMIN submit ---------- */
+document.getElementById('createAdminForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  hideErr(createErrBox);
+  document.querySelectorAll('#createView .form-group.error').forEach(g => g.classList.remove('error'));
+
+  const u  = document.getElementById('newUser').value.trim();
+  const p  = document.getElementById('newPass').value;
+  const p2 = document.getElementById('newPass2').value;
+
+  if (!u) {
+    document.getElementById('newUser').closest('.form-group').classList.add('error');
+    return showErr(createErrBox, 'Please enter a username.');
+  }
+  if (u.length < 3) {
+    document.getElementById('newUser').closest('.form-group').classList.add('error');
+    return showErr(createErrBox, 'Username must be at least 3 characters.');
+  }
+  if (p.length < 6) {
+    document.getElementById('newPass').closest('.form-group').classList.add('error');
+    return showErr(createErrBox, 'Password must be at least 6 characters.');
+  }
+  if (p !== p2) {
+    document.getElementById('newPass').closest('.form-group').classList.add('error');
+    document.getElementById('newPass2').closest('.form-group').classList.add('error');
+    return showErr(createErrBox, 'Passwords do not match.');
+  }
+
+  // prevent overwriting an existing account
+  const existing = loadDB();
+  if (existing && existing.user && existing.user.username) {
+    return showErr(createErrBox, 'An admin account already exists. Please sign in instead.');
+  }
+
+  const btn = e.target.querySelector('button[type="submit"]');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+  const passwordHash = await hashPassword(p);
+
+  localStorage.setItem(DB_KEY, JSON.stringify({
+    user: { username: u, passwordHash },
+    createdAt: Date.now()
+  }));
+
+  btn.disabled = false;
+  btn.innerHTML = orig;
+
+  // Auto-fill login and switch back
+  document.getElementById('adminUser').value = u;
+  document.getElementById('adminPass').value = '';
+  showLogin();
+  hideErr(errBox);
+  errBox.classList.add('success');
+  showErr(errBox, 'Admin account created! Please sign in with your new password.');
+  // revert success style after a few seconds
+  setTimeout(() => errBox.classList.remove('success'), 4000);
 });
 </script>
 </body>
