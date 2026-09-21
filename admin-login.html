@@ -204,10 +204,14 @@ a { text-decoration: none; color: inherit; }
 <script>
 /* =====================================================
    ADMIN LOGIN + CREATE ADMIN ACCOUNT
-   Uses localStorage key 'medicare_hms' with user:{username,passwordHash}
+   -----------------------------------------------------
+   Storage keys (ISOLATED so dashboard data is safe):
+     • medicare_admin    → admin credentials (this file)
+     • medicare_session  → active session token
+     • medicare_hms      → DASHBOARD DATA (untouched!)
 ===================================================== */
-const SALT = 'medicare::hms::v2::salt';
-const DB_KEY = 'medicare_hms';
+const SALT        = 'medicare::hms::v2::salt';
+const DB_KEY      = 'medicare_admin';   // ← credentials ONLY
 const SESSION_KEY = 'medicare_session';
 
 async function hashPassword(password) {
@@ -350,7 +354,6 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
     return showErr(errBox, 'Invalid username or password.');
   }
 
-  // set session — dashboard will accept this and skip its own login
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: db.user.username, t: Date.now() }));
   location.replace('dashboard.html');
 });
@@ -383,7 +386,6 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
     return showErr(createErrBox, 'Passwords do not match.');
   }
 
-  // prevent overwriting an existing account
   const existing = loadDB();
   if (existing && existing.user && existing.user.username) {
     return showErr(createErrBox, 'An admin account already exists. Please sign in instead.');
@@ -396,6 +398,8 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
 
   const passwordHash = await hashPassword(p);
 
+  // ✅ Saves ONLY credentials to 'medicare_admin'
+  //    'medicare_hms' (your dashboard dummy data) is NOT touched.
   localStorage.setItem(DB_KEY, JSON.stringify({
     user: { username: u, passwordHash },
     createdAt: Date.now()
@@ -404,14 +408,12 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
   btn.disabled = false;
   btn.innerHTML = orig;
 
-  // Auto-fill login and switch back
   document.getElementById('adminUser').value = u;
   document.getElementById('adminPass').value = '';
   showLogin();
   hideErr(errBox);
   errBox.classList.add('success');
   showErr(errBox, 'Admin account created! Please sign in with your new password.');
-  // revert success style after a few seconds
   setTimeout(() => errBox.classList.remove('success'), 4000);
 });
 </script>
