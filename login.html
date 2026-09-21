@@ -2,350 +2,333 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Staff Login · MediCare Hospital</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Login — MediCare HMS</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
 :root {
-  --primary: #0d6e9e; --primary-dark: #0a5578; --primary-light: #e1f0f8;
-  --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
-  --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
-  --border: #e6f0f5;
+  --primary:#0d6e9e; --primary-dark:#0a5578; --primary-light:#e1f0f8;
+  --success:#0e8b5e; --warning:#e8a33d; --danger:#e84a5f;
+  --dark:#0b3b4b; --gray:#5e7e8c; --border:#e6f0f5;
 }
-body { font-family: 'Inter', sans-serif; background: var(--light-gray); color: #1e293b; line-height: 1.6; }
-a { text-decoration: none; color: inherit; }
 
-.btn { padding: 12px 22px; border-radius: 12px; border: none; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; white-space: nowrap; }
-.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 8px 16px -4px rgba(13,110,158,0.3); }
-.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-.btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--border); }
-.btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
-.btn-lg { padding: 16px 30px; font-size: 15px; border-radius: 14px; }
-.btn-block { width: 100%; }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-.auth-wrap {
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  padding: 60px 24px;
-  background: linear-gradient(135deg, #0b3b4b 0%, #0d6e9e 100%);
-  position: relative; overflow: hidden;
+body {
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#0d6e9e 0%,#0b3b4b 100%);
+  padding:20px; overflow-x:hidden; color:#1e293b;
 }
-.auth-wrap::before { content: ''; position: absolute; width: 600px; height: 600px; background: rgba(255,255,255,0.05); border-radius: 50%; top: -250px; right: -200px; }
-.auth-wrap::after  { content: ''; position: absolute; width: 450px; height: 450px; background: rgba(255,255,255,0.04); border-radius: 50%; bottom: -200px; left: -150px; }
 
 .auth-card {
-  background: #fff; border-radius: 24px; padding: 40px 36px;
-  width: 100%; max-width: 440px;
-  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.4);
-  position: relative; z-index: 2;
+  background:#fff;
+  border-radius:24px;
+  padding:34px 30px;
+  width:100%; max-width:430px;
+  box-shadow:0 40px 80px -20px rgba(0,0,0,.45);
+  animation:cardIn .35s ease;
+  margin:auto;
 }
 
-.auth-head { text-align: center; margin-bottom: 28px; }
-.auth-head .logo-icon {
-  background: linear-gradient(135deg, #0b3b4b, #0d6e9e); color: #fff;
-  width: 60px; height: 60px; border-radius: 16px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 26px; margin: 0 auto 16px;
-  box-shadow: 0 12px 24px -6px rgba(11,59,75,0.4);
-}
-.auth-head h1 { font-size: 24px; font-weight: 800; color: var(--dark); margin-bottom: 6px; letter-spacing: -0.4px; }
-.auth-head p { font-size: 14px; color: var(--gray); }
-
-.auth-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--primary-light); color: var(--primary);
-  padding: 6px 14px; border-radius: 40px;
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; margin-bottom: 14px;
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(20px) scale(.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
 }
 
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 7px; }
+.auth-brand { display:flex; align-items:center; gap:14px; margin-bottom:26px; }
+.auth-brand .logo-icon {
+  background:var(--primary); color:#fff;
+  width:52px; height:52px; border-radius:15px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; flex-shrink:0;
+}
+.auth-brand h1 { font-size:20px; font-weight:800; color:var(--dark); line-height:1.1; }
+.auth-brand p  { font-size:12px; color:var(--gray); margin-top:3px; }
+
+.auth-title { font-size:16px; font-weight:700; color:var(--dark); margin-bottom:6px; }
+.auth-sub   { font-size:13px; color:var(--gray); margin-bottom:20px; line-height:1.5; }
+
+.form-group { margin-bottom:16px; }
+.form-group label {
+  display:block; font-size:11.5px; font-weight:700;
+  color:var(--gray); text-transform:uppercase; letter-spacing:.4px;
+  margin-bottom:7px;
+}
 .form-group input {
-  width: 100%; padding: 13px 15px;
-  border: 1.5px solid var(--border); border-radius: 12px;
-  font-family: inherit; font-size: 14px; color: var(--dark);
-  background: #f9fcfd; outline: none; transition: all .15s;
+  width:100%; padding:12px 14px; border-radius:12px;
+  border:1px solid var(--border); background:#fbfdfe;
+  font-family:inherit; font-size:14px; font-weight:500; color:var(--dark);
+  outline:none; transition:border-color .15s, box-shadow .15s, background .15s;
 }
-.form-group input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(13,110,158,0.08); }
-.form-group.error label { color: var(--danger); }
-.form-group.error input { border-color: var(--danger); background: #fff7f8; }
+.form-group input:focus {
+  border-color:var(--primary); background:#fff;
+  box-shadow:0 0 0 4px rgba(13,110,158,.1);
+}
+.form-group.error label { color:var(--danger); }
+.form-group.error input {
+  border-color:var(--danger); background:#fff7f8;
+  box-shadow:0 0 0 4px rgba(232,74,95,.10);
+}
 
-.pass-wrap { position: relative; }
-.pass-wrap input { padding-right: 48px; }
+.pass-wrap { position:relative; }
+.pass-wrap input { padding-right:48px; }
 .pass-toggle {
-  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-  width: 36px; height: 36px; border: none; background: transparent;
-  color: var(--gray); cursor: pointer; border-radius: 9px; font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
+  position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  width:34px; height:34px; border:none; background:transparent;
+  color:var(--gray); cursor:pointer; border-radius:9px; font-size:14px;
 }
-.pass-toggle:hover { background: var(--primary-light); color: var(--primary); }
+.pass-toggle:hover { background:var(--primary-light); color:var(--primary); }
 
-.alert { display: none; align-items: flex-start; gap: 10px; padding: 12px 15px; border-radius: 12px; font-size: 13.5px; font-weight: 500; margin-bottom: 16px; background: #fdecef; color: var(--danger); }
-.alert.show { display: flex; }
-.alert.success { background: #e1f7ed; color: var(--success); }
-.alert.warning { background: #fff0e0; color: #c96f1e; }
-
-.auth-foot { text-align: center; font-size: 13.5px; color: var(--gray); margin-top: 18px; }
-.auth-foot a { color: var(--primary); font-weight: 600; cursor: pointer; }
-.auth-foot a:hover { text-decoration: underline; }
-
-.auth-links {
-  display: flex; align-items: center; justify-content: space-between;
-  font-size: 12.5px; margin-top: 14px; flex-wrap: wrap; gap: 8px;
+.auth-error {
+  display:none; align-items:flex-start; gap:9px;
+  background:#fdecef; color:var(--danger);
+  border-radius:12px; padding:11px 14px;
+  font-size:13px; font-weight:500; margin-bottom:14px;
 }
-.auth-links a { color: var(--primary); font-weight: 600; cursor: pointer; }
-.auth-links a:hover { text-decoration: underline; }
+.auth-error.show { display:flex; }
+.auth-error i { margin-top:2px; }
 
-.divider { display: flex; align-items: center; gap: 14px; margin: 24px 0 16px; color: var(--gray); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-.back-link {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin-top: 18px; font-size: 13px; color: var(--gray); font-weight: 600;
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:14px 18px; border-radius:12px; border:1px solid transparent;
+  font-family:inherit; font-size:15px; font-weight:600; line-height:1;
+  cursor:pointer; white-space:nowrap; text-decoration:none;
+  transition:background .18s, color .18s, box-shadow .18s, transform .12s;
+  width:100%; margin-top:6px;
 }
-.back-link:hover { color: var(--primary); }
-
-.hidden { display: none !important; }
-
-.create-head { text-align: center; margin-bottom: 22px; }
-.create-head .logo-icon {
-  background: linear-gradient(135deg, #0e8b5e, #0d6e9e); color: #fff;
-  width: 60px; height: 60px; border-radius: 16px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 26px; margin: 0 auto 16px;
-  box-shadow: 0 12px 24px -6px rgba(14,139,94,0.4);
+.btn-primary {
+  background:var(--primary); color:#fff;
+  box-shadow:0 8px 16px -8px rgba(13,110,158,.7);
 }
-.create-head h1 { font-size: 22px; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
-.create-head p { font-size: 13.5px; color: var(--gray); }
+.btn-primary:hover {
+  background:var(--primary-dark);
+  box-shadow:0 12px 22px -10px rgba(13,110,158,.8);
+}
+.btn:active { transform:translateY(1px); }
+.btn:disabled { opacity:.6; cursor:not-allowed; }
 
-.strength { height: 5px; border-radius: 5px; background: var(--border); margin-top: 9px; overflow: hidden; }
-.strength-fill { height: 100%; width: 0; transition: width .25s, background .25s; }
-.strength-text { font-size: 11.5px; font-weight: 600; margin-top: 6px; color: var(--gray); }
+.auth-foot { text-align:center; font-size:12.5px; color:var(--gray); margin-top:18px; }
+.auth-foot a { color:var(--primary); font-weight:600; cursor:pointer; }
+.auth-foot a:hover { text-decoration:underline; }
 
-@media (max-width: 640px) {
-  .auth-wrap { padding: 30px 16px; }
-  .auth-card { padding: 28px 22px; border-radius: 20px; }
-  .auth-head h1 { font-size: 20px; }
+.auth-back {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  margin-top:18px; padding:11px 16px; border-radius:12px;
+  border:1.5px solid var(--border); background:#fff;
+  color:var(--gray); font-size:13px; font-weight:600;
+  text-decoration:none; transition:all .18s;
+}
+.auth-back:hover {
+  background:var(--primary-light); border-color:var(--primary); color:var(--primary);
+}
+.auth-back i { font-size:12px; }
+
+@media (max-width:640px) {
+  body { padding:14px; }
+  .auth-card { padding:26px 20px; border-radius:20px; }
+  .auth-brand .logo-icon { width:46px; height:46px; font-size:21px; border-radius:13px; }
+  .auth-brand h1 { font-size:18px; }
+  .btn { padding:13px; }
 }
 </style>
 </head>
 <body>
 
-<div class="auth-wrap">
-  <div class="auth-card">
-
-    <!-- LOGIN VIEW -->
-    <div id="loginView">
-      <div class="auth-head">
-        <div class="logo-icon"><i class="fas fa-user-md"></i></div>
-        <div class="auth-badge"><i class="fas fa-shield-alt"></i> Staff Area</div>
-        <h1>Hospital Dashboard</h1>
-        <p>Sign in with your administrator credentials</p>
-      </div>
-
-      <div class="alert" id="err"><i class="fas fa-exclamation-circle"></i><span></span></div>
-      <div class="alert success" id="ok"><i class="fas fa-check-circle"></i><span></span></div>
-      <div class="alert warning" id="warn"><i class="fas fa-info-circle"></i><span></span></div>
-
-      <form id="adminLoginForm" novalidate>
-        <div class="form-group">
-          <label>Username</label>
-          <input type="text" id="adminUser" autocomplete="username" placeholder="e.g. hamza.admin">
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <div class="pass-wrap">
-            <input type="password" id="adminPass" autocomplete="current-password" placeholder="••••••••">
-            <button type="button" class="pass-toggle" data-target="adminPass"><i class="fas fa-eye"></i></button>
-          </div>
-        </div>
-
-        <div class="auth-links">
-          <span></span>
-          <a id="forgotLink">Forgot password?</a>
-        </div>
-
-        <button type="submit" id="loginBtn" class="btn btn-primary btn-lg btn-block" style="margin-top:14px;">
-          <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
-        </button>
-      </form>
-
-      <div class="auth-foot">
-        First time here? <a id="setupLink" style="cursor:pointer;">Create admin account</a>
-      </div>
-
-      <div class="divider">Patient</div>
-      <a href="index.html" class="btn btn-outline btn-block"><i class="fas fa-user"></i> Patient Website</a>
-
-      <a href="index.html" class="back-link">
-        <i class="fas fa-arrow-left"></i> Back to Home
-      </a>
+<!-- ============ SETUP SCREEN ============ -->
+<div class="auth-card" id="setupScreen" style="display:none;">
+  <div class="auth-brand">
+    <div class="logo-icon"><i class="fas fa-hospital"></i></div>
+    <div>
+      <h1>MediCare</h1>
+      <p>Hospital Management System</p>
     </div>
-
-    <!-- CREATE ADMIN VIEW -->
-    <div id="createView" class="hidden">
-      <div class="create-head">
-        <div class="logo-icon"><i class="fas fa-user-plus"></i></div>
-        <h1>Create Admin Account</h1>
-        <p>Set up your administrator credentials for this device</p>
-      </div>
-
-      <div class="alert" id="cErr"><i class="fas fa-exclamation-circle"></i><span></span></div>
-
-      <form id="createAdminForm" novalidate>
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="cName" autocomplete="name" placeholder="e.g. Hamza Saeed">
-        </div>
-        <div class="form-group">
-          <label>Username</label>
-          <input type="text" id="cUser" autocomplete="username" placeholder="e.g. hamza.admin">
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <div class="pass-wrap">
-            <input type="password" id="cPass" autocomplete="new-password" placeholder="Min 8 characters">
-            <button type="button" class="pass-toggle" data-target="cPass"><i class="fas fa-eye"></i></button>
-          </div>
-          <div class="strength"><div class="strength-fill" id="cStrength"></div></div>
-          <div class="strength-text" id="cStrengthText">Use 8+ characters with letters, numbers &amp; a symbol</div>
-        </div>
-        <div class="form-group">
-          <label>Confirm Password</label>
-          <div class="pass-wrap">
-            <input type="password" id="cPass2" autocomplete="new-password" placeholder="Repeat password">
-            <button type="button" class="pass-toggle" data-target="cPass2"><i class="fas fa-eye"></i></button>
-          </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-lg btn-block">
-          <i class="fas fa-check"></i> Create Admin Account
-        </button>
-      </form>
-
-      <div class="auth-foot">
-        Already have an account? <a id="backToLogin">Back to login</a>
-      </div>
-    </div>
-
-    <!-- FORGOT PASSWORD VIEW -->
-    <div id="forgotView" class="hidden">
-      <div class="auth-head">
-        <div class="logo-icon"><i class="fas fa-key"></i></div>
-        <h1>Reset Admin Password</h1>
-        <p>Clear credentials and set up a new account</p>
-      </div>
-
-      <div class="alert" id="fErr"><i class="fas fa-exclamation-circle"></i><span></span></div>
-
-      <p style="font-size:13.5px;color:#5e7e8c;margin-bottom:18px;line-height:1.55;">
-        Your account is stored only on this device. Passwords are hashed and can't be recovered — only reset.
-        <br><br>
-        <strong style="color:#0b3b4b;">Your hospital data (patients, appointments, invoices) will be kept.</strong>
-      </p>
-
-      <button class="btn btn-primary btn-block" id="resetBtn" style="margin-bottom:12px;">
-        <i class="fas fa-user-cog"></i> Reset Credentials &amp; Create New Account
-      </button>
-
-      <button class="btn btn-outline btn-block" id="backToLogin2">
-        <i class="fas fa-arrow-left"></i> Back to Login
-      </button>
-    </div>
-
   </div>
+  <div class="auth-title">Create your administrator account</div>
+  <div class="auth-sub">Set a unique username and password for this device.</div>
+
+  <div class="auth-error" id="setupError"><i class="fas fa-exclamation-circle"></i><span></span></div>
+
+  <form id="setupForm" autocomplete="off">
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="suName" placeholder="e.g. Hamza Saeed" required>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="suUser" placeholder="e.g. hamza.admin" required>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="pass-wrap">
+        <input type="password" id="suPass" required>
+        <button type="button" class="pass-toggle" data-target="suPass"><i class="fas fa-eye"></i></button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <div class="pass-wrap">
+        <input type="password" id="suPass2" required>
+        <button type="button" class="pass-toggle" data-target="suPass2"><i class="fas fa-eye"></i></button>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-user-shield"></i> Create Account
+    </button>
+  </form>
+
+  <a href="index.html" class="auth-back"><i class="fas fa-arrow-left"></i> Back to Website</a>
+</div>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div class="auth-card" id="loginScreen" style="display:none;">
+  <div class="auth-brand">
+    <div class="logo-icon"><i class="fas fa-hospital"></i></div>
+    <div>
+      <h1>MediCare</h1>
+      <p>Hospital Management System</p>
+    </div>
+  </div>
+  <div class="auth-title">Sign in to continue</div>
+  <div class="auth-sub">Enter your credentials to access the dashboard.</div>
+
+  <div class="auth-error" id="loginError"><i class="fas fa-exclamation-circle"></i><span></span></div>
+
+  <form id="loginForm" autocomplete="on">
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="loginUser" required>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="pass-wrap">
+        <input type="password" id="loginPass" required>
+        <button type="button" class="pass-toggle" data-target="loginPass"><i class="fas fa-eye"></i></button>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-sign-in-alt"></i> Sign In
+    </button>
+  </form>
+
+  <div class="auth-foot">
+    Forgot your password? <a id="resetLink">Reset this device</a>
+  </div>
+  <a href="index.html" class="auth-back"><i class="fas fa-arrow-left"></i> Back to Website</a>
 </div>
 
 <script>
 /* =====================================================
-   IMMEDIATE DIAGNOSTIC — tells us if JS even loads
+   🔑 AUTH MODULE
 ===================================================== */
-console.log('=== admin-login.html script STARTED ===');
-window.addEventListener('error', e => console.error('❌ SCRIPT ERROR:', e.message, 'at', e.filename + ':' + e.lineno));
-window.addEventListener('unhandledrejection', e => console.error('❌ PROMISE ERROR:', e.reason));
+const Auth = {
+  SALT: 'medicare::hms::v2::salt',
+  SESSION_KEY: 'medicare_session',
+  AUTH_KEY: 'medicare_admin',
 
-/* =====================================================
-   CONFIG
-===================================================== */
-const DASHBOARD_URL = 'dashboard.html';
-const SALT        = 'medicare::hms::v2::salt';
-const AUTH_KEY    = 'medicare_admin';
-const SESSION_KEY = 'medicare_session';
-
-console.log('[cfg] DASHBOARD_URL =', DASHBOARD_URL);
-console.log('[cfg] Current URL    =', location.href);
-console.log('[cfg] Protocol       =', location.protocol);
-
-/* ---------- HASH ---------- */
-async function hashPassword(password) {
-  const input = SALT + '|' + password;
-  if (window.crypto && window.crypto.subtle && window.isSecureContext) {
+  loadAuth() {
+    try { return JSON.parse(localStorage.getItem(this.AUTH_KEY)); }
+    catch (e) { return null; }
+  },
+  saveAuth(obj) {
+    localStorage.setItem(this.AUTH_KEY, JSON.stringify(obj));
+  },
+  async hash(password) {
+    const input = this.SALT + '|' + password;
+    if (window.crypto && window.crypto.subtle && window.isSecureContext) {
+      try {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+        return 'sha256:' + Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (e) {}
+    }
+    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (let i = 0; i < input.length; i++) {
+      const ch = input.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
+  },
+  hasAccount() {
+    const a = this.loadAuth();
+    return !!(a && a.username && a.passwordHash);
+  },
+  async register({ name, username, password }) {
+    const passwordHash = await this.hash(password);
+    const initials = (name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
+    this.saveAuth({
+      name: name.trim(), username: username.trim(), passwordHash, initials,
+      role: 'Administrator', email: '', createdAt: new Date().toISOString()
+    });
+  },
+  async login(username, password) {
+    const a = this.loadAuth();
+    if (!a || !a.username) return false;
+    if (a.username.toLowerCase() !== String(username).trim().toLowerCase()) return false;
+    return (await this.hash(password)) === a.passwordHash;
+  },
+  setSession() {
+    const a = this.loadAuth();
+    if (!a) return;
+    sessionStorage.setItem(this.SESSION_KEY, JSON.stringify({ u: a.username, t: Date.now() }));
+  },
+  clearSession() { sessionStorage.removeItem(this.SESSION_KEY); },
+  isLoggedIn() {
+    const raw = sessionStorage.getItem(this.SESSION_KEY);
+    if (!raw) return false;
     try {
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-      return 'sha256:' + Array.from(new Uint8Array(buf))
-        .map(b => b.toString(16).padStart(2, '0')).join('');
-    } catch (e) { console.warn('crypto.subtle failed, using fallback:', e); }
+      const s = JSON.parse(raw);
+      const a = this.loadAuth();
+      return !!(s && a && a.username && s.u === a.username);
+    } catch (e) { return false; }
   }
-  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
-  for (let i = 0; i < input.length; i++) {
-    const ch = input.charCodeAt(i);
-    h1 = Math.imul(h1 ^ ch, 2654435761);
-    h2 = Math.imul(h2 ^ ch, 1597334677);
-  }
-  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-  return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
-}
-
-function loadAuth() {
-  try { return JSON.parse(localStorage.getItem(AUTH_KEY)); }
-  catch (e) { return null; }
-}
-function saveAuth(obj) {
-  localStorage.setItem(AUTH_KEY, JSON.stringify(obj));
-}
-
-/* ---------- UI ---------- */
-const loginView  = document.getElementById('loginView');
-const createView = document.getElementById('createView');
-const forgotView = document.getElementById('forgotView');
-
-const errBox  = document.getElementById('err');
-const okBox   = document.getElementById('ok');
-const warnBox = document.getElementById('warn');
-const cErrBox = document.getElementById('cErr');
-const fErrBox = document.getElementById('fErr');
-
-console.log('[ui] loginView =', !!loginView);
-console.log('[ui] errBox =', !!errBox);
-console.log('[ui] adminLoginForm =', !!document.getElementById('adminLoginForm'));
-
-function showAlert(box, msg, kind) {
-  if (!box) { alert(msg); return; }
-  box.querySelector('span').textContent = msg;
-  box.classList.add('show');
-  if (kind === 'success') box.classList.add('success');
-  if (kind === 'warning') box.classList.add('warning');
-  setTimeout(() => { if (!box.classList.contains('success')) box.classList.remove('show'); }, 5000);
-}
-const showErr  = m => showAlert(errBox, m);
-const showOk   = m => showAlert(okBox, m, 'success');
-const showWarn = m => showAlert(warnBox, m, 'warning');
-const hideAll = () => {
-  [errBox, okBox, warnBox, cErrBox, fErrBox].forEach(b => b && b.classList.remove('show'));
-};
-const showView = (which) => {
-  [loginView, createView, forgotView].forEach(v => v && v.classList.add('hidden'));
-  if (which) which.classList.remove('hidden');
-  hideAll();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-/* ---------- Password toggle ---------- */
-document.addEventListener('click', e => {
+/* ---------- UI HELPERS ---------- */
+function showScreen(id) {
+  ['setupScreen', 'loginScreen'].forEach(sid => {
+    const el = document.getElementById(sid);
+    if (el) el.style.display = 'none';
+  });
+  const el = document.getElementById(id);
+  if (el) el.style.display = '';
+}
+
+function showAuthError(elId, message) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.querySelector('span').textContent = message;
+  el.classList.add('show');
+}
+function clearAuthError(elId) {
+  const el = document.getElementById(elId);
+  if (el) el.classList.remove('show');
+}
+function markFieldError(inputEl) {
+  if (!inputEl) return;
+  const group = inputEl.closest('.form-group');
+  if (!group) return;
+  group.classList.add('error');
+  const clear = () => group.classList.remove('error');
+  inputEl.addEventListener('input', clear, { once: true });
+  inputEl.addEventListener('change', clear, { once: true });
+}
+function clearFieldErrors(scope) {
+  (scope || document).querySelectorAll('.form-group.error').forEach(g => g.classList.remove('error'));
+}
+function validatePassword(pw) {
+  if (pw.length < 8) return 'Password must be at least 8 characters long.';
+  if (!/[A-Za-z]/.test(pw)) return 'Password must contain at least one letter.';
+  if (!/\d/.test(pw)) return 'Password must contain at least one number.';
+  return null;
+}
+
+/* ---------- PASSWORD TOGGLE ---------- */
+document.addEventListener('click', (e) => {
   const btn = e.target.closest('.pass-toggle');
   if (!btn) return;
   const input = document.getElementById(btn.dataset.target);
@@ -355,272 +338,85 @@ document.addEventListener('click', e => {
   btn.innerHTML = `<i class="fas fa-eye${show ? '-slash' : ''}"></i>`;
 });
 
-/* ---------- Auto-redirect if already logged in ---------- */
-(function () {
-  const raw = sessionStorage.getItem(SESSION_KEY);
-  if (!raw) {
-    console.log('[auto] No session found');
-    return;
-  }
-  try {
-    const s = JSON.parse(raw);
-    const a = loadAuth();
-    console.log('[auto] Session:', s, 'Auth:', a);
-    if (a && a.username === s.u) {
-      console.log('[auto] Already logged in → redirecting to', DASHBOARD_URL);
-      location.replace(DASHBOARD_URL);
-    }
-  } catch (e) { console.warn('[auto] Failed:', e); }
-})();
-
-/* ---------- Create admin link ---------- */
-document.getElementById('setupLink').addEventListener('click', e => {
+/* ---------- SETUP FORM ---------- */
+document.getElementById('setupForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  console.log('[setup] Clicked');
-  const a = loadAuth();
-  const hasAccount = !!(a && a.username && a.passwordHash);
-  if (hasAccount) {
-    showErr('An admin account already exists. Please sign in, or use "Forgot password?".');
-    return;
-  }
-  showView(createView);
-  setTimeout(() => document.getElementById('cName').focus(), 100);
-});
+  clearAuthError('setupError');
+  clearFieldErrors(document.getElementById('setupForm'));
+  const name = document.getElementById('suName').value.trim();
+  const username = document.getElementById('suUser').value.trim();
+  const pw = document.getElementById('suPass').value;
+  const pw2 = document.getElementById('suPass2').value;
 
-/* ---------- Back to login ---------- */
-document.getElementById('backToLogin').addEventListener('click', e => {
-  e.preventDefault(); showView(loginView);
-});
-document.getElementById('backToLogin2').addEventListener('click', e => {
-  e.preventDefault(); showView(loginView);
-});
-
-/* ---------- Forgot password ---------- */
-document.getElementById('forgotLink').addEventListener('click', e => {
-  e.preventDefault();
-  console.log('[forgot] Clicked');
-  const a = loadAuth();
-  const hasAccount = !!(a && a.username && a.passwordHash);
-  if (!hasAccount) {
-    showErr('No admin account exists yet. Click "Create admin account" below.');
-    return;
-  }
-  showView(forgotView);
-});
-
-/* ---------- Reset credentials ---------- */
-document.getElementById('resetBtn').addEventListener('click', () => {
-  const sure = confirm(
-    'Reset admin credentials?\n\n' +
-    '• Username & password will be cleared\n' +
-    '• All dashboard data (patients, appointments, invoices) will be KEPT\n\n' +
-    'Continue?'
-  );
-  if (!sure) return;
-
-  localStorage.removeItem(AUTH_KEY);
-  sessionStorage.removeItem(SESSION_KEY);
-
-  showView(createView);
-  setTimeout(() => document.getElementById('cName').focus(), 100);
-});
-
-/* ---------- Strength meter ---------- */
-function scorePassword(pw) {
-  if (!pw) return 0;
-  let s = 0;
-  if (pw.length >= 8) s++;
-  if (pw.length >= 12) s++;
-  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) s++;
-  if (/\d/.test(pw)) s++;
-  if (/[^A-Za-z0-9]/.test(pw)) s++;
-  return Math.min(s, 4);
-}
-function updateStrength(input, bar, label) {
-  if (!input || !bar || !label) return;
-  const map = [
-    { w: '0%',   c: 'transparent', t: 'Use 8+ characters with letters, numbers & a symbol', col: '#5e7e8c' },
-    { w: '25%',  c: '#e84a5f',     t: 'Weak password',   col: '#e84a5f' },
-    { w: '50%',  c: '#e8a33d',     t: 'Fair password',   col: '#e8a33d' },
-    { w: '75%',  c: '#0d6e9e',     t: 'Good password',   col: '#0d6e9e' },
-    { w: '100%', c: '#0e8b5e',     t: 'Strong password', col: '#0e8b5e' }
-  ][scorePassword(input.value)];
-  bar.style.width = map.w;
-  bar.style.background = map.c;
-  label.textContent = map.t;
-  label.style.color = map.col;
-}
-document.getElementById('cPass').addEventListener('input', function () {
-  updateStrength(this, document.getElementById('cStrength'), document.getElementById('cStrengthText'));
-});
-
-/* ---------- Validation helpers ---------- */
-function markError(input) {
-  if (!input) return;
-  const g = input.closest('.form-group');
-  if (!g) return;
-  g.classList.add('error');
-  const clear = () => g.classList.remove('error');
-  input.addEventListener('input', clear, { once: true });
-}
-function validatePassword(pw) {
-  if (pw.length < 8) return 'Password must be at least 8 characters long.';
-  if (!/[A-Za-z]/.test(pw)) return 'Password must contain at least one letter.';
-  if (!/\d/.test(pw)) return 'Password must contain at least one number.';
-  return null;
-}
-
-/* =====================================================
-   CREATE ADMIN SUBMIT
-===================================================== */
-document.getElementById('createAdminForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  console.log('[create] Submit fired');
-  cErrBox.classList.remove('show');
-  document.querySelectorAll('#createView .form-group.error').forEach(g => g.classList.remove('error'));
-
-  const name     = document.getElementById('cName').value.trim();
-  const username = document.getElementById('cUser').value.trim();
-  const pw       = document.getElementById('cPass').value;
-  const pw2      = document.getElementById('cPass2').value;
-
-  if (name.length < 2) { markError(document.getElementById('cName')); return showAlert(cErrBox, 'Please enter your full name.'); }
-  if (!/^[A-Za-z0-9._-]{4,20}$/.test(username)) { markError(document.getElementById('cUser')); return showAlert(cErrBox, 'Username must be 4–20 characters (letters, numbers, . _ -).'); }
+  if (name.length < 2) { markFieldError(document.getElementById('suName')); return showAuthError('setupError', 'Please enter your full name.'); }
+  if (!/^[A-Za-z0-9._-]{4,20}$/.test(username)) { markFieldError(document.getElementById('suUser')); return showAuthError('setupError', 'Username must be 4–20 characters.'); }
   const rule = validatePassword(pw);
-  if (rule) { markError(document.getElementById('cPass')); return showAlert(cErrBox, rule); }
-  if (pw !== pw2) { markError(document.getElementById('cPass2')); return showAlert(cErrBox, 'Passwords do not match.'); }
+  if (rule) { markFieldError(document.getElementById('suPass')); return showAuthError('setupError', rule); }
+  if (pw !== pw2) { markFieldError(document.getElementById('suPass2')); return showAuthError('setupError', 'Passwords do not match.'); }
 
-  const existing = loadAuth();
-  if (existing && existing.username) {
-    return showAlert(cErrBox, 'An admin account already exists. Please sign in instead.');
-  }
+  await Auth.register({ name, username, password: pw });
+  Auth.setSession();
+  window.location.replace('admin.html');
+});
+
+/* ---------- LOGIN FORM ---------- */
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearAuthError('loginError');
+  clearFieldErrors(document.getElementById('loginForm'));
 
   const btn = e.target.querySelector('button[type="submit"]');
-  const orig = btn.innerHTML;
+  const username = document.getElementById('loginUser').value;
+  const password = document.getElementById('loginPass').value;
+
   btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
-
-  try {
-    const passwordHash = await hashPassword(pw);
-    const initials = (name.split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
-
-    saveAuth({
-      name,
-      username,
-      passwordHash,
-      initials,
-      role: 'Administrator',
-      email: '',
-      createdAt: new Date().toISOString()
-    });
-
-    console.log('[create] Saved credentials for', username);
-
-    btn.disabled = false;
-    btn.innerHTML = orig;
-
-    document.getElementById('adminUser').value = username;
-    document.getElementById('adminPass').value = '';
-    showView(loginView);
-    showOk('Admin account created! Please sign in with your new password.');
-    setTimeout(() => document.getElementById('adminPass').focus(), 100);
-  } catch (err) {
-    console.error('[create] Failed:', err);
-    btn.disabled = false;
-    btn.innerHTML = orig;
-    showAlert(cErrBox, 'Error creating account: ' + err.message);
-  }
-});
-
-/* =====================================================
-   LOGIN SUBMIT — with extra diagnostics
-===================================================== */
-const loginForm = document.getElementById('adminLoginForm');
-const loginBtn  = document.getElementById('loginBtn');
-
-console.log('[login] form =', !!loginForm, 'button =', !!loginBtn);
-
-loginForm.addEventListener('submit', async e => {
-  e.preventDefault();
-  console.log('=== [login] Submit handler FIRED ===');
-
-  hideAll();
-  document.querySelectorAll('#loginView .form-group.error').forEach(g => g.classList.remove('error'));
-
-  const username = document.getElementById('adminUser').value.trim();
-  const password = document.getElementById('adminPass').value;
-
-  console.log('[login] username =', JSON.stringify(username));
-  console.log('[login] password length =', password.length);
-
-  if (!username) { markError(document.getElementById('adminUser')); return showErr('Please enter your username.'); }
-  if (!password) { markError(document.getElementById('adminPass')); return showErr('Please enter your password.'); }
-
-  const a = loadAuth();
-  console.log('[login] Stored account =', a ? a.username : 'NONE');
-
-  if (!a || !a.username) {
-    return showErr('No admin account found. Click "Create admin account" below.');
-  }
-  if (username.toLowerCase() !== a.username.toLowerCase()) {
-    markError(document.getElementById('adminUser'));
-    markError(document.getElementById('adminPass'));
-    return showErr('Invalid username or password.');
-  }
-
-  const btn = loginBtn;
-  const orig = btn.innerHTML;
-  btn.disabled = true;
+  const original = btn.innerHTML;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
 
-  try {
-    const hash = await hashPassword(password);
-    console.log('[login] Hash computed. Match:', hash === a.passwordHash);
+  const ok = await Auth.login(username, password);
 
-    btn.disabled = false;
-    btn.innerHTML = orig;
+  btn.disabled = false;
+  btn.innerHTML = original;
 
-    if (hash !== a.passwordHash) {
-      document.getElementById('adminPass').value = '';
-      markError(document.getElementById('adminUser'));
-      markError(document.getElementById('adminPass'));
-      return showErr('Invalid username or password.');
-    }
+  if (!ok) {
+    showAuthError('loginError', 'Invalid username or password.');
+    markFieldError(document.getElementById('loginUser'));
+    markFieldError(document.getElementById('loginPass'));
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+    return;
+  }
 
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: a.username, t: Date.now() }));
-    console.log('[login] ✅ SUCCESS. Session saved:', sessionStorage.getItem(SESSION_KEY));
-    console.log('[login] Redirecting to:', DASHBOARD_URL);
+  Auth.setSession();
+  window.location.replace('admin.html');
+});
 
-    showOk('Signed in! Opening dashboard…');
+/* ---------- RESET DEVICE ---------- */
+document.getElementById('resetLink').addEventListener('click', () => {
+  const sure = confirm('Reset the login for this device?\n\nYou will be asked to create a new username and password.\nHospital records will be KEPT.');
+  if (!sure) return;
+  localStorage.removeItem(Auth.AUTH_KEY);
+  Auth.clearSession();
+  document.getElementById('loginForm').reset();
+  showScreen('setupScreen');
+});
 
+/* ---------- BOOTSTRAP ---------- */
+(function boot() {
+  if (Auth.isLoggedIn()) {
+    window.location.replace('admin.html');
+    return;
+  }
+  if (!Auth.hasAccount()) {
+    showScreen('setupScreen');
+  } else {
+    showScreen('loginScreen');
     setTimeout(() => {
-      console.log('[login] NOW redirecting...');
-      window.location.href = DASHBOARD_URL;
-    }, 500);
-  } catch (err) {
-    console.error('[login] ERROR:', err);
-    btn.disabled = false;
-    btn.innerHTML = orig;
-    showErr('Login error: ' + err.message);
+      const el = document.getElementById('loginUser');
+      if (el) el.focus();
+    }, 100);
   }
-});
-
-/* Fallback — also handle button click directly in case submit event fails */
-if (loginBtn) {
-  loginBtn.addEventListener('click', (e) => {
-    if (!loginForm.checkValidity()) return;
-    console.log('[login] Button clicked directly');
-  });
-}
-
-/* Double-check the form will submit on Enter */
-document.getElementById('adminPass').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    console.log('[login] Enter pressed in password field');
-  }
-});
-
-console.log('=== admin-login.html script READY ===');
+})();
 </script>
 </body>
 </html>

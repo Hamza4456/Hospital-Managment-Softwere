@@ -375,40 +375,51 @@
 
   /* =====================================================
      SECTION B — STAFF (ADMIN) SESSION HELPER
+     ✅ This now reads from the SAME key that login.html writes:
+        medicare_session (sessionStorage)
+        and verifies against localStorage.medicare_admin
   ===================================================== */
   const StaffAuth = {
     SESSION_KEY: 'medicare_session',
-    DB_KEY: 'medicare_hms',
+    AUTH_KEY: 'medicare_admin',
+
+    /* Logged in if sessionStorage has a session AND
+       localStorage has a matching medicare_admin record. */
     isLoggedIn() {
       try {
         const raw = sessionStorage.getItem(this.SESSION_KEY);
         if (!raw) return false;
         const s = JSON.parse(raw);
-        const db = JSON.parse(localStorage.getItem(this.DB_KEY) || '{}');
-        return !!(s && db.user && db.user.username && s.u === db.user.username);
+        const a = JSON.parse(localStorage.getItem(this.AUTH_KEY) || 'null');
+        return !!(s && a && a.username && s.u === a.username);
       } catch (e) { return false; }
     },
+
     current() {
       try {
-        const db = JSON.parse(localStorage.getItem(this.DB_KEY) || '{}');
-        return db.user || null;
+        const a = JSON.parse(localStorage.getItem(this.AUTH_KEY) || 'null');
+        return a || null;
       } catch (e) { return null; }
     },
-    logout() { sessionStorage.removeItem(this.SESSION_KEY); }
+
+    logout() {
+      sessionStorage.removeItem(this.SESSION_KEY);
+    }
   };
 
   window.StaffAuth = StaffAuth;
 
   /* =====================================================
      SECTION C — PAGE INFO + ADMIN GUARD
+     ✅ Admin pages now redirect to login.html
   ===================================================== */
   const path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-  const ADMIN_PAGES = ['dashboard.html', '1.html'];
+  const ADMIN_PAGES = ['admin.html', 'dashboard.html', '1.html'];
   const isHome = (path === 'index.html' || path === '');
 
   if (ADMIN_PAGES.indexOf(path) !== -1) {
     if (!StaffAuth.isLoggedIn()) {
-      location.replace('admin-login.html');
+      location.replace('login.html');
     }
     return;
   }
@@ -952,6 +963,7 @@
 
   /* =====================================================
      SECTION F — HEADER + FOOTER HTML
+     ✅ Staff Login links now point to login.html
   ===================================================== */
   const headerHTML = `
     <nav class="navbar">
@@ -1006,7 +1018,7 @@
               <li><a href="profile-user.html">My Profile</a></li>
               <li><a href="user-booking.html">My Appointments</a></li>
               <li><a href="doctorbook2.html">Book Appointment</a></li>
-              <li><a href="admin-login.html" target="_blank" rel="noopener noreferrer">Staff Login</a></li>
+              <li><a href="login.html">Staff Login</a></li>
             </ul>
           </div>
           <div class="footer-col">
@@ -1031,6 +1043,7 @@
 
   /* =====================================================
      SECTION G — RENDER AUTH SLOT
+     ✅ Staff Login button now points to login.html
   ===================================================== */
   function closeAllMenus() {
     const userMenu = document.getElementById('navUserMenu');
@@ -1161,7 +1174,7 @@
             <i class="fas fa-chevron-down chev"></i>
           </div>
           <div class="nav-staff-menu" id="navStaffMenu">
-            <a href="dashboard.html" target="_blank" rel="noopener noreferrer">
+            <a href="admin.html">
               <i class="fas fa-columns"></i> Dashboard
             </a>
             <hr>
@@ -1172,7 +1185,7 @@
         </div>
       `;
     } else {
-      html += `<a href="admin-login.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline"><i class="fas fa-user-md"></i> Staff Login</a>`;
+      html += `<a href="login.html" class="btn btn-outline"><i class="fas fa-user-md"></i> Staff Login</a>`;
     }
 
     if (!user) {
@@ -1209,7 +1222,7 @@
           <a href="doctorbook2.html"><i class="fas fa-calendar-plus"></i> Book Appointment</a>
           ${isStaff ? `
             <hr>
-            <a href="dashboard.html" target="_blank" rel="noopener noreferrer" class="staff-link">
+            <a href="admin.html" class="staff-link">
               <i class="fas fa-columns"></i> Staff Dashboard
             </a>
           ` : ''}
