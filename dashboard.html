@@ -600,10 +600,15 @@ input:-webkit-autofill:active {
 
 .form-group input[type="number"]::-webkit-outer-spin-button,
 .form-group input[type="number"]::-webkit-inner-spin-button {
+  appearance: none;
   -webkit-appearance: none;
   margin: 0;
 }
-.form-group input[type="number"] { -moz-appearance: textfield; }
+.form-group input[type="number"] {
+  appearance: textfield;
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+}
 
 /* ===== MODALS ===== */
 .modal-overlay {
@@ -1716,7 +1721,7 @@ const money = (n) => (window.GlobalSupport && window.GlobalSupport.money)
     : ('$' + (Number(n) || 0).toFixed(2));
 
 /* =====================================================
-   AUTH — credentials live in 'medicare_admin' (isolated)
+   AUTH — credentials live in 'medicare_admin' (isolated from data)
 ===================================================== */
 const Auth = {
   SALT: 'medicare::hms::v2::salt',
@@ -2076,16 +2081,21 @@ function initApp() {
   setVal('settingEmail',    me.email || '');
   setVal('settingRole',     me.role || 'Administrator');
 
-  renderDashboard();
-  renderPatients();
-  renderAppointments();
-  renderDoctors();
-  renderDepartments();
-  renderServices();
-  renderBilling();
-  renderReports();
-  updateNavCounts();
-  renderBookingRequests();
+  [
+    ['dashboard',    renderDashboard],
+    ['patients',     renderPatients],
+    ['appointments', renderAppointments],
+    ['doctors',      renderDoctors],
+    ['departments',  renderDepartments],
+    ['services',     renderServices],
+    ['billing',      renderBilling],
+    ['reports',      renderReports],
+    ['navCounts',    updateNavCounts],
+    ['bookingReqs',  renderBookingRequests]
+  ].forEach(([name, fn]) => {
+    try { fn(); }
+    catch (err) { console.error('[initApp] Step "' + name + '" failed:', err); }
+  });
 }
 
 (function safeBoot() {
@@ -2455,6 +2465,7 @@ function saveSettings() {
   a.role = role;
   a.initials = initials;
   Auth.saveAuth(a);
+  Auth.setSession();
   const un = document.getElementById('userName'); if (un) un.textContent = name;
   const ur = document.getElementById('userRole'); if (ur) ur.textContent = role;
   const ua = document.getElementById('userAvatar'); if (ua) ua.textContent = initials;
@@ -2568,7 +2579,7 @@ function renderBookingRequests() {
   const host = document.getElementById('bookingsList');
   if (!host) return;
   if (typeof UserAuth === 'undefined') {
-    host.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>shared.js not loaded</h3><p>Make sure shared.js sits next to dashboard.html.</p></div>`;
+    host.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>shared.js not loaded</h3><p>Make sure shared.js sits next to this file.</p></div>`;
     return;
   }
   const all = UserAuth.getAllBookings();
