@@ -36,7 +36,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ===== APP LAYOUT ===== */
 .app-container { display: block; }
 
 .sidebar {
@@ -129,7 +128,6 @@ body {
   transition: margin-left 0.3s;
 }
 
-/* ===== TOP BAR ===== */
 .topbar {
   display: flex;
   align-items: center;
@@ -253,7 +251,6 @@ body {
 .user-dropdown a:hover { background: var(--primary-light); color: var(--primary); }
 .user-dropdown a.danger:hover { background: #fdecef; color: var(--danger); }
 
-/* ===== CARDS & STATS ===== */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -293,7 +290,6 @@ body {
 .stat-icon.purple { background: #eee9fd; color: #6c4bc9; }
 .stat-icon.red { background: #fdecef; color: #e84a5f; }
 
-/* ===== STAT TEXT — FIXED (no clipping) ===== */
 .stat-content {
   min-width: 0;
   flex: 1;
@@ -308,8 +304,8 @@ body {
   font-size: 26px;
   font-weight: 800;
   color: var(--dark);
-  line-height: 1.4;         /* was 1.2 — this was clipping the letters */
-  padding: 2px 0;           /* breathing room above/below */
+  line-height: 1.4;
+  padding: 2px 0;
   margin: 0;
   white-space: nowrap;
   overflow: visible;
@@ -371,7 +367,6 @@ body {
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
-/* ===== TABLES ===== */
 .table-wrap {
   overflow-x: auto;
   border-radius: 14px;
@@ -420,7 +415,6 @@ table tbody tr:hover { background: #fafcfe; }
 .badge-info { background: #e1f0f8; color: #0d6e9e; }
 .badge-gray { background: #eef2f5; color: #5e7e8c; }
 
-/* ===== BUTTONS ===== */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -503,7 +497,6 @@ table tbody tr:hover { background: #fafcfe; }
   transform: none;
 }
 
-/* ===== FORMS ===== */
 .form-group { margin-bottom: 16px; }
 
 .form-group label {
@@ -606,7 +599,6 @@ input:-webkit-autofill:active {
 }
 .form-group input[type="number"] { -moz-appearance: textfield; }
 
-/* ===== MODALS ===== */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -675,7 +667,6 @@ input:-webkit-autofill:active {
 
 .modal-footer .btn { width: auto; }
 
-/* ===== TOAST ===== */
 .toast-container {
   position: fixed;
   top: 24px;
@@ -720,7 +711,6 @@ input:-webkit-autofill:active {
   to { opacity: 1; transform: translateX(0); }
 }
 
-/* ===== PAGE SECTIONS ===== */
 .page { display: none; }
 .page.active { display: block; animation: fadeIn 0.3s ease; }
 
@@ -729,7 +719,6 @@ input:-webkit-autofill:active {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== APPOINTMENT LIST ===== */
 .appt-item {
   display: flex;
   align-items: center;
@@ -770,7 +759,6 @@ input:-webkit-autofill:active {
   flex-shrink: 0;
 }
 
-/* ===== DEPT LIST ===== */
 .dept-item {
   display: flex;
   align-items: center;
@@ -811,13 +799,11 @@ input:-webkit-autofill:active {
 .capacity-fill.warn { background: var(--warning); }
 .capacity-fill.danger { background: var(--danger); }
 
-/* ===== EMPTY STATE ===== */
 .empty-state { text-align: center; padding: 48px 20px; color: var(--gray); }
 .empty-state i { font-size: 48px; color: #c5d8e2; margin-bottom: 16px; }
 .empty-state h3 { font-size: 17px; color: var(--dark); margin-bottom: 6px; }
 .empty-state p { font-size: 14px; }
 
-/* ===== MOBILE MENU TOGGLE ===== */
 .menu-toggle {
   display: none;
   background: white;
@@ -832,7 +818,6 @@ input:-webkit-autofill:active {
   flex-shrink: 0;
 }
 
-/* ===== SIDEBAR BACKDROP ===== */
 .sidebar-backdrop {
   display: none;
   position: fixed;
@@ -844,7 +829,6 @@ input:-webkit-autofill:active {
 }
 .sidebar-backdrop.show { display: block; opacity: 1; }
 
-/* ===== AUTH SCREENS ===== */
 .auth-screen {
   position: fixed;
   inset: 0;
@@ -933,9 +917,6 @@ input:-webkit-autofill:active {
 }
 .auth-back i { font-size: 12px; }
 
-/* =====================================================
-   BOOKING REQUESTS
-===================================================== */
 .filter-bar {
   background: #fff;
   border-radius: 20px;
@@ -1048,23 +1029,12 @@ input:-webkit-autofill:active {
   padding-top: 14px;
 }
 
-/* =====================================================
-   RESPONSIVE
-===================================================== */
 @media (max-width: 1024px) {
-  .sidebar {
-    transform: translateX(-100%);
-    box-shadow: 0 0 40px rgba(0,0,0,0.15);
-    width: 280px;
-  }
+  .sidebar { transform: translateX(-100%); box-shadow: 0 0 40px rgba(0,0,0,0.15); width: 280px; }
   .sidebar.open { transform: translateX(0); }
-
   .main-content { margin-left: 0; padding: 20px; }
-
   .menu-toggle { display: flex; }
-
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
-
   .search-box input { width: 140px; }
 }
 
@@ -1074,80 +1044,45 @@ input:-webkit-autofill:active {
   .stat-icon { width: 46px; height: 46px; font-size: 20px; border-radius: 13px; }
   .stat-content h3 { font-size: 22px; }
   .stat-content p { font-size: 12px; }
-
   .card { padding: 20px 18px; border-radius: 18px; }
-
   .page-title h1 { font-size: 20px; }
   .page-title p { font-size: 12px; }
-
   .search-box { display: none; }
 }
 
 @media (max-width: 640px) {
   .main-content { padding: 14px; }
-
   .topbar { margin-bottom: 18px; gap: 10px; }
   .page-title h1 { font-size: 18px; }
   .page-title p { font-size: 11.5px; }
-
   .user-info { display: none; }
   .user-profile { padding: 6px; gap: 0; }
   .notification-badge { width: 40px; height: 40px; font-size: 15px; }
   .menu-toggle { width: 40px; height: 40px; font-size: 16px; }
-
   .stats-grid { grid-template-columns: 1fr; gap: 12px; }
   .stat-card { padding: 16px 14px; border-radius: 16px; }
   .stat-icon { width: 44px; height: 44px; font-size: 18px; border-radius: 12px; }
   .stat-content h3 { font-size: 20px; }
-
   .card { padding: 18px 16px; border-radius: 16px; margin-bottom: 16px; }
   .card-header { margin-bottom: 16px; gap: 10px; }
   .card-header h2 { font-size: 15px; }
   .card-header h2 i { font-size: 14px; }
-
-  .card-header .btn-primary.btn-sm {
-    width: 100%;
-    padding: 11px 14px;
-    font-size: 13px;
-  }
-
+  .card-header .btn-primary.btn-sm { width: 100%; padding: 11px 14px; font-size: 13px; }
   .modal-overlay { padding: 12px; align-items: flex-start; padding-top: 20px; padding-bottom: 20px; }
-  .modal {
-    padding: 22px 18px;
-    border-radius: 20px;
-    max-height: calc(100vh - 40px);
-  }
+  .modal { padding: 22px 18px; border-radius: 20px; max-height: calc(100vh - 40px); }
   .modal-header { margin-bottom: 18px; }
   .modal-header h2 { font-size: 17px; }
   .modal-close { width: 34px; height: 34px; font-size: 15px; }
-
-  .modal form > div[style*="grid-template-columns"] {
-    grid-template-columns: 1fr !important;
-    gap: 0 !important;
-  }
-
-  .modal-footer {
-    flex-direction: column-reverse;
-    gap: 10px;
-    margin-top: 20px;
-  }
+  .modal form > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; gap: 0 !important; }
+  .modal-footer { flex-direction: column-reverse; gap: 10px; margin-top: 20px; }
   .modal-footer .btn { width: 100%; padding: 13px 16px; font-size: 14px; }
-
   .form-group { margin-bottom: 14px; }
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    padding: 12px 14px;
-    font-size: 15px;
-    border-radius: 11px;
-  }
-
+  .form-group input, .form-group select, .form-group textarea { padding: 12px 14px; font-size: 15px; border-radius: 11px; }
   .appt-item { padding: 12px 0; gap: 8px; }
   .appt-avatar { width: 40px; height: 40px; font-size: 13px; }
   .appt-details h4 { font-size: 13.5px; }
   .appt-details p { font-size: 11.5px; }
   .appt-time { padding: 5px 10px; font-size: 11.5px; }
-
   .dept-item { flex-wrap: wrap; padding: 14px 0; gap: 12px; }
   .dept-info { min-width: 100%; }
   .dept-stats { width: 100%; justify-content: space-between; gap: 10px; }
@@ -1155,41 +1090,23 @@ input:-webkit-autofill:active {
   .dept-icon { width: 42px; height: 42px; font-size: 18px; border-radius: 12px; }
   .dept-name h4 { font-size: 14px; }
   .dept-name span { font-size: 11.5px; }
-
   table { font-size: 12.5px; min-width: 560px; }
   table th, table td { padding: 10px 12px; }
   table th { font-size: 11px; }
-
   table .btn-sm { padding: 7px 10px; }
-
-  .toast-container {
-    top: 14px;
-    right: 14px;
-    left: 14px;
-    max-width: none;
-  }
-  .toast {
-    min-width: auto;
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 13px;
-  }
-
+  .toast-container { top: 14px; right: 14px; left: 14px; max-width: none; }
+  .toast { min-width: auto; width: 100%; padding: 12px 16px; font-size: 13px; }
   .grid-2 { gap: 14px; }
-
   .sidebar { width: 82vw; max-width: 300px; padding: 20px 14px; }
   .sidebar-logo { padding: 0 4px 18px; margin-bottom: 14px; }
-
   .auth-screen { padding: 14px; }
   .auth-card { padding: 26px 20px; border-radius: 20px; }
   .auth-brand { margin-bottom: 20px; }
   .auth-brand .logo-icon { width: 46px; height: 46px; font-size: 21px; border-radius: 13px; }
   .auth-brand h1 { font-size: 18px; }
   .auth-btn { padding: 13px; }
-
   .bk-actions { width: 100%; }
   .bk-actions .btn { flex: 1; }
-
   #currencyPill { display: none; }
 }
 
@@ -1717,7 +1634,98 @@ const money = (n) => (window.GlobalSupport && window.GlobalSupport.money)
     : ('$' + (Number(n) || 0).toFixed(2));
 
 /* =====================================================
-   DATA LAYER
+   CREDENTIALS STORE (separate from data!)
+   medicare_admin → credentials (username, passwordHash, name, ...)
+   medicare_hms   → patients, doctors, appointments, etc.
+===================================================== */
+const AUTH_KEY = 'medicare_admin';
+
+const Auth = {
+  SALT: 'medicare::hms::v2::salt',
+  SESSION_KEY: 'medicare_session',
+  AUTH_KEY: 'medicare_admin',
+
+  loadAuth() {
+    try { return JSON.parse(localStorage.getItem(this.AUTH_KEY)); }
+    catch (e) { return null; }
+  },
+  saveAuth(obj) {
+    localStorage.setItem(this.AUTH_KEY, JSON.stringify(obj));
+  },
+
+  async hash(password) {
+    const input = this.SALT + '|' + password;
+    if (window.crypto && window.crypto.subtle && window.isSecureContext) {
+      try {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+        return 'sha256:' + Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (e) {}
+    }
+    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (let i = 0; i < input.length; i++) {
+      const ch = input.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
+  },
+
+  hasAccount() {
+    const a = this.loadAuth();
+    return !!(a && a.username && a.passwordHash);
+  },
+
+  async register({ name, username, password }) {
+    const passwordHash = await this.hash(password);
+    const initials = (name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
+    this.saveAuth({
+      name: name.trim(),
+      username: username.trim(),
+      passwordHash,
+      initials,
+      role: 'Administrator',
+      email: '',
+      createdAt: new Date().toISOString()
+    });
+  },
+
+  async login(username, password) {
+    const a = this.loadAuth();
+    if (!a || !a.username) return false;
+    if (a.username.toLowerCase() !== String(username).trim().toLowerCase()) return false;
+    return (await this.hash(password)) === a.passwordHash;
+  },
+
+  async changePassword(current, next) {
+    const a = this.loadAuth();
+    if (!a || (await this.hash(current)) !== a.passwordHash) return false;
+    a.passwordHash = await this.hash(next);
+    this.saveAuth(a);
+    return true;
+  },
+
+  setSession() {
+    const a = this.loadAuth();
+    sessionStorage.setItem(this.SESSION_KEY, JSON.stringify({ u: a.username, t: Date.now() }));
+  },
+
+  clearSession() { sessionStorage.removeItem(this.SESSION_KEY); },
+
+  isLoggedIn() {
+    const raw = sessionStorage.getItem(this.SESSION_KEY);
+    if (!raw) return false;
+    try {
+      const s = JSON.parse(raw);
+      const a = this.loadAuth();
+      return !!(s && a && a.username && s.u === a.username);
+    } catch (e) { return false; }
+  }
+};
+
+/* =====================================================
+   DATA LAYER (unchanged — dummy data lives here)
 ===================================================== */
 const DB = {
   key: 'medicare_hms',
@@ -1729,10 +1737,15 @@ const DB = {
     try {
       const d = JSON.parse(localStorage.getItem(this.key));
       let changed = false;
-      if (!d.user) { d.user = this.seed().user; changed = true; }
-      if ('password' in d.user) { delete d.user.password; changed = true; }
-      if (!('username' in d.user))     { d.user.username = null; changed = true; }
-      if (!('passwordHash' in d.user)) { d.user.passwordHash = null; changed = true; }
+      // Make sure all required arrays exist; never delete user data
+      if (!d.patients)     { d.patients = [];     changed = true; }
+      if (!d.doctors)      { d.doctors = [];      changed = true; }
+      if (!d.appointments) { d.appointments = []; changed = true; }
+      if (!d.departments)  { d.departments = [];  changed = true; }
+      if (!d.services)     { d.services = [];     changed = true; }
+      if (!d.invoices)     { d.invoices = [];     changed = true; }
+      // Remove any stray user field from older versions (credentials live in medicare_admin now)
+      if ('user' in d) { delete d.user; changed = true; }
       if (changed) localStorage.setItem(this.key, JSON.stringify(d));
     } catch (e) {
       localStorage.removeItem(this.key);
@@ -1741,7 +1754,6 @@ const DB = {
   },
   seed() {
     return {
-      user: { username: null, passwordHash: null, name: 'Administrator', email: '', role: 'Administrator', initials: 'AD', createdAt: null },
       patients: [
         { id: 'P-1001', name: 'James Sullivan', age: 45, gender: 'Male', phone: '+1 555-0101', dept: 'Cardiology', status: 'Admitted' },
         { id: 'P-1002', name: 'Maria Garcia', age: 32, gender: 'Female', phone: '+1 555-0102', dept: 'Neurology', status: 'Outpatient' },
@@ -1814,59 +1826,6 @@ function getAllAppointments() {
   const merged = dbAppts.filter(a => !bookingIds.has(a.id));
   return merged.concat(fromBookings);
 }
-
-const Auth = {
-  SALT: 'medicare::hms::v2::salt',
-  SESSION_KEY: 'medicare_session',
-  async hash(password) {
-    const input = this.SALT + '|' + password;
-    if (window.crypto && window.crypto.subtle && window.isSecureContext) {
-      try {
-        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-        return 'sha256:' + Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-      } catch (e) {}
-    }
-    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
-    for (let i = 0; i < input.length; i++) {
-      const ch = input.charCodeAt(i);
-      h1 = Math.imul(h1 ^ ch, 2654435761);
-      h2 = Math.imul(h2 ^ ch, 1597334677);
-    }
-    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-    return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
-  },
-  hasAccount() { const u = DB.get().user; return !!(u && u.username && u.passwordHash); },
-  async register({ name, username, password }) {
-    const passwordHash = await this.hash(password);
-    const initials = (name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
-    DB.update(d => { d.user = { ...d.user, name: name.trim(), username: username.trim(), passwordHash, initials, createdAt: new Date().toISOString() }; });
-  },
-  async login(username, password) {
-    const u = DB.get().user;
-    if (!u || !u.username) return false;
-    if (u.username.toLowerCase() !== String(username).trim().toLowerCase()) return false;
-    return (await this.hash(password)) === u.passwordHash;
-  },
-  async changePassword(current, next) {
-    const u = DB.get().user;
-    if ((await this.hash(current)) !== u.passwordHash) return false;
-    const passwordHash = await this.hash(next);
-    DB.update(d => { d.user.passwordHash = passwordHash; });
-    return true;
-  },
-  setSession() { sessionStorage.setItem(this.SESSION_KEY, JSON.stringify({ u: DB.get().user.username, t: Date.now() })); },
-  clearSession() { sessionStorage.removeItem(this.SESSION_KEY); },
-  isLoggedIn() {
-    const raw = sessionStorage.getItem(this.SESSION_KEY);
-    if (!raw) return false;
-    try {
-      const s = JSON.parse(raw);
-      const u = DB.get().user;
-      return !!(s && u && u.username && s.u === u.username);
-    } catch (e) { return false; }
-  }
-};
 
 function showScreen(id) {
   document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('show'));
@@ -1996,9 +1955,10 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 });
 
 document.getElementById('resetLink').addEventListener('click', () => {
-  const sure = confirm('Reset the login for this device?\n\nYou will be asked to create a new username and password.\nHospital records will be KEPT.');
+  const sure = confirm('Reset the login for this device?\n\nYou will be asked to create a new username and password.\nHospital records (patients, appointments, invoices) will be KEPT.');
   if (!sure) return;
-  DB.update(d => { d.user.username = null; d.user.passwordHash = null; });
+  // Only clear credentials — dummy data in medicare_hms stays untouched
+  localStorage.removeItem(Auth.AUTH_KEY);
   Auth.clearSession();
   document.getElementById('appContainer').style.display = 'none';
   showScreen('setupScreen');
@@ -2014,15 +1974,15 @@ function bootstrap() {
 }
 
 function initApp() {
-  const data = DB.get();
-  document.getElementById('userName').textContent = data.user.name;
-  document.getElementById('userRole').textContent = data.user.role;
-  document.getElementById('userAvatar').textContent = data.user.initials;
-  document.getElementById('pageSubtitle').textContent = `Welcome back, ${data.user.name}`;
-  const su = document.getElementById('settingUsername'); if (su) su.value = data.user.username || '';
-  const sn = document.getElementById('settingName'); if (sn) sn.value = data.user.name || '';
-  const se = document.getElementById('settingEmail'); if (se) se.value = data.user.email || '';
-  const sr = document.getElementById('settingRole'); if (sr) sr.value = data.user.role || 'Administrator';
+  const me = Auth.loadAuth() || { name: 'Administrator', role: 'Administrator', initials: 'AD', email: '', username: '' };
+  document.getElementById('userName').textContent = me.name || 'Administrator';
+  document.getElementById('userRole').textContent = me.role || 'Administrator';
+  document.getElementById('userAvatar').textContent = me.initials || 'AD';
+  document.getElementById('pageSubtitle').textContent = `Welcome back, ${me.name || 'Administrator'}`;
+  const su = document.getElementById('settingUsername'); if (su) su.value = me.username || '';
+  const sn = document.getElementById('settingName'); if (sn) sn.value = me.name || '';
+  const se = document.getElementById('settingEmail'); if (se) se.value = me.email || '';
+  const sr = document.getElementById('settingRole'); if (sr) sr.value = me.role || 'Administrator';
   renderDashboard();
   renderPatients();
   renderAppointments();
@@ -2368,8 +2328,13 @@ function saveSettings() {
   const role = document.getElementById('settingRole').value.trim();
   if (name.length < 2) { showToast('Please enter a valid name', 'error'); return; }
   const initials = (name.replace('Dr. ', '').split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
-  DB.update(d => { d.user = { ...d.user, name, email, role, initials }; });
-  Auth.setSession();
+  // Update only credentials in medicare_admin
+  const a = Auth.loadAuth() || {};
+  a.name = name;
+  a.email = email;
+  a.role = role;
+  a.initials = initials;
+  Auth.saveAuth(a);
   document.getElementById('userName').textContent = name;
   document.getElementById('userRole').textContent = role;
   document.getElementById('userAvatar').textContent = initials;
@@ -2614,9 +2579,6 @@ window.addEventListener('medicare:settings-changed', () => { try { renderBilling
 
 </script>
 
-<!-- =========================================================
-     INLINE REGION & CURRENCY
-========================================================= -->
 <script>
 (function () {
   'use strict';
@@ -2802,9 +2764,6 @@ window.addEventListener('medicare:settings-changed', () => { try { renderBilling
 })();
 </script>
 
-<!-- =========================================================
-     ADDON SCRIPTS
-========================================================= -->
 <script src="admin-hospitals.js"></script>
 <script src="admin-doctors-public.js"></script>
 <script src="admin-invoice-patch.js"></script>
