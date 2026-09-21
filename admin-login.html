@@ -131,6 +131,16 @@ a { text-decoration: none; color: inherit; }
 }
 .warn-box i { color: var(--warning); margin-top: 3px; }
 
+.debug-box {
+  background: #0b3b4b; color: #a5e8ff;
+  font-family: monospace; font-size: 11.5px;
+  padding: 12px 14px; border-radius: 10px;
+  margin-bottom: 16px; white-space: pre-wrap;
+  word-break: break-all; max-height: 180px;
+  overflow-y: auto; line-height: 1.5;
+}
+.debug-box b { color: #fff; }
+
 @media (max-width: 640px) {
   .auth-wrap { padding: 30px 16px; }
   .auth-card { padding: 28px 22px; border-radius: 20px; }
@@ -236,20 +246,44 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
+    <!-- ============================== -->
+    <!-- VIEW 3: DEBUG                  -->
+    <!-- ============================== -->
+    <div id="debugView" class="hidden">
+      <div class="auth-head">
+        <div class="logo-icon"><i class="fas fa-bug"></i></div>
+        <div class="auth-badge warn"><i class="fas fa-tools"></i> Diagnostics</div>
+        <h1>Diagnostic Info</h1>
+        <p>Read the info below to see what's happening</p>
+      </div>
+
+      <div class="debug-box" id="debugOutput">Loading...</div>
+
+      <button class="btn btn-primary btn-block" id="forceRedirectBtn">
+        <i class="fas fa-arrow-right"></i> Force Open Dashboard
+      </button>
+
+      <div class="auth-foot" style="margin-top:16px;">
+        <a id="backToLoginFromDebug"><i class="fas fa-arrow-left"></i> Back to login</a>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
 /* =====================================================
    CONFIG
-   ⚠️ Change DASHBOARD_URL if your file is not "dashboard.html"
+   ⚠️ CHANGE DASHBOARD_URL to your real dashboard filename
 ===================================================== */
-const DASHBOARD_URL = 'dashboard.html';   // ← set to '1.html' or whatever your dashboard file is called
+const DASHBOARD_URL = 'dashboard.html';   // ← SET THIS: 'dashboard.html' or '1.html' or 'admin.html' etc.
 const SALT        = 'medicare::hms::v2::salt';
-const DB_KEY      = 'medicare_hms';       // same key the dashboard uses
+const DB_KEY      = 'medicare_hms';
 const SESSION_KEY = 'medicare_session';
 
-/* ---------- Password hashing (must match dashboard) ---------- */
+/* =====================================================
+   PASSWORD HASHING (must match dashboard.html)
+===================================================== */
 async function hashPassword(password) {
   const input = SALT + '|' + password;
   if (window.crypto && window.crypto.subtle && window.isSecureContext) {
@@ -275,30 +309,45 @@ function loadDB() {
   catch (e) { return null; }
 }
 
-/* ---------- Alerts ---------- */
+/* =====================================================
+   UI HELPERS
+===================================================== */
 const errBox = document.getElementById('err');
 const okBox  = document.getElementById('ok');
 const showErr = m => { errBox.querySelector('span').textContent = m; errBox.classList.add('show'); okBox.classList.remove('show'); };
 const showOk  = m => { okBox.querySelector('span').textContent  = m; okBox.classList.add('show');  errBox.classList.remove('show'); };
 const hideAll = () => { errBox.classList.remove('show'); okBox.classList.remove('show'); };
 
-/* ---------- Views ---------- */
 const loginView  = document.getElementById('loginView');
 const forgotView = document.getElementById('forgotView');
-const showLogin  = () => { forgotView.classList.add('hidden'); loginView.classList.remove('hidden'); hideAll(); };
-const showForgot = () => { loginView.classList.add('hidden'); forgotView.classList.remove('hidden'); hideAll(); };
+const debugView  = document.getElementById('debugView');
 
-/* ---------- Password visibility toggle ---------- */
+const showView = (which) => {
+  [loginView, forgotView, debugView].forEach(v => v.classList.add('hidden'));
+  which.classList.remove('hidden');
+  hideAll();
+};
+
+const showLogin  = () => showView(loginView);
+const showForgot = () => showView(forgotView);
+const showDebug  = () => showView(debugView);
+
+/* =====================================================
+   PASSWORD VISIBILITY TOGGLE
+===================================================== */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.pass-toggle');
   if (!btn) return;
   const input = document.getElementById(btn.dataset.target);
+  if (!input) return;
   const show = input.type === 'password';
   input.type = show ? 'text' : 'password';
   btn.innerHTML = `<i class="fas fa-eye${show ? '-slash' : ''}"></i>`;
 });
 
-/* ---------- Auto-redirect if already logged in ---------- */
+/* =====================================================
+   AUTO-REDIRECT IF ALREADY LOGGED IN
+===================================================== */
 (function () {
   const raw = sessionStorage.getItem(SESSION_KEY);
   if (!raw) return;
@@ -311,50 +360,116 @@ document.addEventListener('click', e => {
   } catch (e) {}
 })();
 
-/* ---------- "Create admin account" ---------- */
+/* =====================================================
+   DIAGNOSTICS
+===================================================== */
+function buildDiagnostics() {
+  const db = loadDB();
+  const hasAccount = !!(db && db.user && db.user.username && db.user.passwordHash);
+
+  return [
+    '<b>DASHBOARD_URL:</b> ' + DASHBOARD_URL,
+    '<b>Current page:</b> ' + location.href,
+    '<b>Protocol:</b> ' + location.protocol + ' ' + (location.protocol === 'file:' ? '(may block redirects on some browsers)' : ''),
+    '<b>Account exists:</b> ' + hasAccount,
+    '<b>DB loaded:</b> ' + (db ? 'yes' : 'no'),
+    '<b>Username in DB:</b> ' + (db && db.user ? (db.user.username || '(none)') : '(no user object)'),
+    '<b>Hash present:</b> ' + !!(db && db.user && db.user.passwordHash),
+    '<b>Patients in DB:</b> ' + (db && db.patients ? db.patients.length : 'n/a'),
+    '<b>Browser supports crypto.subtle:</b> ' + !!(window.crypto && window.crypto.subtle)
+  ].join('\n');
+}
+
+function refreshDiagnostics() {
+  const out = document.getElementById('debugOutput');
+  out.innerHTML = buildDiagnostics();
+}
+
+document.getElementById('backToLoginFromDebug').addEventListener('click', e => {
+  e.preventDefault();
+  showLogin();
+});
+
+document.getElementById('forceRedirectBtn').addEventListener('click', () => {
+  try {
+    window.location.href = DASHBOARD_URL;
+  } catch (err) {
+    alert('Redirect failed: ' + err.message + '\n\nTry opening ' + DASHBOARD_URL + ' manually.');
+  }
+});
+
+/* =====================================================
+   "CREATE ADMIN ACCOUNT" LINK
+===================================================== */
 document.getElementById('setupLink').addEventListener('click', e => {
   e.preventDefault();
+
   const db = loadDB();
-  const hasAccount = db && db.user && db.user.username && db.user.passwordHash;
+  const hasAccount = !!(db && db.user && db.user.username && db.user.passwordHash);
+
   if (hasAccount) {
-    showErr('An admin account already exists on this device. Please sign in above.');
+    // Account already exists — show error AND diagnostics
+    showErr('An admin account already exists on this device. Please sign in, or click "Forgot password?" to reset.');
+    refreshDiagnostics();
+    // Stay on login but reveal debug info below (scroll to it)
     return;
   }
-  // No account — dashboard will show its setup screen
+
+  // No account — attempt redirect to dashboard setup
+  showOk('Opening dashboard setup…');
+
+  // Debug alert (remove later once it works)
+  const ok = confirm(
+    'Attempting to open:\n\n' +
+    DASHBOARD_URL + '\n\n' +
+    'From:\n' + location.href + '\n\n' +
+    'If the dashboard opens, click OK.\n' +
+    'If nothing happens, click CANCEL to see diagnostics.'
+  );
+
+  if (!ok) {
+    refreshDiagnostics();
+    showDebug();
+    return;
+  }
+
   window.location.href = DASHBOARD_URL;
 });
 
-/* ---------- "Forgot password?" ---------- */
+/* =====================================================
+   "FORGOT PASSWORD?" LINK
+===================================================== */
 document.getElementById('forgotLink').addEventListener('click', e => {
   e.preventDefault();
   const db = loadDB();
-  const hasAccount = db && db.user && db.user.username && db.user.passwordHash;
+  const hasAccount = !!(db && db.user && db.user.username && db.user.passwordHash);
   if (!hasAccount) {
-    showErr('No admin account exists on this device yet. Click "Create admin account" below.');
+    showErr('No admin account exists yet. Click "Create admin account" below.');
     return;
   }
   showForgot();
 });
 
-/* ---------- Back to login ---------- */
 document.getElementById('backToLoginFromForgot').addEventListener('click', e => {
   e.preventDefault();
   showLogin();
 });
 
-/* ---------- Reset credentials (KEEP data) ---------- */
+/* =====================================================
+   RESET CREDENTIALS (KEEP DATA)
+===================================================== */
 document.getElementById('resetKeepDataBtn').addEventListener('click', () => {
   const sure = confirm(
     'Reset admin credentials?\n\n' +
-    '• Your username & password will be cleared.\n' +
-    '• Patients, appointments, invoices, doctors, departments — ALL KEPT.\n\n' +
-    'You will be taken to the dashboard to create a new account.\n\nContinue?'
+    '• Username & password will be cleared\n' +
+    '• Patients, appointments, invoices, doctors — ALL KEPT\n\n' +
+    'You will be redirected to the dashboard to create a new account.\n\n' +
+    'Continue?'
   );
   if (!sure) return;
 
   const db = loadDB();
   if (db && db.user) {
-    // Only clear credentials — leave everything else untouched
     db.user.username = null;
     db.user.passwordHash = null;
     db.user.createdAt = null;
@@ -366,19 +481,21 @@ document.getElementById('resetKeepDataBtn').addEventListener('click', () => {
   setTimeout(() => { window.location.href = DASHBOARD_URL; }, 900);
 });
 
-/* ---------- Factory reset (WIPE everything) ---------- */
+/* =====================================================
+   FACTORY RESET (WIPE EVERYTHING)
+===================================================== */
 document.getElementById('resetAllBtn').addEventListener('click', () => {
-  const confirmText = prompt(
+  const typed = prompt(
     '⚠️ FACTORY RESET\n\n' +
-    'This will DELETE ALL DATA:\n' +
+    'This DELETES ALL DATA:\n' +
     '• Admin account\n' +
     '• Patients, appointments, doctors\n' +
     '• Invoices, departments, services\n\n' +
     'Sample demo data will be restored.\n\n' +
     'Type RESET (all caps) to confirm:'
   );
-  if (confirmText !== 'RESET') {
-    if (confirmText !== null) showErr('Cancelled — you must type RESET exactly.');
+  if (typed !== 'RESET') {
+    if (typed !== null) showErr('Cancelled — you must type RESET exactly.');
     return;
   }
 
@@ -389,7 +506,9 @@ document.getElementById('resetAllBtn').addEventListener('click', () => {
   setTimeout(() => { window.location.href = DASHBOARD_URL; }, 900);
 });
 
-/* ---------- LOGIN submit ---------- */
+/* =====================================================
+   LOGIN SUBMIT
+===================================================== */
 document.getElementById('adminLoginForm').addEventListener('submit', async e => {
   e.preventDefault();
   hideAll();
@@ -433,7 +552,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
     document.getElementById('adminPass').value = '';
     document.getElementById('adminUser').closest('.form-group').classList.add('error');
     document.getElementById('adminPass').closest('.form-group').classList.add('error');
-    return showErr('Invalid username or password. Try "Forgot password?" if you\'re locked out.');
+    return showErr('Invalid username or password. Try "Forgot password?" if locked out.');
   }
 
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: db.user.username, t: Date.now() }));
