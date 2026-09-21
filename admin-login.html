@@ -10,7 +10,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
   --primary: #0d6e9e; --primary-dark: #0a5578; --primary-light: #e1f0f8;
-  --success: #0e8b5e; --danger: #e84a5f;
+  --success: #0e8b5e; --warning: #e8a33d; --danger: #e84a5f;
   --dark: #0b3b4b; --gray: #5e7e8c; --light-gray: #f5f9fc;
   --border: #e6f0f5; --white: #fff;
 }
@@ -22,6 +22,8 @@ a { text-decoration: none; color: inherit; }
 .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
 .btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--border); }
 .btn-outline:hover { background: var(--primary-light); border-color: var(--primary); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #c93a4c; }
 .btn-lg { padding: 16px 30px; font-size: 15px; border-radius: 14px; }
 .btn-block { width: 100%; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
@@ -60,6 +62,7 @@ a { text-decoration: none; color: inherit; }
   font-size: 12px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.5px; margin-bottom: 14px;
 }
+.auth-badge.warn { background: #fff0e0; color: #c96f1e; }
 
 .form-group { margin-bottom: 16px; }
 .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 7px; }
@@ -86,10 +89,18 @@ a { text-decoration: none; color: inherit; }
 .alert { display: none; align-items: flex-start; gap: 10px; padding: 12px 15px; border-radius: 12px; font-size: 13.5px; font-weight: 500; margin-bottom: 16px; background: #fdecef; color: var(--danger); }
 .alert.show { display: flex; }
 .alert.success { background: #e1f7ed; color: var(--success); }
+.alert.warning { background: #fff0e0; color: #c96f1e; }
 
 .auth-foot { text-align: center; font-size: 13.5px; color: var(--gray); margin-top: 18px; }
 .auth-foot a { color: var(--primary); font-weight: 600; cursor: pointer; }
 .auth-foot a:hover { text-decoration: underline; }
+
+.auth-links {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12.5px; margin-top: 14px; flex-wrap: wrap; gap: 8px;
+}
+.auth-links a { color: var(--primary); font-weight: 600; cursor: pointer; }
+.auth-links a:hover { text-decoration: underline; }
 
 .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0 16px; color: var(--gray); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -99,6 +110,26 @@ a { text-decoration: none; color: inherit; }
   margin-top: 18px; font-size: 13px; color: var(--gray); font-weight: 600;
 }
 .back-link:hover { color: var(--primary); }
+
+.hidden { display: none !important; }
+
+.info-box {
+  background: #f5fafd; border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  font-size: 13px; color: var(--dark);
+  margin-bottom: 16px; line-height: 1.55;
+}
+.info-box strong { color: var(--dark); }
+.info-box i { color: var(--primary); margin-right: 6px; }
+
+.warn-box {
+  background: #fff7ed; border: 1px solid #fde3c8;
+  border-radius: 12px; padding: 14px 16px;
+  font-size: 13px; color: #8a4f13;
+  margin-bottom: 16px; line-height: 1.55;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.warn-box i { color: var(--warning); margin-top: 3px; }
 
 @media (max-width: 640px) {
   .auth-wrap { padding: 30px 16px; }
@@ -111,56 +142,114 @@ a { text-decoration: none; color: inherit; }
 
 <div class="auth-wrap">
   <div class="auth-card">
-    <div class="auth-head">
-      <div class="logo-icon"><i class="fas fa-user-md"></i></div>
-      <div class="auth-badge"><i class="fas fa-shield-alt"></i> Staff Area</div>
-      <h1>Hospital Dashboard</h1>
-      <p>Sign in with your administrator credentials</p>
+
+    <!-- ============================== -->
+    <!-- VIEW 1: LOGIN                  -->
+    <!-- ============================== -->
+    <div id="loginView">
+      <div class="auth-head">
+        <div class="logo-icon"><i class="fas fa-user-md"></i></div>
+        <div class="auth-badge"><i class="fas fa-shield-alt"></i> Staff Area</div>
+        <h1>Hospital Dashboard</h1>
+        <p>Sign in with your administrator credentials</p>
+      </div>
+
+      <div class="alert" id="err"><i class="fas fa-exclamation-circle"></i><span></span></div>
+      <div class="alert success" id="ok"><i class="fas fa-check-circle"></i><span></span></div>
+
+      <form id="adminLoginForm" novalidate>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="adminUser" autocomplete="username" placeholder="e.g. hamza.admin" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="adminPass" autocomplete="current-password" placeholder="••••••••" required>
+            <button type="button" class="pass-toggle" data-target="adminPass"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+
+        <div class="auth-links">
+          <span></span>
+          <a id="forgotLink">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-block" style="margin-top:14px;">
+          <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+        </button>
+      </form>
+
+      <div class="auth-foot">
+        First time here? <a id="setupLink">Create admin account</a>
+      </div>
+
+      <div class="divider">Patient</div>
+      <a href="index.html" class="btn btn-outline btn-block"><i class="fas fa-user"></i> Patient Website</a>
+
+      <a href="index.html" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Home
+      </a>
     </div>
 
-    <div class="alert" id="err"><i class="fas fa-exclamation-circle"></i><span></span></div>
-    <div class="alert success" id="ok"><i class="fas fa-check-circle"></i><span></span></div>
-
-    <form id="adminLoginForm" novalidate>
-      <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="adminUser" autocomplete="username" placeholder="e.g. hamza.admin" required>
+    <!-- ============================== -->
+    <!-- VIEW 2: FORGOT PASSWORD        -->
+    <!-- ============================== -->
+    <div id="forgotView" class="hidden">
+      <div class="auth-head">
+        <div class="logo-icon"><i class="fas fa-key"></i></div>
+        <div class="auth-badge warn"><i class="fas fa-exclamation-triangle"></i> Account Recovery</div>
+        <h1>Reset Admin Password</h1>
+        <p>Choose how you want to recover access</p>
       </div>
-      <div class="form-group">
-        <label>Password</label>
-        <div class="pass-wrap">
-          <input type="password" id="adminPass" autocomplete="current-password" placeholder="••••••••" required>
-          <button type="button" class="pass-toggle" data-target="adminPass"><i class="fas fa-eye"></i></button>
+
+      <div class="warn-box">
+        <i class="fas fa-shield-alt"></i>
+        <div>
+          <strong>Local-only security.</strong> Your account is stored only on this device.
+          Passwords are hashed and cannot be recovered — only reset.
         </div>
       </div>
-      <button type="submit" class="btn btn-primary btn-lg btn-block">
-        <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
-      </button>
-    </form>
 
-    <div class="auth-foot" id="setupFoot">
-      First time here? <a id="setupLink">Create admin account</a>
+      <div class="info-box">
+        <i class="fas fa-info-circle"></i>
+        <strong>Option 1 — Keep your data, reset credentials</strong><br>
+        Erases your username &amp; password but keeps all hospital records (patients, appointments, invoices). You'll set up a new account on the next screen.
+      </div>
+
+      <button class="btn btn-primary btn-block" id="resetKeepDataBtn">
+        <i class="fas fa-user-cog"></i> Reset Credentials (Keep Data)
+      </button>
+
+      <div class="info-box" style="margin-top:16px;">
+        <i class="fas fa-info-circle"></i>
+        <strong>Option 2 — Factory reset (danger)</strong><br>
+        Wipes <em>everything</em>: credentials + all data. Restores the sample demo data.
+      </div>
+
+      <button class="btn btn-danger btn-block" id="resetAllBtn">
+        <i class="fas fa-trash-alt"></i> Factory Reset (Erase Everything)
+      </button>
+
+      <div class="auth-foot" style="margin-top:20px;">
+        <a id="backToLoginFromForgot"><i class="fas fa-arrow-left"></i> Back to login</a>
+      </div>
     </div>
 
-    <div class="divider">Patient</div>
-    <a href="index.html" class="btn btn-outline btn-block"><i class="fas fa-user"></i> Patient Website</a>
-
-    <a href="index.html" class="back-link">
-      <i class="fas fa-arrow-left"></i> Back to Home
-    </a>
   </div>
 </div>
 
 <script>
 /* =====================================================
-   ADMIN LOGIN — uses the SAME storage as dashboard.html
-   Key:  'medicare_hms'   Shape: { user: { username, passwordHash, ... }, patients, ... }
-   Session: 'medicare_session'
+   CONFIG
+   ⚠️ Change DASHBOARD_URL if your file is not "dashboard.html"
 ===================================================== */
-const SALT = 'medicare::hms::v2::salt';
-const DB_KEY = 'medicare_hms';        // ← same as dashboard
+const DASHBOARD_URL = 'dashboard.html';   // ← set to '1.html' or whatever your dashboard file is called
+const SALT        = 'medicare::hms::v2::salt';
+const DB_KEY      = 'medicare_hms';       // same key the dashboard uses
 const SESSION_KEY = 'medicare_session';
 
+/* ---------- Password hashing (must match dashboard) ---------- */
 async function hashPassword(password) {
   const input = SALT + '|' + password;
   if (window.crypto && window.crypto.subtle && window.isSecureContext) {
@@ -186,13 +275,20 @@ function loadDB() {
   catch (e) { return null; }
 }
 
+/* ---------- Alerts ---------- */
 const errBox = document.getElementById('err');
 const okBox  = document.getElementById('ok');
 const showErr = m => { errBox.querySelector('span').textContent = m; errBox.classList.add('show'); okBox.classList.remove('show'); };
 const showOk  = m => { okBox.querySelector('span').textContent  = m; okBox.classList.add('show');  errBox.classList.remove('show'); };
 const hideAll = () => { errBox.classList.remove('show'); okBox.classList.remove('show'); };
 
-// Password visibility toggle
+/* ---------- Views ---------- */
+const loginView  = document.getElementById('loginView');
+const forgotView = document.getElementById('forgotView');
+const showLogin  = () => { forgotView.classList.add('hidden'); loginView.classList.remove('hidden'); hideAll(); };
+const showForgot = () => { loginView.classList.add('hidden'); forgotView.classList.remove('hidden'); hideAll(); };
+
+/* ---------- Password visibility toggle ---------- */
 document.addEventListener('click', e => {
   const btn = e.target.closest('.pass-toggle');
   if (!btn) return;
@@ -202,7 +298,7 @@ document.addEventListener('click', e => {
   btn.innerHTML = `<i class="fas fa-eye${show ? '-slash' : ''}"></i>`;
 });
 
-// If already logged in (session matches user in medicare_hms), skip
+/* ---------- Auto-redirect if already logged in ---------- */
 (function () {
   const raw = sessionStorage.getItem(SESSION_KEY);
   if (!raw) return;
@@ -210,12 +306,12 @@ document.addEventListener('click', e => {
     const s = JSON.parse(raw);
     const db = loadDB();
     if (db && db.user && db.user.username === s.u) {
-      location.replace('dashboard.html');
+      location.replace(DASHBOARD_URL);
     }
   } catch (e) {}
 })();
 
-// "Create admin account" link — dashboard handles setup
+/* ---------- "Create admin account" ---------- */
 document.getElementById('setupLink').addEventListener('click', e => {
   e.preventDefault();
   const db = loadDB();
@@ -224,11 +320,76 @@ document.getElementById('setupLink').addEventListener('click', e => {
     showErr('An admin account already exists on this device. Please sign in above.');
     return;
   }
-  // No account yet — dashboard will show its setup screen
-  location.href = 'dashboard.html';
+  // No account — dashboard will show its setup screen
+  window.location.href = DASHBOARD_URL;
 });
 
-// Submit
+/* ---------- "Forgot password?" ---------- */
+document.getElementById('forgotLink').addEventListener('click', e => {
+  e.preventDefault();
+  const db = loadDB();
+  const hasAccount = db && db.user && db.user.username && db.user.passwordHash;
+  if (!hasAccount) {
+    showErr('No admin account exists on this device yet. Click "Create admin account" below.');
+    return;
+  }
+  showForgot();
+});
+
+/* ---------- Back to login ---------- */
+document.getElementById('backToLoginFromForgot').addEventListener('click', e => {
+  e.preventDefault();
+  showLogin();
+});
+
+/* ---------- Reset credentials (KEEP data) ---------- */
+document.getElementById('resetKeepDataBtn').addEventListener('click', () => {
+  const sure = confirm(
+    'Reset admin credentials?\n\n' +
+    '• Your username & password will be cleared.\n' +
+    '• Patients, appointments, invoices, doctors, departments — ALL KEPT.\n\n' +
+    'You will be taken to the dashboard to create a new account.\n\nContinue?'
+  );
+  if (!sure) return;
+
+  const db = loadDB();
+  if (db && db.user) {
+    // Only clear credentials — leave everything else untouched
+    db.user.username = null;
+    db.user.passwordHash = null;
+    db.user.createdAt = null;
+    localStorage.setItem(DB_KEY, JSON.stringify(db));
+  }
+  sessionStorage.removeItem(SESSION_KEY);
+
+  showOk('Credentials cleared. Redirecting to setup…');
+  setTimeout(() => { window.location.href = DASHBOARD_URL; }, 900);
+});
+
+/* ---------- Factory reset (WIPE everything) ---------- */
+document.getElementById('resetAllBtn').addEventListener('click', () => {
+  const confirmText = prompt(
+    '⚠️ FACTORY RESET\n\n' +
+    'This will DELETE ALL DATA:\n' +
+    '• Admin account\n' +
+    '• Patients, appointments, doctors\n' +
+    '• Invoices, departments, services\n\n' +
+    'Sample demo data will be restored.\n\n' +
+    'Type RESET (all caps) to confirm:'
+  );
+  if (confirmText !== 'RESET') {
+    if (confirmText !== null) showErr('Cancelled — you must type RESET exactly.');
+    return;
+  }
+
+  localStorage.removeItem(DB_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
+
+  showOk('Factory reset complete. Redirecting…');
+  setTimeout(() => { window.location.href = DASHBOARD_URL; }, 900);
+});
+
+/* ---------- LOGIN submit ---------- */
 document.getElementById('adminLoginForm').addEventListener('submit', async e => {
   e.preventDefault();
   hideAll();
@@ -272,12 +433,12 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
     document.getElementById('adminPass').value = '';
     document.getElementById('adminUser').closest('.form-group').classList.add('error');
     document.getElementById('adminPass').closest('.form-group').classList.add('error');
-    return showErr('Invalid username or password.');
+    return showErr('Invalid username or password. Try "Forgot password?" if you\'re locked out.');
   }
 
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: db.user.username, t: Date.now() }));
   showOk('Signed in! Redirecting…');
-  location.replace('dashboard.html');
+  setTimeout(() => { window.location.replace(DASHBOARD_URL); }, 350);
 });
 </script>
 </body>
