@@ -136,7 +136,6 @@ a { text-decoration: none; color: inherit; }
 <div class="auth-wrap">
   <div class="auth-card">
 
-    <!-- LOGIN VIEW -->
     <div id="loginView">
       <div class="auth-head">
         <div class="logo-icon"><i class="fas fa-user-md"></i></div>
@@ -183,7 +182,6 @@ a { text-decoration: none; color: inherit; }
       </a>
     </div>
 
-    <!-- CREATE ADMIN VIEW -->
     <div id="createView" class="hidden">
       <div class="create-head">
         <div class="logo-icon"><i class="fas fa-user-plus"></i></div>
@@ -229,7 +227,6 @@ a { text-decoration: none; color: inherit; }
       </div>
     </div>
 
-    <!-- FORGOT PASSWORD VIEW -->
     <div id="forgotView" class="hidden">
       <div class="auth-head">
         <div class="logo-icon"><i class="fas fa-key"></i></div>
@@ -260,11 +257,11 @@ a { text-decoration: none; color: inherit; }
 <script>
 /* =====================================================
    CONFIG
-   ⚠️ Set DASHBOARD_URL to your real dashboard filename
+   ⚠️ IMPORTANT: Set DASHBOARD_URL to your real dashboard filename
 ===================================================== */
-const DASHBOARD_URL = 'dashboard.html';
+const DASHBOARD_URL = 'dashboard.html';   // ← change if your file is named differently (e.g. '1.html', 'admin.html')
 const SALT        = 'medicare::hms::v2::salt';
-const AUTH_KEY    = 'medicare_admin';   // ← credentials ONLY (dashboard data stays in medicare_hms)
+const AUTH_KEY    = 'medicare_admin';     // credentials ONLY
 const SESSION_KEY = 'medicare_session';
 
 /* ---------- HASH ---------- */
@@ -288,7 +285,6 @@ async function hashPassword(password) {
   return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
 }
 
-/* ---------- Credentials store ---------- */
 function loadAuth() {
   try { return JSON.parse(localStorage.getItem(AUTH_KEY)); }
   catch (e) { return null; }
@@ -330,7 +326,7 @@ document.addEventListener('click', e => {
   btn.innerHTML = `<i class="fas fa-eye${show ? '-slash' : ''}"></i>`;
 });
 
-/* ---------- Auto-redirect if logged in ---------- */
+/* ---------- Auto-redirect if already logged in ---------- */
 (function () {
   const raw = sessionStorage.getItem(SESSION_KEY);
   if (!raw) return;
@@ -338,6 +334,7 @@ document.addEventListener('click', e => {
     const s = JSON.parse(raw);
     const a = loadAuth();
     if (a && a.username === s.u) {
+      console.log('[login] Session found — redirecting to', DASHBOARD_URL);
       location.replace(DASHBOARD_URL);
     }
   } catch (e) {}
@@ -466,7 +463,8 @@ document.getElementById('createAdminForm').addEventListener('submit', async e =>
   const passwordHash = await hashPassword(pw);
   const initials = (name.split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
 
-  // ✅ Save ONLY credentials — dashboard data in medicare_hms is UNTOUCHED
+  // ✅ Save ONLY credentials to 'medicare_admin'
+  //    Your dashboard's data ('medicare_hms') is never touched.
   saveAuth({
     name,
     username,
@@ -529,10 +527,17 @@ document.getElementById('adminLoginForm').addEventListener('submit', async e => 
     return showErr(errBox, 'Invalid username or password.');
   }
 
+  // ✅ Session written — dashboard will read this and skip its own login
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ u: a.username, t: Date.now() }));
+  console.log('[login] Signed in. Session:', sessionStorage.getItem(SESSION_KEY));
+  console.log('[login] About to redirect to:', DASHBOARD_URL);
+
   okBox.querySelector('span').textContent = 'Signed in! Opening dashboard…';
   okBox.classList.add('show');
-  setTimeout(() => { window.location.href = DASHBOARD_URL; }, 350);
+
+  setTimeout(() => {
+    window.location.href = DASHBOARD_URL;
+  }, 500);
 });
 </script>
 </body>
