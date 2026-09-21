@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Global Support Test</title>
+  <script src="shared.js"></script>
+  <script src="global-support.js"></script>
+  <style>
+    body { font-family: monospace; padding: 30px; background: #f5f9fc; color: #0b3b4b; }
+    h1 { color: #0d6e9e; font-size: 22px; }
+    .box { background: #fff; border: 2px solid #e6f0f5; border-radius: 12px; padding: 20px; margin: 16px 0; }
+    .ok { color: #0e8b5e; font-weight: 700; }
+    .bad { color: #e84a5f; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>Global Support — Status Check</h1>
+
+  <div class="box">
+    <div>shared.js loaded? <span id="r1">checking…</span></div>
+    <div>global-support.js loaded? <span id="r2">checking…</span></div>
+    <div>GlobalSupport object exists? <span id="r3">checking…</span></div>
+    <div>Number of countries: <span id="r4">?</span></div>
+    <div>Number of currencies: <span id="r5">?</span></div>
+    <div>Current currency: <span id="r6">?</span></div>
+    <div>Sample amount: <span id="r7">?</span></div>
+  </div>
+
+  <div class="box" id="countryBox">
+    <div style="font-weight:700; margin-bottom:10px;">Country Dropdown Test:</div>
+    <select id="testCountry" style="padding:10px 14px; border-radius:10px; border:2px solid #e6f0f5; font-size:14px; width:300px;">
+      <option>Loading…</option>
+    </select>
+  </div>
+
+  <script>
+    function set(id, text, ok) {
+      const el = document.getElementById(id);
+      el.textContent = text;
+      el.className = ok ? 'ok' : 'bad';
+    }
+
+    setTimeout(function () {
+      set('r1', typeof window.UserAuth !== 'undefined' ? 'YES ✅' : 'NO ❌', typeof window.UserAuth !== 'undefined');
+      set('r2', typeof window.GlobalSupport !== 'undefined' ? 'YES ✅' : 'NO ❌', typeof window.GlobalSupport !== 'undefined');
+
+      if (typeof window.GlobalSupport === 'undefined') {
+        set('r3', 'NO — global-support.js did not load ❌', false);
+        return;
+      }
+
+      set('r3', 'YES ✅', true);
+      set('r4', GlobalSupport.COUNTRIES.length + ' countries', true);
+      set('r5', GlobalSupport.CURRENCIES.length + ' currencies', true);
+      set('r6', GlobalSupport.getSettings().currency, true);
+      set('r7', GlobalSupport.money(1234.5), true);
+
+      // Fill the country dropdown
+      const sel = document.getElementById('testCountry');
+      sel.innerHTML = '<option value="">— Pick a country —</option>' +
+        GlobalSupport.COUNTRIES.map(c =>
+          '<option value="' + c.code + '">' + c.name + ' (' + c.dial + ') — ' + c.currency + '</option>'
+        ).join('');
+    }, 300);
+  </script>
+</body>
+</html>

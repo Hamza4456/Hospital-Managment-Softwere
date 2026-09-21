@@ -1,0 +1,394 @@
+/* =========================================================
+   ADMIN EXTRAS — Pharmacy + Patient Bills + Invoice modal
+   ========================================================= */
+
+/* ===== Tabs ===== */
+.mp-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.mp-tab {
+  padding:10px 18px; border-radius:12px; border:1.5px solid var(--border);
+  background:#fff; font-family:inherit; font-size:13.5px; font-weight:600;
+  color:var(--gray); cursor:pointer; display:inline-flex; align-items:center;
+  gap:8px; transition:all .15s;
+}
+.mp-tab:hover { border-color:var(--primary); color:var(--primary); }
+.mp-tab.active {
+  background:var(--primary); border-color:var(--primary); color:#fff;
+  box-shadow:0 8px 16px -8px rgba(13,110,158,.6);
+}
+.mp-tab .cnt {
+  background:rgba(0,0,0,.08); font-size:11px; padding:2px 8px;
+  border-radius:20px; font-weight:700;
+}
+.mp-tab.active .cnt { background:rgba(255,255,255,.25); }
+
+.mp-tabpane { display:none; }
+.mp-tabpane.active { display:block; animation:fadeIn .25s ease; }
+
+/* ===== Forms ===== */
+.mp-form-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+  gap:16px;
+}
+
+/* ===== Filters ===== */
+.mp-filters {
+  display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+  margin-bottom:16px;
+}
+
+.mp-search {
+  background:#fff; border-radius:40px; padding:10px 18px;
+  display:flex; align-items:center; gap:10px;
+  box-shadow:var(--shadow); border:1px solid var(--border);
+}
+.mp-search i { color:#7f9aa8; font-size:14px; }
+.mp-search input {
+  border:none; outline:none; font-size:14px; background:transparent;
+  font-family:inherit; color:var(--dark); width:220px;
+}
+
+/* ===== Row states ===== */
+.row-low { background:#fffaf0 !important; }
+.row-out { background:#fdecef !important; }
+
+/* ===== Badges ===== */
+.mp-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 12px; border-radius:20px; font-size:12px;
+  font-weight:600; white-space:nowrap;
+}
+.mp-badge.low    { background:#fff0e0; color:#c96f1e; }
+.mp-badge.out    { background:#fdecef; color:#e84a5f; }
+.mp-badge.ok     { background:#e1f7ed; color:#0e8b5e; }
+.mp-badge.info   { background:#e1f0f8; color:#0d6e9e; }
+.mp-badge.warn   { background:#fff0e0; color:#c96f1e; }
+.mp-badge.paid   { background:#e1f7ed; color:#0e8b5e; }
+.mp-badge.pending{ background:#fff0e0; color:#c96f1e; }
+
+/* ===== Prescription cards ===== */
+.mp-rx-card {
+  background:#fff; border:1px solid var(--border); border-radius:16px;
+  padding:20px; margin-bottom:16px; box-shadow:var(--shadow);
+  position:relative; overflow:hidden; transition:all .2s;
+}
+.mp-rx-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+.mp-rx-card::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+  background:#e8a33d;
+}
+.mp-rx-card[data-status="Fulfilled"]::before { background:#0e8b5e; }
+.mp-rx-card[data-status="Cancelled"]::before { background:#e84a5f; }
+
+.mp-rx-top {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  gap:14px; flex-wrap:wrap; margin-bottom:14px;
+}
+.mp-rx-patient { font-size:16px; font-weight:700; color:var(--dark); }
+.mp-rx-sub { font-size:13px; color:var(--gray); margin-top:2px; }
+
+.mp-rx-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+  gap:12px; padding:14px 0;
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+}
+.mp-rx-cell .lbl {
+  font-size:11px; font-weight:700; color:var(--gray);
+  text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px;
+}
+.mp-rx-cell .val { font-size:13.5px; font-weight:600; color:var(--dark); }
+
+.mp-rx-items { padding:12px 0; font-size:13.5px; }
+.mp-rx-items ul { margin:6px 0 0; padding-left:22px; color:var(--dark); }
+.mp-rx-items li { padding:3px 0; }
+
+.mp-rx-actions {
+  display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+  padding-top:8px;
+}
+
+.mp-empty { text-align:center; padding:40px 20px; color:var(--gray); }
+.mp-empty i { font-size:42px; color:#c5d8e2; margin-bottom:12px; }
+.mp-empty h3 { font-size:16px; color:var(--dark); margin-bottom:6px; }
+.mp-empty p { font-size:13.5px; }
+
+/* =========================================================
+   STAT CARDS — no clipping, no overflow
+   ========================================================= */
+.stat-card {
+  min-width: 0;
+  overflow: hidden;
+  padding: 22px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.stat-content {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+.stat-content h3 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--dark);
+  margin: 0;
+  letter-spacing: -0.3px;
+  line-height: 1.5;
+  padding: 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  max-width: 100%;
+  transition: font-size 0.15s ease;
+}
+.stat-content p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--gray);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stat-trend {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stat-trend.down { color: var(--danger); }
+
+/* Tighter buttons in table action cells */
+.table-wrap td:last-child { white-space: nowrap; }
+.table-wrap td:last-child .btn { margin-left: 3px; }
+.table-wrap td:last-child .btn:first-child { margin-left: 0; }
+
+/* =========================================================
+   Invoice modal — phone row with country code
+   ========================================================= */
+.pInv-phone-row {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.pInv-phone-row .pInv-cc {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 12px 34px 12px 12px;
+  border-radius: 12px;
+  border: 1px solid #e6f0f5;
+  background: #fbfdfe;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0b3b4b;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235e7e8c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+}
+.pInv-phone-row .pInv-cc:focus {
+  border-color: #0d6e9e;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(13,110,158,.1);
+}
+
+.pInv-phone-row .pInv-phone {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #e6f0f5;
+  background: #fbfdfe;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0b3b4b;
+  outline: none;
+}
+.pInv-phone-row .pInv-phone:focus {
+  border-color: #0d6e9e;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(13,110,158,.1);
+}
+
+/* =========================================================
+   STATS GRID — 4 per row on desktop, 2 on tablet, 1 on mobile
+   ========================================================= */
+@media (min-width: 901px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+  }
+  .stat-card {
+    padding: 18px 16px !important;
+    gap: 12px !important;
+  }
+  .stat-icon {
+    width: 46px !important;
+    height: 46px !important;
+    font-size: 20px !important;
+    border-radius: 13px !important;
+  }
+  .stat-content h3 {
+    font-size: 22px !important;
+    line-height: 1.5 !important;
+    padding: 4px 0 !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}
+
+/* =========================================================
+   MOBILE — topbar / page-title / hospital subheading overflow
+   ========================================================= */
+@media (max-width: 640px) {
+  .topbar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .topbar > div:first-child {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+  }
+
+  .topbar > div:first-child .page-title {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+  }
+
+  .page-title h1 {
+    font-size: 18px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  .page-title p {
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  .topbar-right {
+    flex: 1 1 100% !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    min-width: 0 !important;
+  }
+
+  .user-info {
+    display: none !important;
+  }
+
+  .user-profile {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .card-header h2 {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  .sidebar-logo h1,
+  .sidebar-logo p {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Smaller padding so more content fits */
+  .stat-card { padding: 16px 14px !important; }
+  .stat-content h3 { font-size: 20px !important; line-height: 1.5 !important; padding: 4px 0 !important; }
+
+  /* Phone row — narrower country picker */
+  .pInv-phone-row {
+    grid-template-columns: 130px 1fr;
+    gap: 8px;
+  }
+  .pInv-phone-row .pInv-cc {
+    font-size: 13px;
+    padding: 11px 8px;
+    padding-right: 26px;
+  }
+  .pInv-phone-row .pInv-phone {
+    font-size: 15px;
+    padding: 11px 12px;
+  }
+
+  /* Modal — single column, comfortable inputs */
+  #modalContent .mp-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  #modalContent select,
+  #modalContent input[type="text"],
+  #modalContent input[type="email"],
+  #modalContent input[type="tel"],
+  #modalContent input[type="number"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 15px !important;
+  }
+  #pInvPreview { word-break: break-word; }
+}
+
+/* =========================================================
+   Extra-narrow phones (iPhone SE 320px)
+   ========================================================= */
+@media (max-width: 380px) {
+  .page-title h1 { font-size: 16px !important; }
+  .page-title p  { font-size: 11px !important; }
+  .stat-card     { padding: 14px 12px !important; }
+  .stat-content h3 { font-size: 18px !important; }
+}

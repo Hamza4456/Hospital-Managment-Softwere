@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharmacy — MediCare</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="medicare-pages.css">
+<script src="global-support.js"></script>
+</head>
+<body>
+
+<header id="site-header"></header>
+
+<main class="mp-page">
+  <div class="mp-container">
+    <div class="mp-page-head row">
+      <div>
+        <h1>Pharmacy</h1>
+        <p class="sub">Medicine stock and purchasing</p>
+      </div>
+      <div class="mp-tabs">
+        <button class="mp-tab active" data-tab="stock">
+          <i class="fas fa-pills"></i> Stock <span id="lowBadge"></span>
+        </button>
+        <button class="mp-tab" data-tab="purchase">
+          <i class="fas fa-shopping-cart"></i> Purchases
+        </button>
+      </div>
+    </div>
+
+    <div class="mp-alert" id="phError" style="display:none"></div>
+
+    <!-- STOCK -->
+    <section id="tab-stock">
+      <div class="mp-filters">
+        <input class="mp-input search" id="mSearch" placeholder="Search medicine…">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#3d4b56">
+          <input type="checkbox" id="mLowOnly"> Low stock only
+        </label>
+        <button class="btn btn-primary" id="mAddBtn">
+          <i class="fas fa-plus"></i> Add Medicine
+        </button>
+      </div>
+
+      <form class="mp-panel" id="medForm" style="display:none">
+        <h3>New Medicine</h3>
+        <div class="mp-grid-4">
+          <label class="mp-field">Name *<input required id="mName"></label>
+          <label class="mp-field">Generic name<input id="mGeneric"></label>
+          <label class="mp-field">Category<input id="mCat" value="Tablet"></label>
+          <label class="mp-field">Batch no<input id="mBatch"></label>
+          <label class="mp-field">Expiry<input type="date" id="mExp"></label>
+          <label class="mp-field">Unit<input id="mUnit" value="tablet"></label>
+          <label class="mp-field">Opening stock<input type="number" min="0" id="mQty" value="0"></label>
+          <label class="mp-field">Reorder level<input type="number" min="0" id="mReorder" value="20"></label>
+          <label class="mp-field">Purchase price<input type="number" min="0" step="0.01" id="mBuy" value="0"></label>
+          <label class="mp-field">Selling price<input type="number" min="0" step="0.01" id="mSell" value="0"></label>
+          <label class="mp-field">Supplier<input id="mSup"></label>
+        </div>
+        <div class="mp-actions">
+          <button type="button" class="btn btn-outline" id="mCancelBtn">Cancel</button>
+          <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i> Save medicine</button>
+        </div>
+      </form>
+
+      <div class="mp-table-wrap">
+        <table class="mp-table">
+          <thead>
+            <tr>
+              <th>Medicine</th><th>Category</th><th>Batch</th><th>Expiry</th>
+              <th>Stock</th><th>Purchase</th><th>Selling</th><th>Adjust</th>
+            </tr>
+          </thead>
+          <tbody id="mList"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PURCHASE -->
+    <section id="tab-purchase" style="display:none">
+      <form class="mp-panel" id="purForm">
+        <h3>New Purchase</h3>
+        <div class="mp-grid-4">
+          <label class="mp-field">Invoice no<input id="pInv" placeholder="auto if blank"></label>
+          <label class="mp-field">Supplier<input id="pSup"></label>
+          <label class="mp-field">Payment
+            <select id="pPay">
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+            </select>
+          </label>
+          <label class="mp-field">Tax %<input type="number" min="0" step="0.01" id="pTax" value="0"></label>
+        </div>
+
+        <div class="mp-table-wrap" style="margin-top:16px">
+          <table class="mp-table">
+            <thead>
+              <tr><th>Medicine</th><th>Qty</th><th>Unit cost</th><th>Amount</th><th></th></tr>
+            </thead>
+            <tbody id="pItems"></tbody>
+          </table>
+        </div>
+
+        <div class="mp-actions" style="justify-content:flex-start">
+          <button type="button" class="btn btn-outline mp-btn-sm" id="pAddRow">
+            <i class="fas fa-plus"></i> Add row
+          </button>
+        </div>
+
+        <div class="mp-stats" style="margin-top:16px">
+          <div class="mp-stat"><span class="label">Subtotal</span><span class="value" id="pSub">$0.00</span></div>
+          <div class="mp-stat"><span class="label">Tax</span><span class="value" id="pTaxAmt">$0.00</span></div>
+          <div class="mp-stat"><span class="label">Total</span><span class="value ok" id="pTotal">$0.00</span></div>
+        </div>
+
+        <div class="mp-actions">
+          <button class="btn btn-primary" type="submit">
+            <i class="fas fa-save"></i> Save purchase &amp; add to stock
+          </button>
+        </div>
+      </form>
+
+      <h3 style="margin: 22px 0 12px; color:#0b3b4b">Purchase History</h3>
+      <div class="mp-table-wrap">
+        <table class="mp-table">
+          <thead>
+            <tr><th>Invoice</th><th>Date</th><th>Supplier</th><th>Items</th><th>Total</th><th>Status</th></tr>
+          </thead>
+          <tbody id="pList"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer id="site-footer"></footer>
+
+<script src="shared.js"></script>
+<script src="medicare-data.js"></script>
+<script src="pharmacy.js"></script>
+</body>
+</html>

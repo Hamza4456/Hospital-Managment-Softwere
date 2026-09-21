@@ -6,6 +6,11 @@
 <title>Our Doctors · MediCare Hospital</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="public-extras.css">
+<!-- ...existing shared.js include... -->
+<script src="public-extras.js"></script>
+<script src="public-doctors.js"></script>
+<script src="global-support.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -267,6 +272,7 @@ const doctors = [
   { id: 14, name: 'Dr. L. Fernández', initials: 'LF', dept: 'Emergency', specialty: 'Trauma Surgeon', experience: '14 years', patients: 1680, rating: 4.8, reviews: 342, available: true, degree: 'MS (Trauma Surgery)', languages: 'English, Spanish', expertise: ['Polytrauma', 'Emergency Surgery', 'Burn Management', 'Orthopedic Trauma'], education: [{ degree: 'MS (General Surgery)', school: 'Universidad de Madrid', year: '2005' }, { degree: 'Fellowship in Trauma Surgery', school: 'R Adams Cowley Shock Trauma Center, USA', year: '2010' }], schedule: [true, true, true, true, true, false, true], bio: 'Trauma surgeon with 14 years of experience in polytrauma, emergency surgery, and burn management.' },
   { id: 15, name: 'Dr. A. Ivanova', initials: 'AI', dept: 'Oncology', specialty: 'Radiation Oncologist', experience: '16 years', patients: 660, rating: 4.9, reviews: 201, available: true, degree: 'MD (Radiation Oncology)', languages: 'English, Russian', expertise: ['IMRT & IGRT', 'Stereotactic Radiosurgery', 'Proton Therapy', 'Brachytherapy'], education: [{ degree: 'MD (Radiation Oncology)', school: 'Moscow State Medical University', year: '2004' }, { degree: 'Fellowship in Advanced Radiation', school: 'Memorial Sloan Kettering, USA', year: '2009' }], schedule: [true, false, true, true, false, true, false], bio: 'Radiation oncologist with advanced training in IMRT, stereotactic radiosurgery, and proton therapy.' }
 ];
+
 
 let state = { search: '', dept: 'all', availability: 'all', sortBy: 'name' };
 

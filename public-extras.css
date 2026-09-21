@@ -1,0 +1,68 @@
+/* ===== PUBLIC EXTRAS — Hospitals + My Bills ===== */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+.mp-page { padding: 34px 0 60px; background: #f7fafc; min-height: 60vh; }
+.mp-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+.mp-page-head { margin-bottom: 22px; }
+.mp-page-head.row { display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; }
+.mp-page-head h1 { font-size: 26px; font-weight: 800; color: #0b3b4b;
+  margin: 0 0 4px; letter-spacing: -.5px; }
+.mp-page-head .sub { color: #5e7e8c; font-size: 14px; margin: 0; }
+
+.mp-filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+.mp-input, .mp-select {
+  padding: 10px 13px; border: 1.5px solid #e6f0f5; border-radius: 10px;
+  font: inherit; font-size: 14px; background: #fff; color: #0b3b4b;
+  outline: none; transition: all .15s;
+}
+.mp-input:focus, .mp-select:focus { border-color: #0d6e9e;
+  box-shadow: 0 0 0 4px rgba(13,110,158,.08); }
+.mp-input.search { min-width: 260px; flex: 1; max-width: 400px; }
+
+.mp-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+.mp-card { background: #fff; border: 1px solid #e6f0f5; border-radius: 14px;
+  padding: 18px; display: flex; flex-direction: column; gap: 8px;
+  transition: box-shadow .18s, transform .18s; }
+.mp-card:hover { box-shadow: 0 12px 28px -10px rgba(0,80,110,.15);
+  transform: translateY(-2px); }
+.mp-card h3 { margin: 0; font-size: 17px; color: #0b3b4b; }
+.mp-card .muted { color: #7a8b96; font-size: 13.5px; margin: 0; }
+.mp-card-foot { display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid #f0f4f7; padding-top: 10px; margin-top: 4px;
+  font-size: 13.5px; color: #4b5468; }
+
+.mp-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.mp-tag { font-size: 11.5px; padding: 3px 9px; border-radius: 999px;
+  background: #e1f0f8; color: #0d6e9e; font-weight: 600; }
+
+.mp-tbl-wrap { background: #fff; border: 1px solid #e6f0f5; border-radius: 14px; overflow: auto; }
+.mp-tbl { width: 100%; border-collapse: collapse; }
+.mp-tbl th { text-align: left; font-size: 11.5px; text-transform: uppercase;
+  letter-spacing: .05em; color: #7a8b96; background: #f8fbfd;
+  padding: 12px 14px; border-bottom: 1px solid #e6f0f5; white-space: nowrap; }
+.mp-tbl td { padding: 12px 14px; border-bottom: 1px solid #f0f4f7;
+  font-size: 13.5px; color: #2b3c45; vertical-align: middle; }
+.mp-tbl tr:last-child td { border-bottom: none; }
+
+.mp-badge { display: inline-block; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; padding: 3px 9px; border-radius: 999px; }
+.mp-badge.paid   { background: #e6f7ee; color: #0e8b5e; }
+.mp-badge.pending{ background: #fff4e0; color: #c9791e; }
+
+.mp-empty { text-align: center; padding: 44px 20px; color: #8b93a7; }
+.mp-empty i { font-size: 44px; color: #c5d8e2; margin-bottom: 12px; }
+.mp-empty h3 { font-size: 17px; color: #0b3b4b; margin-bottom: 6px; }
+
+@media (max-width: 640px) {
+  .mp-page { padding: 22px 0 44px; }
+  .mp-container { padding: 0 14px; }
+  .mp-page-head h1 { font-size: 21px; }
+  .mp-input.search { min-width: 100%; }
+}

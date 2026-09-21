@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Bills — MediCare</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="public-extras.css">
+<style>
+  /* Small extra styles specific to this page */
+  .mb-user-banner {
+    background: #fff;
+    border: 1px solid #e6f0f5;
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .mb-user-banner .icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6e9e, #0e8b5e);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .mb-user-banner .meta { flex: 1; min-width: 180px; }
+  .mb-user-banner .meta strong { display: block; color: #0b3b4b; font-size: 14px; }
+  .mb-user-banner .meta span { color: #7a8b96; font-size: 12.5px; }
+  .mb-hint {
+    background: #fff8e6;
+    border: 1px solid #f2d98a;
+    color: #8a6410;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    margin-bottom: 16px;
+    line-height: 1.55;
+  }
+  .mb-hint code {
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #0b3b4b;
+    border: 1px solid #e6f0f5;
+  }
+  .mb-currency-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 40px;
+    background: #e1f0f8;
+    color: #0d6e9e;
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header id="site-header"></header>
+
+<main class="mp-page">
+  <div class="mp-container">
+    <div class="mp-page-head row">
+      <div>
+        <h1>My Bills</h1>
+        <p class="sub">Invoices sent to you by the hospital</p>
+      </div>
+      <button class="btn btn-outline" id="mbRefresh" type="button">
+        <i class="fas fa-rotate"></i> Refresh
+      </button>
+    </div>
+
+    <div id="mbUserBanner"></div>
+    <div id="mbHost"></div>
+  </div>
+</main>
+
+<footer id="site-footer"></footer>
+
+<script src="shared.js"></script>
+<script src="public-extras.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* =====================================================
+     SELF-CONTAINED CURRENCY HELPERS
+     No external dependency — reads settings directly from
+     the same localStorage key the dashboard writes.
+  ===================================================== */
+  var SETTINGS_KEY = 'medicare_global_settings';
+
+  var SYMBOLS = {
+    PKR:'₨', INR:'₹', BDT:'৳', LKR:'Rs', NPR:'रू', CNY:'¥', JPY:'¥',
+    KRW:'₩', IDR:'Rp', MYR:'RM', SGD:'S$', THB:'฿', VND:'₫', PHP:'₱',
+    HKD:'HK$', TWD:'NT$', AED:'د.إ', SAR:'﷼', QAR:'ر.ق', KWD:'د.ك',
+    BHD:'BD', OMR:'ر.ع.', JOD:'JD', LBP:'ل.ل', ILS:'₪', TRY:'₺',
+    IRR:'﷼', IQD:'ع.د', EGP:'E£', ZAR:'R', NGN:'₦', KES:'KSh',
+    GHS:'₵', MAD:'DH', TND:'د.ت', DZD:'د.ج', ETB:'Br', TZS:'TSh',
+    UGX:'USh', GBP:'£', EUR:'€', CHF:'CHF', SEK:'kr', NOK:'kr',
+    DKK:'kr', PLN:'zł', CZK:'Kč', HUF:'Ft', RON:'lei', RUB:'₽',
+    UAH:'₴', ISK:'kr', USD:'$', CAD:'C$', MXN:'MX$', BRL:'R$',
+    ARS:'$', CLP:'$', COP:'$', PEN:'S/', AUD:'A$', NZD:'NZ$'
+  };
+
+  function getSettings() {
+    try {
+      var s = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
+      if (!s.currency) s.currency = 'USD';
+      if (!s.country)  s.country  = 'US';
+      return s;
+    } catch (e) {
+      return { currency: 'USD', country: 'US' };
+    }
+  }
+
+  function symbolOf(code) {
+    if (window.GlobalSupport && window.GlobalSupport.currencySymbol) {
+      try { return window.GlobalSupport.currencySymbol(code); } catch (e) {}
+    }
+    return SYMBOLS[code] || code;
+  }
+
+  function money(n) {
+    /* Prefer GlobalSupport if it happens to be loaded */
+    if (window.GlobalSupport && typeof window.GlobalSupport.money === 'function') {
+      try { return window.GlobalSupport.money(n); } catch (e) {}
+    }
+    var code = getSettings().currency;
+    var num  = Number(n) || 0;
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: code,
+        maximumFractionDigits: 2
+      }).format(num);
+    } catch (e) {
+      return symbolOf(code) + num.toFixed(2);
+    }
+  }
+
+  /* =====================================================
+     PAGE HELPERS
+  ===================================================== */
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  };
+  var norm = function (s) { return String(s || '').trim().toLowerCase(); };
+
+  var KEY = 'medicare_patient_bills_v1';
+
+  function allBills() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || []; }
+    catch (e) { return []; }
+  }
+
+  /* =====================================================
+     RENDER
+  ===================================================== */
+  function render() {
+    var bannerHost = document.getElementById('mbUserBanner');
+    var host       = document.getElementById('mbHost');
+    if (!host) return;
+
+    var user = (typeof UserAuth !== 'undefined') ? UserAuth.current() : null;
+    var settings = getSettings();
+    var currencyPillHTML =
+      '<span class="mb-currency-pill">' +
+        '<i class="fas fa-coins"></i> ' +
+        esc(settings.currency) + ' ' + esc(symbolOf(settings.currency)) +
+      '</span>';
+
+    /* ---------- Not signed in ---------- */
+    if (!user) {
+      bannerHost.innerHTML = '';
+      host.innerHTML =
+        '<div class="mp-empty">' +
+          '<i class="fas fa-lock"></i>' +
+          '<h3>Please sign in to view your bills</h3>' +
+          '<p>Your bills are linked to your account email.</p>' +
+          '<div style="margin-top:16px;">' +
+            '<button class="btn btn-primary" onclick="openAuthPopup(\'login\')">' +
+              '<i class="fas fa-sign-in-alt"></i> Sign In' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+      return;
+    }
+
+    var myEmail = norm(user.email);
+    var myName  = norm(user.name);
+    var all     = allBills();
+
+    /* ---------- User banner ---------- */
+    bannerHost.innerHTML =
+      '<div class="mb-user-banner">' +
+        '<div class="icon">' + esc(user.initials || 'U') + '</div>' +
+        '<div class="meta">' +
+          '<strong>Signed in as ' + esc(user.name) + currencyPillHTML + '</strong>' +
+          '<span>Bills for <code style="background:#f1f7fb;padding:1px 6px;border-radius:5px;color:#0b3b4b;">' +
+            esc(user.email || '(no email on account)') +
+          '</code></span>' +
+        '</div>' +
+      '</div>';
+
+    /* ---------- Match bills by email OR name ---------- */
+    var mine = all.filter(function (b) {
+      var bEmail = norm(b.patientEmail);
+      var bName  = norm(b.patientName);
+      return (myEmail && bEmail && bEmail === myEmail) ||
+             (myName  && bName  && bName  === myName);
+    }).sort(function (a, b) {
+      return new Date(b.date) - new Date(a.date);
+    });
+
+    /* ---------- Empty state ---------- */
+    if (!mine.length) {
+      var emailsWithBills = [];
+      var seen = {};
+      all.forEach(function (b) {
+        var e = norm(b.patientEmail);
+        if (e && !seen[e]) { seen[e] = 1; emailsWithBills.push(e); }
+      });
+
+      var hint = '';
+      if (all.length === 0) {
+        hint =
+          '<div class="mb-hint">' +
+            '<strong>No bills found in storage.</strong> ' +
+            'Open the dashboard as staff, go to <strong>Patient Bills</strong>, click ' +
+            '<strong>Create Bill</strong>, and save one first.' +
+          '</div>';
+      } else {
+        hint =
+          '<div class="mb-hint">' +
+            '<strong>' + all.length + '</strong> bill(s) exist in the system, but none match your account.<br>' +
+            'Your account email is <code>' + esc(user.email || '(none)') + '</code>.<br>' +
+            (emailsWithBills.length
+              ? 'Bills exist for these emails: ' +
+                emailsWithBills.map(function (e) { return '<code>' + esc(e) + '</code>'; }).join(', ') +
+                '<br>'
+              : '') +
+            '<span style="opacity:.8;">Tip: on the dashboard, make sure the Patient Email field exactly matches your account email above.</span>' +
+          '</div>';
+      }
+
+      host.innerHTML = hint +
+        '<div class="mp-empty">' +
+          '<i class="fas fa-receipt"></i>' +
+          '<h3>No bills for you yet</h3>' +
+          '<p>When the hospital sends a bill to your email, it will appear here.</p>' +
+        '</div>';
+      return;
+    }
+
+    /* ---------- Summary ---------- */
+    var total = mine.reduce(function (s, b) { return s + (Number(b.total) || 0); }, 0);
+    var paid  = mine.filter(function (b) { return b.status === 'Paid'; })
+                    .reduce(function (s, b) { return s + (Number(b.total) || 0); }, 0);
+    var pending = mine.filter(function (b) { return b.status !== 'Paid'; })
+                      .reduce(function (s, b) { return s + (Number(b.total) || 0); }, 0);
+
+    host.innerHTML =
+      '<div class="mp-cards" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); margin-bottom:22px;">' +
+        '<div class="mp-card"><div>' +
+          '<div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Total Billed</div>' +
+          '<div style="font-size:26px;font-weight:800;color:#0b3b4b;margin-top:4px;">' + money(total) + '</div>' +
+        '</div></div>' +
+        '<div class="mp-card"><div>' +
+          '<div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Paid</div>' +
+          '<div style="font-size:26px;font-weight:800;color:#0e8b5e;margin-top:4px;">' + money(paid) + '</div>' +
+        '</div></div>' +
+        '<div class="mp-card"><div>' +
+          '<div class="muted" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Pending</div>' +
+          '<div style="font-size:26px;font-weight:800;color:#c9791e;margin-top:4px;">' + money(pending) + '</div>' +
+        '</div></div>' +
+      '</div>' +
+
+      '<div class="mp-tbl-wrap">' +
+        '<table class="mp-tbl">' +
+          '<thead>' +
+            '<tr><th>Bill No</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr>' +
+          '</thead>' +
+          '<tbody>' +
+            mine.map(function (b) {
+              var itemsTxt = (b.items || []).map(function (i) {
+                return esc(i.description || '');
+              }).join(', ') || '—';
+              return '<tr>' +
+                '<td><strong>' + esc(b.billNo) + '</strong></td>' +
+                '<td>' + new Date(b.date).toLocaleDateString() + '</td>' +
+                '<td>' + itemsTxt + '</td>' +
+                '<td><strong>' + money(b.total) + '</strong></td>' +
+                '<td><span class="mp-badge ' + (b.status === 'Paid' ? 'paid' : 'pending') + '">' +
+                  esc(b.status) + '</span></td>' +
+              '</tr>';
+            }).join('') +
+          '</tbody>' +
+        '</table>' +
+      '</div>';
+  }
+
+  /* =====================================================
+     EVENT LISTENERS
+  ===================================================== */
+
+  /* Manual refresh */
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#mbRefresh')) render();
+  });
+
+  /* Re-render when auth slot changes (login/logout) */
+  var slot = document.getElementById('navAuthSlot');
+  if (slot && window.MutationObserver) {
+    new MutationObserver(render).observe(slot, { childList: true, subtree: true });
+  }
+
+  /* Re-render when bills change in another tab */
+  window.addEventListener('storage', function (e) {
+    if (e.key === KEY || e.key === SETTINGS_KEY) render();
+  });
+
+  /* Re-render on our custom event */
+  window.addEventListener('medicare:changed', function (e) {
+    if (!e.detail || e.detail.key === KEY) render();
+  });
+
+  /* Re-render when currency changes */
+  window.addEventListener('medicare:settings-changed', render);
+
+  /* Re-render when the user comes back to this tab */
+  window.addEventListener('focus', render);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) render();
+  });
+
+  /* Initial paint */
+  setTimeout(render, 80);
+})();
+</script>
+</body>
+</html>

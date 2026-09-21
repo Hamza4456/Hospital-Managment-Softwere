@@ -271,6 +271,8 @@ body {
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
   transition: transform 0.15s, box-shadow 0.2s;
+  min-width: 0;
+  overflow: visible;
 }
 
 .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(0,80,110,0.12); }
@@ -291,9 +293,50 @@ body {
 .stat-icon.purple { background: #eee9fd; color: #6c4bc9; }
 .stat-icon.red { background: #fdecef; color: #e84a5f; }
 
-.stat-content h3 { font-size: 26px; font-weight: 800; color: var(--dark); line-height: 1.2; }
-.stat-content p { font-size: 13px; color: var(--gray); font-weight: 500; margin-bottom: 4px; }
-.stat-trend { font-size: 12px; font-weight: 600; color: var(--success); display: flex; align-items: center; gap: 4px; }
+/* ===== STAT TEXT — FIXED (no clipping) ===== */
+.stat-content {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  overflow: visible;
+}
+
+.stat-content h3 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--dark);
+  line-height: 1.4;         /* was 1.2 — this was clipping the letters */
+  padding: 2px 0;           /* breathing room above/below */
+  margin: 0;
+  white-space: nowrap;
+  overflow: visible;
+  letter-spacing: -0.3px;
+}
+
+.stat-content p {
+  font-size: 13px;
+  color: var(--gray);
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.stat-trend {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .stat-trend.down { color: var(--danger); }
 
 .card {
@@ -789,7 +832,7 @@ input:-webkit-autofill:active {
   flex-shrink: 0;
 }
 
-/* ===== SIDEBAR BACKDROP (mobile) ===== */
+/* ===== SIDEBAR BACKDROP ===== */
 .sidebar-backdrop {
   display: none;
   position: fixed;
@@ -891,7 +934,7 @@ input:-webkit-autofill:active {
 .auth-back i { font-size: 12px; }
 
 /* =====================================================
-   BOOKING REQUESTS — added
+   BOOKING REQUESTS
 ===================================================== */
 .filter-bar {
   background: #fff;
@@ -1146,6 +1189,8 @@ input:-webkit-autofill:active {
 
   .bk-actions { width: 100%; }
   .bk-actions .btn { flex: 1; }
+
+  #currencyPill { display: none; }
 }
 
 @media (max-width: 380px) {
@@ -1274,7 +1319,6 @@ input:-webkit-autofill:active {
 <!-- MAIN APP -->
 <div class="app-container" id="appContainer" style="display:none;">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon"><i class="fas fa-hospital"></i></div>
@@ -1287,55 +1331,28 @@ input:-webkit-autofill:active {
     <nav>
       <div class="nav-section">
         <div class="nav-label">Main</div>
-        <a class="nav-item active" data-page="dashboard">
-          <i class="fas fa-chart-pie"></i> Dashboard
-        </a>
-        <a class="nav-item" data-page="patients">
-          <i class="fas fa-user-injured"></i> Patients
-          <span class="badge-count" id="navPatientCount">0</span>
-        </a>
-        <a class="nav-item" data-page="appointments">
-          <i class="fas fa-calendar-check"></i> Appointments
-          <span class="badge-count" id="navApptCount">0</span>
-        </a>
-        <a class="nav-item" data-page="bookings">
-          <i class="fas fa-calendar-plus"></i> Booking Requests
-          <span class="badge-count" id="navBookingCount" style="display:none;">0</span>
-        </a>
-        <a class="nav-item" data-page="doctors">
-          <i class="fas fa-user-md"></i> Doctors
-        </a>
+        <a class="nav-item active" data-page="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a class="nav-item" data-page="patients"><i class="fas fa-user-injured"></i> Patients <span class="badge-count" id="navPatientCount">0</span></a>
+        <a class="nav-item" data-page="appointments"><i class="fas fa-calendar-check"></i> Appointments <span class="badge-count" id="navApptCount">0</span></a>
+        <a class="nav-item" data-page="bookings"><i class="fas fa-calendar-plus"></i> Booking Requests <span class="badge-count" id="navBookingCount" style="display:none;">0</span></a>
+        <a class="nav-item" data-page="doctors"><i class="fas fa-user-md"></i> Doctors</a>
       </div>
       <div class="nav-section">
         <div class="nav-label">Operations</div>
-        <a class="nav-item" data-page="departments">
-          <i class="fas fa-building"></i> Departments
-        </a>
-        <a class="nav-item" data-page="services">
-          <i class="fas fa-hand-holding-medical"></i> Services
-        </a>
-        <a class="nav-item" data-page="billing">
-          <i class="fas fa-file-invoice-dollar"></i> Billing
-        </a>
-        <a class="nav-item" data-page="reports">
-          <i class="fas fa-chart-line"></i> Reports
-        </a>
+        <a class="nav-item" data-page="departments"><i class="fas fa-building"></i> Departments</a>
+        <a class="nav-item" data-page="services"><i class="fas fa-hand-holding-medical"></i> Services</a>
+        <a class="nav-item" data-page="billing"><i class="fas fa-file-invoice-dollar"></i> Billing</a>
+        <a class="nav-item" data-page="reports"><i class="fas fa-chart-line"></i> Reports</a>
       </div>
       <div class="nav-section">
         <div class="nav-label">Account</div>
-        <a class="nav-item" data-page="settings">
-          <i class="fas fa-cog"></i> Settings
-        </a>
-        <a class="nav-item" id="logoutBtn">
-          <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
+        <a class="nav-item" data-page="settings"><i class="fas fa-cog"></i> Settings</a>
+        <a class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </div>
     </nav>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <main class="main-content">
-    <!-- TOP BAR -->
     <div class="topbar">
       <div style="display:flex; align-items:center; gap:14px; min-width:0; flex:1;">
         <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
@@ -1369,7 +1386,7 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- ========== PAGE: DASHBOARD ========== -->
+    <!-- PAGE: DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="stats-grid">
         <div class="stat-card">
@@ -1424,22 +1441,17 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- ========== PAGE: PATIENTS ========== -->
+    <!-- PAGE: PATIENTS -->
     <div class="page" id="page-patients">
       <div class="card">
         <div class="card-header">
           <h2><i class="fas fa-user-injured"></i> Patient Records</h2>
-          <button class="btn btn-primary btn-sm" onclick="openPatientModal()">
-            <i class="fas fa-plus"></i> Add Patient
-          </button>
+          <button class="btn btn-primary btn-sm" onclick="openPatientModal()"><i class="fas fa-plus"></i> Add Patient</button>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr>
-                <th>ID</th><th>Patient Name</th><th>Age</th><th>Gender</th>
-                <th>Phone</th><th>Department</th><th>Status</th><th>Actions</th>
-              </tr>
+              <tr><th>ID</th><th>Patient Name</th><th>Age</th><th>Gender</th><th>Phone</th><th>Department</th><th>Status</th><th>Actions</th></tr>
             </thead>
             <tbody id="patientsTableBody"></tbody>
           </table>
@@ -1447,22 +1459,17 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- ========== PAGE: APPOINTMENTS ========== -->
+    <!-- PAGE: APPOINTMENTS -->
     <div class="page" id="page-appointments">
       <div class="card">
         <div class="card-header">
           <h2><i class="fas fa-calendar-check"></i> All Appointments</h2>
-          <button class="btn btn-primary btn-sm" onclick="openApptModal()">
-            <i class="fas fa-plus"></i> New Appointment
-          </button>
+          <button class="btn btn-primary btn-sm" onclick="openApptModal()"><i class="fas fa-plus"></i> New Appointment</button>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr>
-                <th>ID</th><th>Patient</th><th>Doctor</th><th>Department</th>
-                <th>Date & Time</th><th>Status</th><th>Actions</th>
-              </tr>
+              <tr><th>ID</th><th>Patient</th><th>Doctor</th><th>Department</th><th>Date & Time</th><th>Status</th><th>Actions</th></tr>
             </thead>
             <tbody id="apptTableBody"></tbody>
           </table>
@@ -1470,7 +1477,7 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- ========== PAGE: BOOKING REQUESTS ========== -->
+    <!-- PAGE: BOOKINGS -->
     <div class="page" id="page-bookings">
       <div class="filter-bar">
         <div class="chips" id="bookingChips">
@@ -1484,53 +1491,45 @@ input:-webkit-autofill:active {
           <i class="fas fa-search"></i>
           <input type="text" id="searchBookings" placeholder="Search patient, doctor…">
         </div>
-        <button class="btn btn-success btn-sm" id="confirmAllBookings">
-          <i class="fas fa-check-double"></i> Confirm all pending
-        </button>
+        <button class="btn btn-success btn-sm" id="confirmAllBookings"><i class="fas fa-check-double"></i> Confirm all pending</button>
       </div>
       <div class="bk-list" id="bookingsList"></div>
     </div>
 
-    <!-- ========== PAGE: DOCTORS ========== -->
+    <!-- PAGE: DOCTORS -->
     <div class="page" id="page-doctors">
       <div class="card">
         <div class="card-header">
           <h2><i class="fas fa-user-md"></i> Medical Staff</h2>
-          <button class="btn btn-primary btn-sm" onclick="openDoctorModal()">
-            <i class="fas fa-plus"></i> Add Doctor
-          </button>
+          <button class="btn btn-primary btn-sm" onclick="openDoctorModal()"><i class="fas fa-plus"></i> Add Doctor</button>
         </div>
         <div class="grid-3" id="doctorsGrid"></div>
       </div>
     </div>
 
-    <!-- ========== PAGE: DEPARTMENTS ========== -->
+    <!-- PAGE: DEPARTMENTS -->
     <div class="page" id="page-departments">
       <div class="card">
         <div class="card-header">
           <h2><i class="fas fa-building"></i> Department Management</h2>
-          <button class="btn btn-primary btn-sm" onclick="openDeptModal()">
-            <i class="fas fa-plus"></i> Add Department
-          </button>
+          <button class="btn btn-primary btn-sm" onclick="openDeptModal()"><i class="fas fa-plus"></i> Add Department</button>
         </div>
         <div id="deptFullList"></div>
       </div>
     </div>
 
-    <!-- ========== PAGE: SERVICES ========== -->
+    <!-- PAGE: SERVICES -->
     <div class="page" id="page-services">
       <div class="card">
         <div class="card-header">
           <h2><i class="fas fa-hand-holding-medical"></i> Hospital Services</h2>
-          <button class="btn btn-primary btn-sm" onclick="openServiceModal()">
-            <i class="fas fa-plus"></i> Add Service
-          </button>
+          <button class="btn btn-primary btn-sm" onclick="openServiceModal()"><i class="fas fa-plus"></i> Add Service</button>
         </div>
         <div class="grid-3" id="servicesGrid"></div>
       </div>
     </div>
 
-    <!-- ========== PAGE: BILLING ========== -->
+    <!-- PAGE: BILLING -->
     <div class="page" id="page-billing">
       <div class="stats-grid">
         <div class="stat-card">
@@ -1569,9 +1568,7 @@ input:-webkit-autofill:active {
       <div class="card">
         <div class="card-header">
           <h2><i class="fas fa-file-invoice-dollar"></i> Recent Invoices</h2>
-          <button class="btn btn-primary btn-sm" onclick="openInvoiceModal()">
-            <i class="fas fa-plus"></i> Create Invoice
-          </button>
+          <button class="btn btn-primary btn-sm" onclick="openInvoiceModal()"><i class="fas fa-plus"></i> Create Invoice</button>
         </div>
         <div class="table-wrap">
           <table>
@@ -1584,40 +1581,24 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- ========== PAGE: REPORTS ========== -->
+    <!-- PAGE: REPORTS -->
     <div class="page" id="page-reports">
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon blue"><i class="fas fa-chart-line"></i></div>
-          <div class="stat-content">
-            <p>Monthly Admissions</p>
-            <h3>324</h3>
-            <div class="stat-trend"><i class="fas fa-arrow-up"></i> 12% growth</div>
-          </div>
+          <div class="stat-content"><p>Monthly Admissions</p><h3>324</h3><div class="stat-trend"><i class="fas fa-arrow-up"></i> 12% growth</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon green"><i class="fas fa-heartbeat"></i></div>
-          <div class="stat-content">
-            <p>Recovery Rate</p>
-            <h3>94.2%</h3>
-            <div class="stat-trend"><i class="fas fa-arrow-up"></i> 2.1%</div>
-          </div>
+          <div class="stat-content"><p>Recovery Rate</p><h3>94.2%</h3><div class="stat-trend"><i class="fas fa-arrow-up"></i> 2.1%</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon purple"><i class="fas fa-hourglass-half"></i></div>
-          <div class="stat-content">
-            <p>Avg. Stay Duration</p>
-            <h3>4.2 days</h3>
-            <div class="stat-trend down"><i class="fas fa-arrow-down"></i> 0.5 days</div>
-          </div>
+          <div class="stat-content"><p>Avg. Stay Duration</p><h3>4.2 days</h3><div class="stat-trend down"><i class="fas fa-arrow-down"></i> 0.5 days</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon orange"><i class="fas fa-star"></i></div>
-          <div class="stat-content">
-            <p>Patient Satisfaction</p>
-            <h3>4.8/5</h3>
-            <div class="stat-trend"><i class="fas fa-arrow-up"></i> 0.2</div>
-          </div>
+          <div class="stat-content"><p>Patient Satisfaction</p><h3>4.8/5</h3><div class="stat-trend"><i class="fas fa-arrow-up"></i> 0.2</div></div>
         </div>
       </div>
       <div class="grid-2">
@@ -1632,54 +1613,29 @@ input:-webkit-autofill:active {
       </div>
     </div>
 
-    <!-- ========== PAGE: SETTINGS ========== -->
+    <!-- PAGE: SETTINGS -->
     <div class="page" id="page-settings">
       <div class="grid-2">
         <div class="card">
           <div class="card-header"><h2><i class="fas fa-user"></i> Profile Information</h2></div>
-          <div class="form-group">
-            <label>Username</label>
-            <input type="text" id="settingUsername" readonly style="background:#eef4f8; cursor:not-allowed; color:#5e7e8c;">
-          </div>
-          <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="settingName" value="">
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="settingEmail" value="">
-          </div>
-          <div class="form-group">
-            <label>Role</label>
-            <input type="text" id="settingRole" value="Administrator">
-          </div>
+          <div class="form-group"><label>Username</label><input type="text" id="settingUsername" readonly style="background:#eef4f8; cursor:not-allowed; color:#5e7e8c;"></div>
+          <div class="form-group"><label>Full Name</label><input type="text" id="settingName" value=""></div>
+          <div class="form-group"><label>Email</label><input type="email" id="settingEmail" value=""></div>
+          <div class="form-group"><label>Role</label><input type="text" id="settingRole" value="Administrator"></div>
           <button class="btn btn-primary" onclick="saveSettings()" style="width:100%;"><i class="fas fa-save"></i> Save Changes</button>
         </div>
 
         <div class="card">
           <div class="card-header"><h2><i class="fas fa-hospital"></i> Hospital Information</h2></div>
-          <div class="form-group">
-            <label>Hospital Name</label>
-            <input type="text" value="MediCare General Hospital">
-          </div>
-          <div class="form-group">
-            <label>Address</label>
-            <input type="text" value="123 Health Ave, Medical District">
-          </div>
-          <div class="form-group">
-            <label>Contact</label>
-            <input type="text" value="+1 (555) 123-4567">
-          </div>
+          <div class="form-group"><label>Hospital Name</label><input type="text" value="MediCare General Hospital"></div>
+          <div class="form-group"><label>Address</label><input type="text" value="123 Health Ave, Medical District"></div>
+          <div class="form-group"><label>Contact</label><input type="text" value="+1 (555) 123-4567"></div>
           <button class="btn btn-primary" onclick="showToast('Hospital info saved!', 'success')" style="width:100%;"><i class="fas fa-save"></i> Save</button>
         </div>
 
         <div class="card">
           <div class="card-header"><h2><i class="fas fa-lock"></i> Change Password</h2></div>
-
-          <div class="auth-error" id="pwError" style="margin-bottom:16px;">
-            <i class="fas fa-exclamation-circle"></i><span></span>
-          </div>
-
+          <div class="auth-error" id="pwError" style="margin-bottom:16px;"><i class="fas fa-exclamation-circle"></i><span></span></div>
           <div class="form-group">
             <label>Current Password</label>
             <div class="pass-wrap">
@@ -1687,7 +1643,6 @@ input:-webkit-autofill:active {
               <button type="button" class="pass-toggle" data-target="pwCurrent"><i class="fas fa-eye"></i></button>
             </div>
           </div>
-
           <div class="form-group">
             <label>New Password</label>
             <div class="pass-wrap">
@@ -1697,7 +1652,6 @@ input:-webkit-autofill:active {
             <div class="strength"><div class="strength-fill" id="pwStrength"></div></div>
             <div class="strength-text" id="pwStrengthText">Use 8+ characters with letters, numbers &amp; a symbol</div>
           </div>
-
           <div class="form-group">
             <label>Confirm New Password</label>
             <div class="pass-wrap">
@@ -1705,8 +1659,30 @@ input:-webkit-autofill:active {
               <button type="button" class="pass-toggle" data-target="pwConfirm"><i class="fas fa-eye"></i></button>
             </div>
           </div>
-
           <button class="btn btn-primary" onclick="changePassword()" style="width:100%;"><i class="fas fa-key"></i> Update Password</button>
+        </div>
+
+        <div class="card" id="globalRegionCard">
+          <div class="card-header"><h2><i class="fas fa-globe"></i> Region &amp; Currency</h2></div>
+          <div class="form-group">
+            <label>Country</label>
+            <select id="setCountry"></select>
+          </div>
+          <div class="form-group">
+            <label>Currency (pick any country's currency)</label>
+            <select id="setCurrency"></select>
+          </div>
+          <div style="background:#f5fafd;border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7a8b96;">Preview</div>
+              <div id="currencyPreviewAmount" style="font-size:22px;font-weight:800;color:#0b3b4b;margin-top:2px;">—</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7a8b96;">Code</div>
+              <div id="currencyPreviewCode" style="font-size:14px;font-weight:700;color:#0d6e9e;margin-top:2px;">—</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="saveRegionBtn" style="width:100%;"><i class="fas fa-save"></i> Save Region &amp; Currency</button>
         </div>
       </div>
     </div>
@@ -1722,9 +1698,24 @@ input:-webkit-autofill:active {
 <!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- shared.js loads the booking store -->
+<!-- =========================================================
+     SCRIPTS
+========================================================= -->
 <script src="shared.js"></script>
+<script src="global-support.js"></script>
+<link rel="stylesheet" href="admin-extras.css">
+<script src="admin-extras.js"></script>
+
 <script>
+/* =====================================================
+   CURRENCY HELPER
+===================================================== */
+const money = (n) => (window.GlobalSupport && window.GlobalSupport.money)
+  ? window.GlobalSupport.money(n)
+  : (window.CurrencyHelper && window.CurrencyHelper.money)
+    ? window.CurrencyHelper.money(n)
+    : ('$' + (Number(n) || 0).toFixed(2));
+
 /* =====================================================
    DATA LAYER
 ===================================================== */
@@ -1750,15 +1741,7 @@ const DB = {
   },
   seed() {
     return {
-      user: {
-        username: null,
-        passwordHash: null,
-        name: 'Administrator',
-        email: '',
-        role: 'Administrator',
-        initials: 'AD',
-        createdAt: null
-      },
+      user: { username: null, passwordHash: null, name: 'Administrator', email: '', role: 'Administrator', initials: 'AD', createdAt: null },
       patients: [
         { id: 'P-1001', name: 'James Sullivan', age: 45, gender: 'Male', phone: '+1 555-0101', dept: 'Cardiology', status: 'Admitted' },
         { id: 'P-1002', name: 'Maria Garcia', age: 32, gender: 'Female', phone: '+1 555-0102', dept: 'Neurology', status: 'Outpatient' },
@@ -1817,49 +1800,31 @@ const DB = {
 
 DB.init();
 
-/* =====================================================
-   NEW HELPER — merged appointment source
-   Combines DB.appointments + UserAuth.getAllBookings()
-   so patient bookings appear in Appointments / Dashboard
-===================================================== */
 function getAllAppointments() {
   const dbAppts  = (DB.get().appointments || []).slice();
   const bookings = (typeof UserAuth !== 'undefined' && UserAuth.getAllBookings)
-    ? UserAuth.getAllBookings()
-    : [];
-
-  /* Convert each booking into the appointment shape */
+    ? UserAuth.getAllBookings() : [];
   const fromBookings = bookings.map(b => ({
-    id:       b.id,
-    patient:  b.patientName || b.userName || '—',
-    doctor:   b.doctorName  || '—',
-    dept:     b.department  || '—',
+    id: b.id, patient: b.patientName || b.userName || '—',
+    doctor: b.doctorName || '—', dept: b.department || '—',
     datetime: `${b.date || ''}T${b.time || '00:00'}`,
-    status:   b.status || 'Pending',
-    _fromBooking: true
+    status: b.status || 'Pending', _fromBooking: true
   }));
-
-  /* Bookings override any DB appointment with the same id */
   const bookingIds = new Set(fromBookings.map(b => b.id));
   const merged = dbAppts.filter(a => !bookingIds.has(a.id));
   return merged.concat(fromBookings);
 }
 
-/* =====================================================
-   AUTH ENGINE
-===================================================== */
 const Auth = {
   SALT: 'medicare::hms::v2::salt',
   SESSION_KEY: 'medicare_session',
-
   async hash(password) {
     const input = this.SALT + '|' + password;
     if (window.crypto && window.crypto.subtle && window.isSecureContext) {
       try {
         const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-        return 'sha256:' + Array.from(new Uint8Array(buf))
-          .map(b => b.toString(16).padStart(2, '0')).join('');
-      } catch (e) { /* fall through */ }
+        return 'sha256:' + Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (e) {}
     }
     let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
     for (let i = 0; i < input.length; i++) {
@@ -1871,34 +1836,18 @@ const Auth = {
     h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
     return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
   },
-
-  hasAccount() {
-    const u = DB.get().user;
-    return !!(u && u.username && u.passwordHash);
-  },
-
+  hasAccount() { const u = DB.get().user; return !!(u && u.username && u.passwordHash); },
   async register({ name, username, password }) {
     const passwordHash = await this.hash(password);
     const initials = (name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
-    DB.update(d => {
-      d.user = {
-        ...d.user,
-        name: name.trim(),
-        username: username.trim(),
-        passwordHash,
-        initials,
-        createdAt: new Date().toISOString()
-      };
-    });
+    DB.update(d => { d.user = { ...d.user, name: name.trim(), username: username.trim(), passwordHash, initials, createdAt: new Date().toISOString() }; });
   },
-
   async login(username, password) {
     const u = DB.get().user;
     if (!u || !u.username) return false;
     if (u.username.toLowerCase() !== String(username).trim().toLowerCase()) return false;
     return (await this.hash(password)) === u.passwordHash;
   },
-
   async changePassword(current, next) {
     const u = DB.get().user;
     if ((await this.hash(current)) !== u.passwordHash) return false;
@@ -1906,16 +1855,8 @@ const Auth = {
     DB.update(d => { d.user.passwordHash = passwordHash; });
     return true;
   },
-
-  setSession() {
-    sessionStorage.setItem(this.SESSION_KEY, JSON.stringify({
-      u: DB.get().user.username,
-      t: Date.now()
-    }));
-  },
-
+  setSession() { sessionStorage.setItem(this.SESSION_KEY, JSON.stringify({ u: DB.get().user.username, t: Date.now() })); },
   clearSession() { sessionStorage.removeItem(this.SESSION_KEY); },
-
   isLoggedIn() {
     const raw = sessionStorage.getItem(this.SESSION_KEY);
     if (!raw) return false;
@@ -1927,31 +1868,22 @@ const Auth = {
   }
 };
 
-/* =====================================================
-   AUTH SCREEN CONTROL
-===================================================== */
 function showScreen(id) {
   document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('show'));
   const el = document.getElementById(id);
   if (el) el.classList.add('show');
   document.body.style.overflow = 'hidden';
 }
-
 function hideScreens() {
   document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('show'));
   document.body.style.overflow = '';
 }
-
 function showAuthError(elId, message) {
   const el = document.getElementById(elId);
   el.querySelector('span').textContent = message;
   el.classList.add('show');
 }
-
-function clearAuthError(elId) {
-  document.getElementById(elId).classList.remove('show');
-}
-
+function clearAuthError(elId) { document.getElementById(elId).classList.remove('show'); }
 function markFieldError(inputEl) {
   if (!inputEl) return;
   const group = inputEl.closest('.form-group');
@@ -1961,20 +1893,13 @@ function markFieldError(inputEl) {
   inputEl.addEventListener('input', clear, { once: true });
   inputEl.addEventListener('change', clear, { once: true });
 }
-
-function clearFieldErrors(scope) {
-  (scope || document)
-    .querySelectorAll('.form-group.error')
-    .forEach(g => g.classList.remove('error'));
-}
-
+function clearFieldErrors(scope) { (scope || document).querySelectorAll('.form-group.error').forEach(g => g.classList.remove('error')); }
 function validatePassword(pw) {
   if (pw.length < 8) return 'Password must be at least 8 characters long.';
   if (!/[A-Za-z]/.test(pw)) return 'Password must contain at least one letter.';
   if (!/\d/.test(pw)) return 'Password must contain at least one number.';
   return null;
 }
-
 function scorePassword(pw) {
   if (!pw) return 0;
   let s = 0;
@@ -1985,13 +1910,12 @@ function scorePassword(pw) {
   if (/[^A-Za-z0-9]/.test(pw)) s++;
   return Math.min(s, 4);
 }
-
 function updateStrength(inputEl, barEl, labelEl) {
   const map = [
-    { w: '0%',   c: 'transparent',    t: 'Use 8+ characters with letters, numbers & a symbol', col: 'var(--gray)' },
-    { w: '25%',  c: 'var(--danger)',  t: 'Weak password',   col: 'var(--danger)' },
-    { w: '50%',  c: 'var(--warning)', t: 'Fair password',   col: 'var(--warning)' },
-    { w: '75%',  c: 'var(--primary)', t: 'Good password',   col: 'var(--primary)' },
+    { w: '0%', c: 'transparent', t: 'Use 8+ characters with letters, numbers & a symbol', col: 'var(--gray)' },
+    { w: '25%', c: 'var(--danger)', t: 'Weak password', col: 'var(--danger)' },
+    { w: '50%', c: 'var(--warning)', t: 'Fair password', col: 'var(--warning)' },
+    { w: '75%', c: 'var(--primary)', t: 'Good password', col: 'var(--primary)' },
     { w: '100%', c: 'var(--success)', t: 'Strong password', col: 'var(--success)' }
   ][scorePassword(inputEl.value)];
   barEl.style.width = map.w;
@@ -2011,85 +1935,50 @@ document.addEventListener('click', (e) => {
 });
 
 (function bindStrengthMeters() {
-  const pairs = [
-    ['suPass', 'suStrength', 'suStrengthText'],
-    ['pwNew',  'pwStrength', 'pwStrengthText']
-  ];
+  const pairs = [['suPass', 'suStrength', 'suStrengthText'], ['pwNew', 'pwStrength', 'pwStrengthText']];
   pairs.forEach(([i, b, l]) => {
     const input = document.getElementById(i);
     if (!input) return;
-    input.addEventListener('input', () =>
-      updateStrength(input, document.getElementById(b), document.getElementById(l))
-    );
+    input.addEventListener('input', () => updateStrength(input, document.getElementById(b), document.getElementById(l)));
   });
 })();
 
-/* =====================================================
-   SETUP FORM
-===================================================== */
 document.getElementById('setupForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   clearAuthError('setupError');
   clearFieldErrors(document.getElementById('setupForm'));
-
   const name = document.getElementById('suName').value.trim();
   const username = document.getElementById('suUser').value.trim();
   const pw = document.getElementById('suPass').value;
   const pw2 = document.getElementById('suPass2').value;
-
-  if (name.length < 2) {
-    markFieldError(document.getElementById('suName'));
-    return showAuthError('setupError', 'Please enter your full name.');
-  }
-  if (!/^[A-Za-z0-9._-]{4,20}$/.test(username)) {
-    markFieldError(document.getElementById('suUser'));
-    return showAuthError('setupError', 'Username must be 4–20 characters (letters, numbers, . _ -).');
-  }
+  if (name.length < 2) { markFieldError(document.getElementById('suName')); return showAuthError('setupError', 'Please enter your full name.'); }
+  if (!/^[A-Za-z0-9._-]{4,20}$/.test(username)) { markFieldError(document.getElementById('suUser')); return showAuthError('setupError', 'Username must be 4–20 characters (letters, numbers, . _ -).'); }
   const rule = validatePassword(pw);
-  if (rule) {
-    markFieldError(document.getElementById('suPass'));
-    return showAuthError('setupError', rule);
-  }
-  if (pw !== pw2) {
-    markFieldError(document.getElementById('suPass2'));
-    return showAuthError('setupError', 'Passwords do not match.');
-  }
-
+  if (rule) { markFieldError(document.getElementById('suPass')); return showAuthError('setupError', rule); }
+  if (pw !== pw2) { markFieldError(document.getElementById('suPass2')); return showAuthError('setupError', 'Passwords do not match.'); }
   await Auth.register({ name, username, password: pw });
   Auth.setSession();
-
   document.getElementById('setupForm').reset();
-  updateStrength(document.getElementById('suPass'),
-    document.getElementById('suStrength'),
-    document.getElementById('suStrengthText'));
-
+  updateStrength(document.getElementById('suPass'), document.getElementById('suStrength'), document.getElementById('suStrengthText'));
   hideScreens();
   document.getElementById('appContainer').style.display = '';
   initApp();
   showToast('Account created. Welcome to MediCare!', 'success');
 });
 
-/* =====================================================
-   LOGIN FORM
-===================================================== */
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   clearAuthError('loginError');
   clearFieldErrors(document.getElementById('loginForm'));
-
   const btn = e.target.querySelector('button[type="submit"]');
   const username = document.getElementById('loginUser').value;
   const password = document.getElementById('loginPass').value;
-
   btn.disabled = true;
   const original = btn.innerHTML;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-
   const ok = await Auth.login(username, password);
-
   btn.disabled = false;
   btn.innerHTML = original;
-
   if (!ok) {
     showAuthError('loginError', 'Invalid username or password.');
     markFieldError(document.getElementById('loginUser'));
@@ -2098,7 +1987,6 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     document.getElementById('loginPass').focus();
     return;
   }
-
   Auth.setSession();
   document.getElementById('loginForm').reset();
   hideScreens();
@@ -2108,63 +1996,33 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 });
 
 document.getElementById('resetLink').addEventListener('click', () => {
-  const sure = confirm(
-    'Reset the login for this device?\n\n' +
-    'You will be asked to create a new username and password.\n' +
-    'Hospital records will be KEPT.'
-  );
+  const sure = confirm('Reset the login for this device?\n\nYou will be asked to create a new username and password.\nHospital records will be KEPT.');
   if (!sure) return;
-
   DB.update(d => { d.user.username = null; d.user.passwordHash = null; });
   Auth.clearSession();
-
   document.getElementById('appContainer').style.display = 'none';
   showScreen('setupScreen');
 });
 
-/* =====================================================
-   BOOTSTRAP  (safe — errors won't kill navigation)
-===================================================== */
 function bootstrap() {
   const app = document.getElementById('appContainer');
-
-  if (!Auth.hasAccount()) {
-    app.style.display = 'none';
-    showScreen('setupScreen');
-    return;
-  }
-
-  if (!Auth.isLoggedIn()) {
-    app.style.display = 'none';
-    showScreen('loginScreen');
-    setTimeout(() => document.getElementById('loginUser').focus(), 100);
-    return;
-  }
-
+  if (!Auth.hasAccount()) { app.style.display = 'none'; showScreen('setupScreen'); return; }
+  if (!Auth.isLoggedIn()) { app.style.display = 'none'; showScreen('loginScreen'); setTimeout(() => document.getElementById('loginUser').focus(), 100); return; }
   hideScreens();
   app.style.display = '';
   initApp();
 }
 
-/* =====================================================
-   INIT APP
-===================================================== */
 function initApp() {
   const data = DB.get();
   document.getElementById('userName').textContent = data.user.name;
   document.getElementById('userRole').textContent = data.user.role;
   document.getElementById('userAvatar').textContent = data.user.initials;
   document.getElementById('pageSubtitle').textContent = `Welcome back, ${data.user.name}`;
-
-  const su = document.getElementById('settingUsername');
-  if (su) su.value = data.user.username || '';
-  const sn = document.getElementById('settingName');
-  if (sn) sn.value = data.user.name || '';
-  const se = document.getElementById('settingEmail');
-  if (se) se.value = data.user.email || '';
-  const sr = document.getElementById('settingRole');
-  if (sr) sr.value = data.user.role || 'Administrator';
-
+  const su = document.getElementById('settingUsername'); if (su) su.value = data.user.username || '';
+  const sn = document.getElementById('settingName'); if (sn) sn.value = data.user.name || '';
+  const se = document.getElementById('settingEmail'); if (se) se.value = data.user.email || '';
+  const sr = document.getElementById('settingRole'); if (sr) sr.value = data.user.role || 'Administrator';
   renderDashboard();
   renderPatients();
   renderAppointments();
@@ -2177,50 +2035,32 @@ function initApp() {
   renderBookingRequests();
 }
 
-/* Safe boot */
 (function safeBoot() {
-  try {
-    bootstrap();
-  } catch (err) {
-    console.error('Bootstrap error:', err);
-    const app = document.getElementById('appContainer');
-    if (app) app.style.display = '';
-  }
+  try { bootstrap(); }
+  catch (err) { console.error('Bootstrap error:', err); const app = document.getElementById('appContainer'); if (app) app.style.display = ''; }
 })();
 
-/* =====================================================
-   LOGOUT
-===================================================== */
 function logout() {
   if (!confirm('Are you sure you want to logout?')) return;
-
   Auth.clearSession();
   closeSidebar();
   closeModal();
-
   document.getElementById('appContainer').style.display = 'none';
   document.getElementById('loginForm').reset();
   document.getElementById('loginPass').value = '';
   clearAuthError('loginError');
   clearFieldErrors(document.getElementById('loginForm'));
-
   showScreen('loginScreen');
   setTimeout(() => document.getElementById('loginUser').focus(), 100);
 }
 
-/* =====================================================
-   NAVIGATION
-===================================================== */
 function goToPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
   const target = document.getElementById('page-' + page);
   if (target) target.classList.add('active');
-
   const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
   if (navItem) navItem.classList.add('active');
-
   const titles = {
     dashboard: ['Dashboard', 'Overview of hospital activity'],
     patients: ['Patients', 'Manage patient records'],
@@ -2233,14 +2073,13 @@ function goToPage(page) {
     reports: ['Reports', 'Analytics and insights'],
     settings: ['Settings', 'System configuration']
   };
-
   const [title, subtitle] = titles[page] || ['Dashboard', ''];
   document.getElementById('pageTitle').textContent = title;
   document.getElementById('pageSubtitle').textContent = subtitle;
-
   closeSidebar();
   const drop = document.getElementById('userDropdown');
   if (drop) drop.classList.remove('show');
+  if (page === 'settings' && typeof window.initRegionCard === 'function') window.initRegionCard();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -2249,118 +2088,48 @@ function openSidebar() {
   document.getElementById('sidebarBackdrop').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
-
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarBackdrop').classList.remove('show');
   document.body.style.overflow = '';
 }
 
-/* Close dropdown on outside click */
-document.addEventListener('click', () => {
-  const drop = document.getElementById('userDropdown');
-  if (drop) drop.classList.remove('show');
-});
-
-/* Keep user profile toggle working */
-document.getElementById('userProfileBtn').addEventListener('click', (e) => {
-  e.stopPropagation();
-  document.getElementById('userDropdown').classList.toggle('show');
-});
-
-/* Notifications */
+document.addEventListener('click', () => { const drop = document.getElementById('userDropdown'); if (drop) drop.classList.remove('show'); });
+document.getElementById('userProfileBtn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
 document.getElementById('notifBtn').addEventListener('click', () => {
-  const pending = (typeof UserAuth !== 'undefined')
-    ? UserAuth.getAllBookings().filter(b => b.status === 'Pending').length
-    : 0;
+  const pending = (typeof UserAuth !== 'undefined') ? UserAuth.getAllBookings().filter(b => b.status === 'Pending').length : 0;
   if (pending) showToast(`You have ${pending} pending booking request(s)`, 'warning');
   else showToast('No new notifications', 'info');
 });
+window.addEventListener('resize', () => { if (window.innerWidth > 1024) closeSidebar(); });
 
-/* Resize handler */
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 1024) closeSidebar();
-});
-
-/* =====================================================
-   DASHBOARD
-===================================================== */
 function renderDashboard() {
   const data = DB.get();
   const allAppts = getAllAppointments();
-
   document.getElementById('statPatients').textContent = data.patients.length;
   document.getElementById('statDoctors').textContent = data.doctors.filter(d => d.available).length;
   document.getElementById('statAppts').textContent = allAppts.filter(a => a.status !== 'Cancelled').length;
-
   document.getElementById('dashboardDepts').innerHTML = data.departments.slice(0, 5).map(d => {
     const cls = d.capacity >= 85 ? 'danger' : d.capacity >= 70 ? 'warn' : '';
-    return `
-      <div class="dept-item">
-        <div class="dept-info">
-          <div class="dept-icon"><i class="fas ${d.icon}"></i></div>
-          <div class="dept-name"><h4>${d.name}</h4><span>${d.head} · ${d.doctors} doctors</span></div>
-        </div>
-        <div class="dept-stats">
-          <span class="badge badge-info">${d.patients} patients</span>
-          <div class="capacity-bar"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div>
-          <span style="font-size:12px;font-weight:600;color:#1f5f74;width:40px;">${d.capacity}%</span>
-        </div>
-      </div>`;
+    return `<div class="dept-item"><div class="dept-info"><div class="dept-icon"><i class="fas ${d.icon}"></i></div><div class="dept-name"><h4>${d.name}</h4><span>${d.head} · ${d.doctors} doctors</span></div></div><div class="dept-stats"><span class="badge badge-info">${d.patients} patients</span><div class="capacity-bar"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div><span style="font-size:12px;font-weight:600;color:#1f5f74;width:40px;">${d.capacity}%</span></div></div>`;
   }).join('');
-
   const appts = allAppts.filter(a => a.status !== 'Cancelled').slice(0, 5);
   document.getElementById('dashboardAppts').innerHTML = appts.length ? appts.map(a => {
     const initials = (a.patient || 'U').split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
-    return `
-      <div class="appt-item">
-        <div class="appt-left">
-          <div class="appt-avatar">${initials}</div>
-          <div class="appt-details">
-            <h4>${a.patient}</h4>
-            <p><i class="fas fa-stethoscope" style="font-size:10px;"></i> ${a.dept} · ${a.doctor}</p>
-          </div>
-        </div>
-        <div class="appt-time">${formatTime(a.datetime)}</div>
-      </div>`;
+    return `<div class="appt-item"><div class="appt-left"><div class="appt-avatar">${initials}</div><div class="appt-details"><h4>${a.patient}</h4><p><i class="fas fa-stethoscope" style="font-size:10px;"></i> ${a.dept} · ${a.doctor}</p></div></div><div class="appt-time">${formatTime(a.datetime)}</div></div>`;
   }).join('') : '<div class="empty-state"><i class="fas fa-calendar-times"></i><h3>No upcoming appointments</h3></div>';
 }
 
-/* =====================================================
-   PATIENTS
-===================================================== */
 function renderPatients() {
   const data = DB.get();
   const tbody = document.getElementById('patientsTableBody');
-  if (!data.patients.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-user-injured"></i><h3>No patients yet</h3></div></td></tr>`;
-    return;
-  }
-  tbody.innerHTML = data.patients.map(p => `
-    <tr>
-      <td><strong>${p.id}</strong></td>
-      <td>${p.name}</td>
-      <td>${p.age}</td>
-      <td>${p.gender}</td>
-      <td>${p.phone}</td>
-      <td>${p.dept}</td>
-      <td>${statusBadge(p.status)}</td>
-      <td>
-        <button class="btn btn-outline btn-sm" onclick="editPatient('${p.id}')"><i class="fas fa-edit"></i></button>
-        <button class="btn btn-danger btn-sm" onclick="deletePatient('${p.id}')"><i class="fas fa-trash"></i></button>
-      </td>
-    </tr>
-  `).join('');
+  if (!data.patients.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-user-injured"></i><h3>No patients yet</h3></div></td></tr>`; return; }
+  tbody.innerHTML = data.patients.map(p => `<tr><td><strong>${p.id}</strong></td><td>${p.name}</td><td>${p.age}</td><td>${p.gender}</td><td>${p.phone}</td><td>${p.dept}</td><td>${statusBadge(p.status)}</td><td><button class="btn btn-outline btn-sm" onclick="editPatient('${p.id}')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deletePatient('${p.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
   updateNavCounts();
 }
 
 function statusBadge(status) {
-  const map = {
-    'Admitted': 'badge-warning', 'Outpatient': 'badge-info', 'Discharged': 'badge-success',
-    'Confirmed': 'badge-success', 'Pending': 'badge-warning', 'Cancelled': 'badge-danger',
-    'Completed': 'badge-info',
-    'Paid': 'badge-success', 'Overdue': 'badge-danger'
-  };
+  const map = { 'Admitted': 'badge-warning', 'Outpatient': 'badge-info', 'Discharged': 'badge-success', 'Confirmed': 'badge-success', 'Pending': 'badge-warning', 'Cancelled': 'badge-danger', 'Completed': 'badge-info', 'Paid': 'badge-success', 'Overdue': 'badge-danger' };
   return `<span class="badge ${map[status] || 'badge-gray'}">${status}</span>`;
 }
 
@@ -2368,44 +2137,7 @@ function openPatientModal(editId = null) {
   const data = DB.get();
   const p = editId ? data.patients.find(x => x.id === editId) : null;
   const depts = data.departments.map(d => d.name);
-
-  showModal(`
-    <div class="modal-header">
-      <h2>${p ? 'Edit Patient' : 'Add New Patient'}</h2>
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-    </div>
-    <form id="patientForm">
-      <div class="form-group"><label>Full Name</label><input type="text" id="pName" value="${p ? p.name : ''}" required></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div class="form-group"><label>Age</label><input type="number" id="pAge" value="${p ? p.age : ''}" required></div>
-        <div class="form-group"><label>Gender</label>
-          <select id="pGender">
-            <option ${p && p.gender === 'Male' ? 'selected' : ''}>Male</option>
-            <option ${p && p.gender === 'Female' ? 'selected' : ''}>Female</option>
-            <option ${p && p.gender === 'Other' ? 'selected' : ''}>Other</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group"><label>Phone</label><input type="text" id="pPhone" value="${p ? p.phone : ''}" required></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div class="form-group"><label>Department</label>
-          <select id="pDept">${depts.map(d => `<option ${p && p.dept === d ? 'selected' : ''}>${d}</option>`).join('')}</select>
-        </div>
-        <div class="form-group"><label>Status</label>
-          <select id="pStatus">
-            <option ${p && p.status === 'Admitted' ? 'selected' : ''}>Admitted</option>
-            <option ${p && p.status === 'Outpatient' ? 'selected' : ''}>Outpatient</option>
-            <option ${p && p.status === 'Discharged' ? 'selected' : ''}>Discharged</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> ${p ? 'Update' : 'Save'}</button>
-      </div>
-    </form>
-  `);
-
+  showModal(`<div class="modal-header"><h2>${p ? 'Edit Patient' : 'Add New Patient'}</h2><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><form id="patientForm"><div class="form-group"><label>Full Name</label><input type="text" id="pName" value="${p ? p.name : ''}" required></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label>Age</label><input type="number" id="pAge" value="${p ? p.age : ''}" required></div><div class="form-group"><label>Gender</label><select id="pGender"><option ${p && p.gender === 'Male' ? 'selected' : ''}>Male</option><option ${p && p.gender === 'Female' ? 'selected' : ''}>Female</option><option ${p && p.gender === 'Other' ? 'selected' : ''}>Other</option></select></div></div><div class="form-group"><label>Phone</label><input type="text" id="pPhone" value="${p ? p.phone : ''}" required></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label>Department</label><select id="pDept">${depts.map(d => `<option ${p && p.dept === d ? 'selected' : ''}>${d}</option>`).join('')}</select></div><div class="form-group"><label>Status</label><select id="pStatus"><option ${p && p.status === 'Admitted' ? 'selected' : ''}>Admitted</option><option ${p && p.status === 'Outpatient' ? 'selected' : ''}>Outpatient</option><option ${p && p.status === 'Discharged' ? 'selected' : ''}>Discharged</option></select></div></div><div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> ${p ? 'Update' : 'Save'}</button></div></form>`);
   document.getElementById('patientForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('pName').value;
@@ -2414,14 +2146,9 @@ function openPatientModal(editId = null) {
     const phone = document.getElementById('pPhone').value;
     const dept = document.getElementById('pDept').value;
     const status = document.getElementById('pStatus').value;
-
     DB.update(d => {
-      if (p) {
-        const idx = d.patients.findIndex(x => x.id === p.id);
-        d.patients[idx] = { ...d.patients[idx], name, age, gender, phone, dept, status };
-      } else {
-        d.patients.push({ id: 'P-' + (1000 + d.patients.length + 1), name, age, gender, phone, dept, status });
-      }
+      if (p) { const idx = d.patients.findIndex(x => x.id === p.id); d.patients[idx] = { ...d.patients[idx], name, age, gender, phone, dept, status }; }
+      else { d.patients.push({ id: 'P-' + (1000 + d.patients.length + 1), name, age, gender, phone, dept, status }); }
     });
     showToast(p ? 'Patient updated' : 'Patient added', 'success');
     closeModal();
@@ -2429,7 +2156,6 @@ function openPatientModal(editId = null) {
     renderDashboard();
   });
 }
-
 function editPatient(id) { openPatientModal(id); }
 function deletePatient(id) {
   if (!confirm('Delete this patient record?')) return;
@@ -2439,67 +2165,17 @@ function deletePatient(id) {
   renderDashboard();
 }
 
-/* =====================================================
-   APPOINTMENTS  — now reads merged source
-===================================================== */
 function renderAppointments() {
   const all = getAllAppointments();
   const tbody = document.getElementById('apptTableBody');
-  if (!all.length) {
-    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-calendar-check"></i><h3>No appointments</h3></div></td></tr>`;
-    return;
-  }
-  tbody.innerHTML = all.map(a => `
-    <tr>
-      <td><strong>${a.id}</strong></td>
-      <td>${a.patient}</td>
-      <td>${a.doctor}</td>
-      <td>${a.dept}</td>
-      <td>${formatDateTime(a.datetime)}</td>
-      <td>${statusBadge(a.status)}</td>
-      <td>
-        <button class="btn btn-outline btn-sm" onclick="editAppt('${a.id}')"><i class="fas fa-edit"></i></button>
-        <button class="btn btn-danger btn-sm" onclick="deleteAppt('${a.id}')"><i class="fas fa-trash"></i></button>
-      </td>
-    </tr>
-  `).join('');
+  if (!all.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-calendar-check"></i><h3>No appointments</h3></div></td></tr>`; return; }
+  tbody.innerHTML = all.map(a => `<tr><td><strong>${a.id}</strong></td><td>${a.patient}</td><td>${a.doctor}</td><td>${a.dept}</td><td>${formatDateTime(a.datetime)}</td><td>${statusBadge(a.status)}</td><td><button class="btn btn-outline btn-sm" onclick="editAppt('${a.id}')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteAppt('${a.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
   updateNavCounts();
 }
-
 function openApptModal(editId = null) {
   const data = DB.get();
   const a = editId ? data.appointments.find(x => x.id === editId) : null;
-
-  showModal(`
-    <div class="modal-header">
-      <h2>${a ? 'Edit Appointment' : 'New Appointment'}</h2>
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-    </div>
-    <form id="apptForm">
-      <div class="form-group"><label>Patient</label>
-        <select id="aPatient">${data.patients.map(p => `<option ${a && a.patient === p.name ? 'selected' : ''}>${p.name}</option>`).join('')}</select>
-      </div>
-      <div class="form-group"><label>Doctor</label>
-        <select id="aDoctor">${data.doctors.map(d => `<option ${a && a.doctor === d.name ? 'selected' : ''}>${d.name}</option>`).join('')}</select>
-      </div>
-      <div class="form-group"><label>Department</label>
-        <select id="aDept">${data.departments.map(d => `<option ${a && a.dept === d.name ? 'selected' : ''}>${d.name}</option>`).join('')}</select>
-      </div>
-      <div class="form-group"><label>Date & Time</label><input type="datetime-local" id="aDatetime" value="${a ? a.datetime : ''}" required></div>
-      <div class="form-group"><label>Status</label>
-        <select id="aStatus">
-          <option ${a && a.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
-          <option ${a && a.status === 'Pending' ? 'selected' : ''}>Pending</option>
-          <option ${a && a.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-        </select>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> ${a ? 'Update' : 'Save'}</button>
-      </div>
-    </form>
-  `);
-
+  showModal(`<div class="modal-header"><h2>${a ? 'Edit Appointment' : 'New Appointment'}</h2><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><form id="apptForm"><div class="form-group"><label>Patient</label><select id="aPatient">${data.patients.map(p => `<option ${a && a.patient === p.name ? 'selected' : ''}>${p.name}</option>`).join('')}</select></div><div class="form-group"><label>Doctor</label><select id="aDoctor">${data.doctors.map(d => `<option ${a && a.doctor === d.name ? 'selected' : ''}>${d.name}</option>`).join('')}</select></div><div class="form-group"><label>Department</label><select id="aDept">${data.departments.map(d => `<option ${a && a.dept === d.name ? 'selected' : ''}>${d.name}</option>`).join('')}</select></div><div class="form-group"><label>Date & Time</label><input type="datetime-local" id="aDatetime" value="${a ? a.datetime : ''}" required></div><div class="form-group"><label>Status</label><select id="aStatus"><option ${a && a.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option><option ${a && a.status === 'Pending' ? 'selected' : ''}>Pending</option><option ${a && a.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option></select></div><div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> ${a ? 'Update' : 'Save'}</button></div></form>`);
   document.getElementById('apptForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const patient = document.getElementById('aPatient').value;
@@ -2507,14 +2183,9 @@ function openApptModal(editId = null) {
     const dept = document.getElementById('aDept').value;
     const datetime = document.getElementById('aDatetime').value;
     const status = document.getElementById('aStatus').value;
-
     DB.update(d => {
-      if (a) {
-        const idx = d.appointments.findIndex(x => x.id === a.id);
-        d.appointments[idx] = { ...d.appointments[idx], patient, doctor, dept, datetime, status };
-      } else {
-        d.appointments.push({ id: 'A-' + String(d.appointments.length + 1).padStart(3, '0'), patient, doctor, dept, datetime, status });
-      }
+      if (a) { const idx = d.appointments.findIndex(x => x.id === a.id); d.appointments[idx] = { ...d.appointments[idx], patient, doctor, dept, datetime, status }; }
+      else { d.appointments.push({ id: 'A-' + String(d.appointments.length + 1).padStart(3, '0'), patient, doctor, dept, datetime, status }); }
     });
     showToast(a ? 'Appointment updated' : 'Appointment created', 'success');
     closeModal();
@@ -2522,92 +2193,33 @@ function openApptModal(editId = null) {
     renderDashboard();
   });
 }
-
 function editAppt(id) {
-  /* If this came from a patient booking, send admin to Booking Requests */
-  if (typeof UserAuth !== 'undefined' && UserAuth.getAllBookings().some(b => b.id === id)) {
-    goToPage('bookings');
-    showToast('Manage this from Booking Requests', 'info');
-    return;
-  }
+  if (typeof UserAuth !== 'undefined' && UserAuth.getAllBookings().some(b => b.id === id)) { goToPage('bookings'); showToast('Manage this from Booking Requests', 'info'); return; }
   openApptModal(id);
 }
-
 function deleteAppt(id) {
-  /* If it's a booking, cancel the booking too */
   if (typeof UserAuth !== 'undefined' && UserAuth.getAllBookings().some(b => b.id === id)) {
     if (!confirm('This appointment came from a patient booking. Cancel it?')) return;
     UserAuth.cancelBooking(id);
     DB.update(d => { d.appointments = d.appointments.filter(a => a.id !== id); });
     showToast('Booking cancelled', 'error');
-    renderAppointments();
-    renderDashboard();
-    renderBookingRequests();
-    updateNavCounts();
+    renderAppointments(); renderDashboard(); renderBookingRequests(); updateNavCounts();
     return;
   }
   if (!confirm('Delete this appointment?')) return;
   DB.update(d => { d.appointments = d.appointments.filter(a => a.id !== id); });
   showToast('Appointment deleted', 'success');
-  renderAppointments();
-  renderDashboard();
-  updateNavCounts();
+  renderAppointments(); renderDashboard(); updateNavCounts();
 }
 
-/* =====================================================
-   DOCTORS
-===================================================== */
 function renderDoctors() {
   const data = DB.get();
-  document.getElementById('doctorsGrid').innerHTML = data.doctors.map(d => `
-    <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:14px;">
-      <div style="display:flex;align-items:center;gap:14px;width:100%;">
-        <div class="appt-avatar" style="width:52px;height:52px;font-size:17px;">${d.initials}</div>
-        <div style="flex:1;min-width:0;">
-          <h4 style="font-size:15px;color:var(--dark);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.name}</h4>
-          <p style="font-size:12px;color:var(--gray);">${d.dept}</p>
-        </div>
-        <span class="badge ${d.available ? 'badge-success' : 'badge-gray'}">${d.available ? 'Available' : 'Busy'}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;width:100%;border-top:1px solid var(--border);padding-top:12px;">
-        <div><p style="font-size:11px;color:var(--gray);">Patients</p><strong style="font-size:15px;color:var(--dark);">${d.patients}</strong></div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-outline btn-sm" onclick="editDoctor('${d.id}')"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-danger btn-sm" onclick="deleteDoctor('${d.id}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </div>
-    </div>
-  `).join('');
+  document.getElementById('doctorsGrid').innerHTML = data.doctors.map(d => `<div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:14px;"><div style="display:flex;align-items:center;gap:14px;width:100%;"><div class="appt-avatar" style="width:52px;height:52px;font-size:17px;">${d.initials}</div><div style="flex:1;min-width:0;"><h4 style="font-size:15px;color:var(--dark);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.name}</h4><p style="font-size:12px;color:var(--gray);">${d.dept}</p></div><span class="badge ${d.available ? 'badge-success' : 'badge-gray'}">${d.available ? 'Available' : 'Busy'}</span></div><div style="display:flex;justify-content:space-between;width:100%;border-top:1px solid var(--border);padding-top:12px;"><div><p style="font-size:11px;color:var(--gray);">Patients</p><strong style="font-size:15px;color:var(--dark);">${d.patients}</strong></div><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" onclick="editDoctor('${d.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteDoctor('${d.id}')"><i class="fas fa-trash"></i></button></div></div></div>`).join('');
 }
-
 function openDoctorModal(editId = null) {
   const data = DB.get();
   const d = editId ? data.doctors.find(x => x.id === editId) : null;
-
-  showModal(`
-    <div class="modal-header">
-      <h2>${d ? 'Edit Doctor' : 'Add Doctor'}</h2>
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-    </div>
-    <form id="doctorForm">
-      <div class="form-group"><label>Full Name</label><input type="text" id="dName" value="${d ? d.name : ''}" placeholder="Dr. John Doe" required></div>
-      <div class="form-group"><label>Department</label>
-        <select id="dDept">${data.departments.map(dep => `<option ${d && d.dept === dep.name ? 'selected' : ''}>${dep.name}</option>`).join('')}</select>
-      </div>
-      <div class="form-group"><label>Patient Count</label><input type="number" id="dPatients" value="${d ? d.patients : 0}" min="0"></div>
-      <div class="form-group"><label>Availability</label>
-        <select id="dAvailable">
-          <option value="true" ${d && d.available ? 'selected' : ''}>Available</option>
-          <option value="false" ${d && !d.available ? 'selected' : ''}>Busy</option>
-        </select>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> ${d ? 'Update' : 'Save'}</button>
-      </div>
-    </form>
-  `);
-
+  showModal(`<div class="modal-header"><h2>${d ? 'Edit Doctor' : 'Add Doctor'}</h2><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><form id="doctorForm"><div class="form-group"><label>Full Name</label><input type="text" id="dName" value="${d ? d.name : ''}" placeholder="Dr. John Doe" required></div><div class="form-group"><label>Department</label><select id="dDept">${data.departments.map(dep => `<option ${d && d.dept === dep.name ? 'selected' : ''}>${dep.name}</option>`).join('')}</select></div><div class="form-group"><label>Patient Count</label><input type="number" id="dPatients" value="${d ? d.patients : 0}" min="0"></div><div class="form-group"><label>Availability</label><select id="dAvailable"><option value="true" ${d && d.available ? 'selected' : ''}>Available</option><option value="false" ${d && !d.available ? 'selected' : ''}>Busy</option></select></div><div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> ${d ? 'Update' : 'Save'}</button></div></form>`);
   document.getElementById('doctorForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('dName').value;
@@ -2615,78 +2227,33 @@ function openDoctorModal(editId = null) {
     const patients = +document.getElementById('dPatients').value;
     const available = document.getElementById('dAvailable').value === 'true';
     const initials = name.replace('Dr. ', '').split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
-
     DB.update(db => {
-      if (d) {
-        const idx = db.doctors.findIndex(x => x.id === d.id);
-        db.doctors[idx] = { ...db.doctors[idx], name, dept, patients, available, initials };
-      } else {
-        db.doctors.push({ id: 'D-' + String(db.doctors.length + 1).padStart(2, '0'), name, dept, patients, available, initials });
-      }
+      if (d) { const idx = db.doctors.findIndex(x => x.id === d.id); db.doctors[idx] = { ...db.doctors[idx], name, dept, patients, available, initials }; }
+      else { db.doctors.push({ id: 'D-' + String(db.doctors.length + 1).padStart(2, '0'), name, dept, patients, available, initials }); }
     });
     showToast(d ? 'Doctor updated' : 'Doctor added', 'success');
-    closeModal();
-    renderDoctors();
-    renderDashboard();
+    closeModal(); renderDoctors(); renderDashboard();
   });
 }
-
 function editDoctor(id) { openDoctorModal(id); }
 function deleteDoctor(id) {
   if (!confirm('Remove this doctor?')) return;
   DB.update(d => { d.doctors = d.doctors.filter(x => x.id !== id); });
   showToast('Doctor removed', 'success');
-  renderDoctors();
-  renderDashboard();
+  renderDoctors(); renderDashboard();
 }
 
-/* =====================================================
-   DEPARTMENTS
-===================================================== */
 function renderDepartments() {
   const data = DB.get();
   document.getElementById('deptFullList').innerHTML = data.departments.map(d => {
     const cls = d.capacity >= 85 ? 'danger' : d.capacity >= 70 ? 'warn' : '';
-    return `
-      <div class="dept-item">
-        <div class="dept-info">
-          <div class="dept-icon"><i class="fas ${d.icon}"></i></div>
-          <div class="dept-name"><h4>${d.name}</h4><span>${d.head} · ${d.doctors} doctors · ${d.patients} patients</span></div>
-        </div>
-        <div class="dept-stats">
-          <div class="capacity-bar" style="width:140px;"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div>
-          <span style="font-size:13px;font-weight:700;color:var(--dark);width:45px;">${d.capacity}%</span>
-          <button class="btn btn-outline btn-sm" onclick="editDept(${d.id})"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-danger btn-sm" onclick="deleteDept(${d.id})"><i class="fas fa-trash"></i></button>
-        </div>
-      </div>`;
+    return `<div class="dept-item"><div class="dept-info"><div class="dept-icon"><i class="fas ${d.icon}"></i></div><div class="dept-name"><h4>${d.name}</h4><span>${d.head} · ${d.doctors} doctors · ${d.patients} patients</span></div></div><div class="dept-stats"><div class="capacity-bar" style="width:140px;"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div><span style="font-size:13px;font-weight:700;color:var(--dark);width:45px;">${d.capacity}%</span><button class="btn btn-outline btn-sm" onclick="editDept(${d.id})"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteDept(${d.id})"><i class="fas fa-trash"></i></button></div></div>`;
   }).join('');
 }
-
 function openDeptModal(editId = null) {
   const data = DB.get();
   const d = editId ? data.departments.find(x => x.id === editId) : null;
-
-  showModal(`
-    <div class="modal-header">
-      <h2>${d ? 'Edit Department' : 'Add Department'}</h2>
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-    </div>
-    <form id="deptForm">
-      <div class="form-group"><label>Department Name</label><input type="text" id="depName" value="${d ? d.name : ''}" required></div>
-      <div class="form-group"><label>Head Doctor</label><input type="text" id="depHead" value="${d ? d.head : ''}" placeholder="Dr. ..."></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div class="form-group"><label>Doctors</label><input type="number" id="depDoctors" value="${d ? d.doctors : 0}" min="0"></div>
-        <div class="form-group"><label>Patients</label><input type="number" id="depPatients" value="${d ? d.patients : 0}" min="0"></div>
-      </div>
-      <div class="form-group"><label>Capacity (%)</label><input type="number" id="depCapacity" value="${d ? d.capacity : 50}" min="0" max="100"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> ${d ? 'Update' : 'Save'}</button>
-      </div>
-    </form>
-  `);
-
+  showModal(`<div class="modal-header"><h2>${d ? 'Edit Department' : 'Add Department'}</h2><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><form id="deptForm"><div class="form-group"><label>Department Name</label><input type="text" id="depName" value="${d ? d.name : ''}" required></div><div class="form-group"><label>Head Doctor</label><input type="text" id="depHead" value="${d ? d.head : ''}" placeholder="Dr. ..."></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label>Doctors</label><input type="number" id="depDoctors" value="${d ? d.doctors : 0}" min="0"></div><div class="form-group"><label>Patients</label><input type="number" id="depPatients" value="${d ? d.patients : 0}" min="0"></div></div><div class="form-group"><label>Capacity (%)</label><input type="number" id="depCapacity" value="${d ? d.capacity : 50}" min="0" max="100"></div><div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> ${d ? 'Update' : 'Save'}</button></div></form>`);
   document.getElementById('deptForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('depName').value;
@@ -2694,93 +2261,43 @@ function openDeptModal(editId = null) {
     const doctors = +document.getElementById('depDoctors').value;
     const patients = +document.getElementById('depPatients').value;
     const capacity = +document.getElementById('depCapacity').value;
-
     DB.update(db => {
-      if (d) {
-        const idx = db.departments.findIndex(x => x.id === d.id);
-        db.departments[idx] = { ...db.departments[idx], name, head, doctors, patients, capacity };
-      } else {
-        const nextId = Math.max(...db.departments.map(x => x.id), 0) + 1;
-        db.departments.push({ id: nextId, name, head, doctors, patients, capacity, icon: 'fa-hospital' });
-      }
+      if (d) { const idx = db.departments.findIndex(x => x.id === d.id); db.departments[idx] = { ...db.departments[idx], name, head, doctors, patients, capacity }; }
+      else { const nextId = Math.max(...db.departments.map(x => x.id), 0) + 1; db.departments.push({ id: nextId, name, head, doctors, patients, capacity, icon: 'fa-hospital' }); }
     });
     showToast(d ? 'Department updated' : 'Department added', 'success');
-    closeModal();
-    renderDepartments();
-    renderDashboard();
+    closeModal(); renderDepartments(); renderDashboard();
   });
 }
-
 function editDept(id) { openDeptModal(id); }
 function deleteDept(id) {
   if (!confirm('Delete this department?')) return;
   DB.update(d => { d.departments = d.departments.filter(x => x.id !== id); });
   showToast('Department removed', 'success');
-  renderDepartments();
-  renderDashboard();
+  renderDepartments(); renderDashboard();
 }
 
-/* =====================================================
-   SERVICES
-===================================================== */
 function renderServices() {
   const data = DB.get();
-  document.getElementById('servicesGrid').innerHTML = data.services.map(s => `
-    <div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:12px;">
-      <div class="dept-icon" style="width:52px;height:52px;font-size:24px;"><i class="fas ${s.icon}"></i></div>
-      <div>
-        <h4 style="font-size:15px;color:var(--dark);font-weight:700;">${s.name}</h4>
-        <p style="font-size:12px;color:var(--gray);margin-top:4px;">${s.desc}</p>
-      </div>
-      <div style="display:flex;gap:8px;width:100%;border-top:1px solid var(--border);padding-top:12px;">
-        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="editService(${s.id})"><i class="fas fa-edit"></i> Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteService(${s.id})"><i class="fas fa-trash"></i></button>
-      </div>
-    </div>
-  `).join('');
+  document.getElementById('servicesGrid').innerHTML = data.services.map(s => `<div class="stat-card" style="flex-direction:column;align-items:flex-start;gap:12px;"><div class="dept-icon" style="width:52px;height:52px;font-size:24px;"><i class="fas ${s.icon}"></i></div><div><h4 style="font-size:15px;color:var(--dark);font-weight:700;">${s.name}</h4><p style="font-size:12px;color:var(--gray);margin-top:4px;">${s.desc}</p></div><div style="display:flex;gap:8px;width:100%;border-top:1px solid var(--border);padding-top:12px;"><button class="btn btn-outline btn-sm" style="flex:1;" onclick="editService(${s.id})"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-danger btn-sm" onclick="deleteService(${s.id})"><i class="fas fa-trash"></i></button></div></div>`).join('');
 }
-
 function openServiceModal(editId = null) {
   const data = DB.get();
   const s = editId ? data.services.find(x => x.id === editId) : null;
-
-  showModal(`
-    <div class="modal-header">
-      <h2>${s ? 'Edit Service' : 'Add Service'}</h2>
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-    </div>
-    <form id="serviceForm">
-      <div class="form-group"><label>Service Name</label><input type="text" id="svcName" value="${s ? s.name : ''}" required></div>
-      <div class="form-group"><label>Description</label><textarea id="svcDesc" required>${s ? s.desc : ''}</textarea></div>
-      <div class="form-group"><label>Icon (Font Awesome class)</label><input type="text" id="svcIcon" value="${s ? s.icon : 'fa-stethoscope'}" placeholder="fa-heartbeat"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> ${s ? 'Update' : 'Save'}</button>
-      </div>
-    </form>
-  `);
-
+  showModal(`<div class="modal-header"><h2>${s ? 'Edit Service' : 'Add Service'}</h2><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><form id="serviceForm"><div class="form-group"><label>Service Name</label><input type="text" id="svcName" value="${s ? s.name : ''}" required></div><div class="form-group"><label>Description</label><textarea id="svcDesc" required>${s ? s.desc : ''}</textarea></div><div class="form-group"><label>Icon (Font Awesome class)</label><input type="text" id="svcIcon" value="${s ? s.icon : 'fa-stethoscope'}" placeholder="fa-heartbeat"></div><div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> ${s ? 'Update' : 'Save'}</button></div></form>`);
   document.getElementById('serviceForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('svcName').value;
     const desc = document.getElementById('svcDesc').value;
     const icon = document.getElementById('svcIcon').value;
-
     DB.update(db => {
-      if (s) {
-        const idx = db.services.findIndex(x => x.id === s.id);
-        db.services[idx] = { ...db.services[idx], name, desc, icon };
-      } else {
-        const nextId = Math.max(...db.services.map(x => x.id), 0) + 1;
-        db.services.push({ id: nextId, name, desc, icon });
-      }
+      if (s) { const idx = db.services.findIndex(x => x.id === s.id); db.services[idx] = { ...db.services[idx], name, desc, icon }; }
+      else { const nextId = Math.max(...db.services.map(x => x.id), 0) + 1; db.services.push({ id: nextId, name, desc, icon }); }
     });
     showToast(s ? 'Service updated' : 'Service added', 'success');
-    closeModal();
-    renderServices();
+    closeModal(); renderServices();
   });
 }
-
 function editService(id) { openServiceModal(id); }
 function deleteService(id) {
   if (!confirm('Delete this service?')) return;
@@ -2789,80 +2306,38 @@ function deleteService(id) {
   renderServices();
 }
 
-/* =====================================================
-   BILLING
-===================================================== */
 function renderBilling() {
   const data = DB.get();
   const total = data.invoices.reduce((s, i) => s + i.amount, 0);
   const pending = data.invoices.filter(i => i.status === 'Pending').reduce((s, i) => s + i.amount, 0);
   const paid = data.invoices.filter(i => i.status === 'Paid').length;
   const overdue = data.invoices.filter(i => i.status === 'Overdue').length;
-
-  document.getElementById('billingTotal').textContent = '$' + total.toLocaleString();
-  document.getElementById('billingPending').textContent = '$' + pending.toLocaleString();
-  document.getElementById('billingPaid').textContent = paid;
+  document.getElementById('billingTotal').textContent   = money(total);
+  document.getElementById('billingPending').textContent = money(pending);
+  document.getElementById('billingPaid').textContent    = paid;
   document.getElementById('billingOverdue').textContent = overdue;
-
-  document.getElementById('billingTableBody').innerHTML = data.invoices.map(inv => `
-    <tr>
-      <td><strong>${inv.id}</strong></td>
-      <td>${inv.patient}</td>
-      <td>${inv.date}</td>
-      <td>$${inv.amount.toLocaleString()}</td>
-      <td>${statusBadge(inv.status)}</td>
-      <td>
-        <button class="btn btn-outline btn-sm" onclick="markInvoicePaid('${inv.id}')" ${inv.status === 'Paid' ? 'disabled style="opacity:0.5;"' : ''}><i class="fas fa-check"></i></button>
-        <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${inv.id}')"><i class="fas fa-trash"></i></button>
-      </td>
-    </tr>
-  `).join('');
+  document.getElementById('billingTableBody').innerHTML = data.invoices.map(inv => `<tr><td><strong>${inv.id}</strong></td><td>${inv.patient}</td><td>${inv.date}</td><td>${money(inv.amount)}</td><td>${statusBadge(inv.status)}</td><td><button class="btn btn-outline btn-sm" onclick="markInvoicePaid('${inv.id}')" ${inv.status === 'Paid' ? 'disabled style="opacity:0.5;"' : ''}><i class="fas fa-check"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${inv.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 }
-
 function openInvoiceModal() {
   const data = DB.get();
-  showModal(`
-    <div class="modal-header">
-      <h2>Create Invoice</h2>
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-    </div>
-    <form id="invoiceForm">
-      <div class="form-group"><label>Patient</label>
-        <select id="invPatient">${data.patients.map(p => `<option>${p.name}</option>`).join('')}</select>
-      </div>
-      <div class="form-group"><label>Amount ($)</label><input type="number" id="invAmount" min="0" required></div>
-      <div class="form-group"><label>Status</label>
-        <select id="invStatus"><option>Pending</option><option>Paid</option><option>Overdue</option></select>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Create</button>
-      </div>
-    </form>
-  `);
-
+  const currLabel = (window.GlobalSupport && window.GlobalSupport.currentCurrency) ? window.GlobalSupport.currentCurrency() : (window.CurrencyHelper && window.CurrencyHelper.getSettings().currency) || 'USD';
+  showModal(`<div class="modal-header"><h2>Create Invoice</h2><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div><form id="invoiceForm"><div class="form-group"><label>Patient</label><select id="invPatient">${data.patients.map(p => `<option>${p.name}</option>`).join('')}</select></div><div class="form-group"><label>Amount (${currLabel})</label><input type="number" id="invAmount" min="0" required></div><div class="form-group"><label>Status</label><select id="invStatus"><option>Pending</option><option>Paid</option><option>Overdue</option></select></div><div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Create</button></div></form>`);
   document.getElementById('invoiceForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const patient = document.getElementById('invPatient').value;
     const amount = +document.getElementById('invAmount').value;
     const status = document.getElementById('invStatus').value;
     const date = new Date().toISOString().split('T')[0];
-
-    DB.update(d => {
-      d.invoices.push({ id: 'INV-' + (2000 + d.invoices.length + 1), patient, date, amount, status });
-    });
+    DB.update(d => { d.invoices.push({ id: 'INV-' + (2000 + d.invoices.length + 1), patient, date, amount, status }); });
     showToast('Invoice created', 'success');
-    closeModal();
-    renderBilling();
+    closeModal(); renderBilling();
   });
 }
-
 function markInvoicePaid(id) {
   DB.update(d => { const i = d.invoices.find(x => x.id === id); if (i) i.status = 'Paid'; });
   showToast('Invoice marked as paid', 'success');
   renderBilling();
 }
-
 function deleteInvoice(id) {
   if (!confirm('Delete this invoice?')) return;
   DB.update(d => { d.invoices = d.invoices.filter(x => x.id !== id); });
@@ -2870,23 +2345,12 @@ function deleteInvoice(id) {
   renderBilling();
 }
 
-/* =====================================================
-   REPORTS  — now counts merged appointments too
-===================================================== */
 function renderReports() {
   const data = DB.get();
   document.getElementById('reportsDeptLoad').innerHTML = data.departments.map(d => {
     const cls = d.capacity >= 85 ? 'danger' : d.capacity >= 70 ? 'warn' : '';
-    return `
-      <div style="margin-bottom:16px;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-          <span style="font-size:13px;font-weight:600;color:var(--dark);">${d.name}</span>
-          <span style="font-size:13px;font-weight:700;color:var(--primary);">${d.capacity}%</span>
-        </div>
-        <div class="capacity-bar" style="width:100%;height:8px;"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div>
-      </div>`;
+    return `<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;font-weight:600;color:var(--dark);">${d.name}</span><span style="font-size:13px;font-weight:700;color:var(--primary);">${d.capacity}%</span></div><div class="capacity-bar" style="width:100%;height:8px;"><div class="capacity-fill ${cls}" style="width:${d.capacity}%"></div></div></div>`;
   }).join('');
-
   const allAppts = getAllAppointments();
   const apptStatus = { Confirmed: 0, Pending: 0, Cancelled: 0, Completed: 0 };
   allAppts.forEach(a => { if (apptStatus[a.status] !== undefined) apptStatus[a.status]++; });
@@ -2894,32 +2358,18 @@ function renderReports() {
   document.getElementById('reportsApptStatus').innerHTML = Object.entries(apptStatus).map(([k, v]) => {
     const pct = Math.round((v / total) * 100);
     const colors = { Confirmed: 'var(--success)', Pending: 'var(--warning)', Cancelled: 'var(--danger)', Completed: 'var(--primary)' };
-    return `
-      <div style="margin-bottom:16px;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-          <span style="font-size:13px;font-weight:600;color:var(--dark);">${k}</span>
-          <span style="font-size:13px;font-weight:700;color:var(--dark);">${v} (${pct}%)</span>
-        </div>
-        <div class="capacity-bar" style="width:100%;height:8px;"><div class="capacity-fill" style="width:${pct}%;background:${colors[k]};"></div></div>
-      </div>`;
+    return `<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;font-weight:600;color:var(--dark);">${k}</span><span style="font-size:13px;font-weight:700;color:var(--dark);">${v} (${pct}%)</span></div><div class="capacity-bar" style="width:100%;height:8px;"><div class="capacity-fill" style="width:${pct}%;background:${colors[k]};"></div></div></div>`;
   }).join('');
 }
 
-/* =====================================================
-   SETTINGS
-===================================================== */
 function saveSettings() {
   const name = document.getElementById('settingName').value.trim();
   const email = document.getElementById('settingEmail').value.trim();
   const role = document.getElementById('settingRole').value.trim();
-
   if (name.length < 2) { showToast('Please enter a valid name', 'error'); return; }
-
   const initials = (name.replace('Dr. ', '').split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
-
   DB.update(d => { d.user = { ...d.user, name, email, role, initials }; });
   Auth.setSession();
-
   document.getElementById('userName').textContent = name;
   document.getElementById('userRole').textContent = role;
   document.getElementById('userAvatar').textContent = initials;
@@ -2931,95 +2381,58 @@ async function changePassword() {
   const cur = document.getElementById('pwCurrent').value;
   const nw  = document.getElementById('pwNew').value;
   const cf  = document.getElementById('pwConfirm').value;
-
   clearAuthError('pwError');
   clearFieldErrors(document.querySelector('#page-settings .grid-2'));
-
   if (!cur || !nw || !cf) {
     if (!cur) markFieldError(document.getElementById('pwCurrent'));
     if (!nw)  markFieldError(document.getElementById('pwNew'));
     if (!cf)  markFieldError(document.getElementById('pwConfirm'));
     return showAuthError('pwError', 'Please fill in all three fields.');
   }
-
   const rule = validatePassword(nw);
-  if (rule) {
-    markFieldError(document.getElementById('pwNew'));
-    return showAuthError('pwError', rule);
-  }
-  if (nw !== cf) {
-    markFieldError(document.getElementById('pwConfirm'));
-    return showAuthError('pwError', 'New passwords do not match.');
-  }
-  if (nw === cur) {
-    markFieldError(document.getElementById('pwNew'));
-    return showAuthError('pwError', 'New password must be different from the current one.');
-  }
-
+  if (rule) { markFieldError(document.getElementById('pwNew')); return showAuthError('pwError', rule); }
+  if (nw !== cf) { markFieldError(document.getElementById('pwConfirm')); return showAuthError('pwError', 'New passwords do not match.'); }
+  if (nw === cur) { markFieldError(document.getElementById('pwNew')); return showAuthError('pwError', 'New password must be different from the current one.'); }
   const ok = await Auth.changePassword(cur, nw);
-  if (!ok) {
-    markFieldError(document.getElementById('pwCurrent'));
-    return showAuthError('pwError', 'Current password is incorrect.');
-  }
-
+  if (!ok) { markFieldError(document.getElementById('pwCurrent')); return showAuthError('pwError', 'Current password is incorrect.'); }
   document.getElementById('pwCurrent').value = '';
   document.getElementById('pwNew').value = '';
   document.getElementById('pwConfirm').value = '';
-  updateStrength(document.getElementById('pwNew'),
-    document.getElementById('pwStrength'),
-    document.getElementById('pwStrengthText'));
-
+  updateStrength(document.getElementById('pwNew'), document.getElementById('pwStrength'), document.getElementById('pwStrengthText'));
   showToast('Password updated successfully', 'success');
 }
 
-/* =====================================================
-   HELPERS  — updateNavCounts now uses merged source
-===================================================== */
 function updateNavCounts() {
   const data = DB.get();
   const allAppts = getAllAppointments();
   document.getElementById('navPatientCount').textContent = data.patients.length;
   document.getElementById('navApptCount').textContent = allAppts.filter(a => a.status !== 'Cancelled').length;
 }
-
 function formatTime(dt) {
   if (!dt) return '—';
   const d = new Date(dt);
   if (isNaN(d)) return '—';
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
-
 function formatDateTime(dt) {
   if (!dt) return '—';
   const d = new Date(dt);
   if (isNaN(d)) return '—';
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' + formatTime(dt);
 }
-
 function showModal(html) {
   document.getElementById('modalContent').innerHTML = html;
   document.getElementById('modalOverlay').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
-
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('show');
   document.body.style.overflow = '';
 }
-
-document.getElementById('modalOverlay').addEventListener('click', (e) => {
-  if (e.target.id === 'modalOverlay') closeModal();
-});
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
-});
-
+document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 function showToast(message, type = 'info') {
-  const icons = {
-    success: 'fa-check-circle', error: 'fa-exclamation-circle',
-    warning: 'fa-exclamation-triangle', info: 'fa-info-circle'
-  };
+  const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `<i class="fas ${icons[type]}"></i> <span>${message}</span>`;
@@ -3031,7 +2444,6 @@ function showToast(message, type = 'info') {
     setTimeout(() => toast.remove(), 300);
   }, 3200);
 }
-
 document.getElementById('globalSearch').addEventListener('input', (e) => {
   const q = e.target.value.toLowerCase().trim();
   if (!q) return;
@@ -3043,83 +2455,50 @@ document.getElementById('globalSearch').addEventListener('input', (e) => {
   else if (foundAppt) goToPage('appointments');
 });
 
-/* =====================================================
-   BOOKING REQUESTS — render + actions
-===================================================== */
 let bookingFilter = 'all';
 let bookingQuery  = '';
 
 function bEsc(s) {
-  return String(s ?? '').replace(/[&<>"']/g, c =>
-    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
-
 function bookingStatusClass(status) {
-  return status === 'Confirmed' ? 'badge-success'
-       : status === 'Cancelled' ? 'badge-danger'
-       : status === 'Completed' ? 'badge-info'
-       : 'badge-warning';
+  return status === 'Confirmed' ? 'badge-success' : status === 'Cancelled' ? 'badge-danger' : status === 'Completed' ? 'badge-info' : 'badge-warning';
 }
-
 function bookingStatusIcon(status) {
-  return status === 'Confirmed' ? 'fa-check-circle'
-       : status === 'Cancelled' ? 'fa-times-circle'
-       : status === 'Completed' ? 'fa-flag-checkered'
-       : 'fa-clock';
+  return status === 'Confirmed' ? 'fa-check-circle' : status === 'Cancelled' ? 'fa-times-circle' : status === 'Completed' ? 'fa-flag-checkered' : 'fa-clock';
 }
-
 function updateBookingChips(all) {
   const c = { Pending: 0, Confirmed: 0, Cancelled: 0, Completed: 0 };
   all.forEach(b => { if (c[b.status] !== undefined) c[b.status]++; });
-
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set('cAll', all.length);
   set('cPending', c.Pending);
   set('cConfirmed', c.Confirmed);
   set('cCancelled', c.Cancelled);
   set('cCompleted', c.Completed);
-
   const nav = document.getElementById('navBookingCount');
-  if (nav) {
-    nav.textContent = c.Pending;
-    nav.style.display = c.Pending > 0 ? '' : 'none';
-  }
+  if (nav) { nav.textContent = c.Pending; nav.style.display = c.Pending > 0 ? '' : 'none'; }
 }
-
 function renderBookingRequests() {
   const host = document.getElementById('bookingsList');
   if (!host) return;
   if (typeof UserAuth === 'undefined') {
-    host.innerHTML = `<div class="empty-state">
-      <i class="fas fa-exclamation-triangle"></i>
-      <h3>shared.js not loaded</h3>
-      <p>Make sure shared.js sits next to admin.html.</p>
-    </div>`;
+    host.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>shared.js not loaded</h3><p>Make sure shared.js sits next to dashboard.html.</p></div>`;
     return;
   }
-
   const all = UserAuth.getAllBookings();
   updateBookingChips(all);
-
   let list = all;
   if (bookingFilter !== 'all') list = list.filter(b => b.status === bookingFilter);
   if (bookingQuery) {
     const q = bookingQuery.toLowerCase();
-    list = list.filter(b =>
-      ((b.patientName || b.userName || '') + ' ' + (b.doctorName || '') + ' ' + (b.id || '') + ' ' +
-       (b.userEmail || '') + ' ' + (b.department || '')).toLowerCase().includes(q));
+    list = list.filter(b => ((b.patientName || b.userName || '') + ' ' + (b.doctorName || '') + ' ' + (b.id || '') + ' ' + (b.userEmail || '') + ' ' + (b.department || '')).toLowerCase().includes(q));
   }
   list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
   if (!list.length) {
-    host.innerHTML = `<div class="empty-state">
-      <i class="fas fa-calendar-plus"></i>
-      <h3>No booking requests</h3>
-      <p>New patient bookings will appear here.</p>
-    </div>`;
+    host.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-plus"></i><h3>No booking requests</h3><p>New patient bookings will appear here.</p></div>`;
     return;
   }
-
   host.innerHTML = list.map(b => {
     const status = b.status || 'Pending';
     const canConfirm = status === 'Pending' || status === 'Cancelled';
@@ -3130,51 +2509,11 @@ function renderBookingRequests() {
     const doctorName = b.doctorName || b.doctor || '—';
     const department = b.department || b.dept || '—';
     const type = b.consultationType || b.type || 'In-Person Visit';
-
-    return `
-      <div class="bk" data-status="${bEsc(status)}">
-        <div class="bk-top">
-          <div>
-            <div class="bk-patient">${bEsc(patientName)}</div>
-            <div class="bk-sub">${bEsc(email)}${b.phone ? ' · ' + bEsc(b.phone) : ''}</div>
-          </div>
-          <span class="badge ${bookingStatusClass(status)}">
-            <i class="fas ${bookingStatusIcon(status)}"></i> ${bEsc(status)}
-          </span>
-        </div>
-
-        <div class="bk-grid">
-          <div class="cell"><div class="lbl">Doctor</div><div class="val">${bEsc(doctorName)}</div></div>
-          <div class="cell"><div class="lbl">Department</div><div class="val">${bEsc(department)}</div></div>
-          <div class="cell"><div class="lbl">Date</div><div class="val">${bEsc(b.date) || '—'}</div></div>
-          <div class="cell"><div class="lbl">Time</div><div class="val">${bEsc(b.time) || '—'}</div></div>
-          <div class="cell"><div class="lbl">Type</div><div class="val">${bEsc(type)}</div></div>
-          <div class="cell"><div class="lbl">Booking ID</div><div class="val">${bEsc(b.id) || '—'}</div></div>
-        </div>
-
-        ${b.reason ? `<div class="bk-note"><i class="fas fa-comment-medical"></i>
-          <span>${bEsc(b.reason)}</span></div>` : ''}
-        ${b.adminNote ? `<div class="bk-note"><i class="fas fa-user-shield"></i>
-          <span>Admin note: ${bEsc(b.adminNote)}</span></div>` : ''}
-
-        <div class="bk-actions">
-          ${canConfirm ? `<button class="btn btn-success btn-sm" data-act="confirm" data-id="${bEsc(b.id)}">
-              <i class="fas fa-check"></i> Confirm</button>` : ''}
-          ${canDone ? `<button class="btn btn-outline btn-sm" data-act="complete" data-id="${bEsc(b.id)}">
-              <i class="fas fa-flag-checkered"></i> Mark Completed</button>` : ''}
-          ${canCancel ? `<button class="btn btn-danger btn-sm" data-act="cancel" data-id="${bEsc(b.id)}">
-              <i class="fas fa-times"></i> Cancel</button>` : ''}
-        </div>
-      </div>`;
+    return `<div class="bk" data-status="${bEsc(status)}"><div class="bk-top"><div><div class="bk-patient">${bEsc(patientName)}</div><div class="bk-sub">${bEsc(email)}${b.phone ? ' · ' + bEsc(b.phone) : ''}</div></div><span class="badge ${bookingStatusClass(status)}"><i class="fas ${bookingStatusIcon(status)}"></i> ${bEsc(status)}</span></div><div class="bk-grid"><div class="cell"><div class="lbl">Doctor</div><div class="val">${bEsc(doctorName)}</div></div><div class="cell"><div class="lbl">Department</div><div class="val">${bEsc(department)}</div></div><div class="cell"><div class="lbl">Date</div><div class="val">${bEsc(b.date) || '—'}</div></div><div class="cell"><div class="lbl">Time</div><div class="val">${bEsc(b.time) || '—'}</div></div><div class="cell"><div class="lbl">Type</div><div class="val">${bEsc(type)}</div></div><div class="cell"><div class="lbl">Booking ID</div><div class="val">${bEsc(b.id) || '—'}</div></div></div>${b.reason ? `<div class="bk-note"><i class="fas fa-comment-medical"></i><span>${bEsc(b.reason)}</span></div>` : ''}${b.adminNote ? `<div class="bk-note"><i class="fas fa-user-shield"></i><span>Admin note: ${bEsc(b.adminNote)}</span></div>` : ''}<div class="bk-actions">${canConfirm ? `<button class="btn btn-success btn-sm" data-act="confirm" data-id="${bEsc(b.id)}"><i class="fas fa-check"></i> Confirm</button>` : ''}${canDone ? `<button class="btn btn-outline btn-sm" data-act="complete" data-id="${bEsc(b.id)}"><i class="fas fa-flag-checkered"></i> Mark Completed</button>` : ''}${canCancel ? `<button class="btn btn-danger btn-sm" data-act="cancel" data-id="${bEsc(b.id)}"><i class="fas fa-times"></i> Cancel</button>` : ''}</div></div>`;
   }).join('');
 }
 
-/* =====================================================
-   ROBUST NAVIGATION — delegated clicks (fixes menu)
-===================================================== */
 document.addEventListener('click', function (e) {
-
-  /* --- booking card actions --- */
   const bookBtn = e.target.closest('#bookingsList [data-act]');
   if (bookBtn && typeof UserAuth !== 'undefined') {
     const act = bookBtn.dataset.act;
@@ -3185,14 +2524,7 @@ document.addEventListener('click', function (e) {
         UserAuth.confirmBooking(id);
         DB.update(d => {
           const exists = d.appointments.find(a => a.id === id);
-          const payload = {
-            id: id,
-            patient: booking.patientName || booking.userName,
-            doctor: booking.doctorName,
-            dept: booking.department,
-            datetime: `${booking.date || ''}T${booking.time || '00:00'}`,
-            status: 'Confirmed'
-          };
+          const payload = { id: id, patient: booking.patientName || booking.userName, doctor: booking.doctorName, dept: booking.department, datetime: `${booking.date || ''}T${booking.time || '00:00'}`, status: 'Confirmed' };
           if (exists) Object.assign(exists, payload);
           else d.appointments.push(payload);
         });
@@ -3201,10 +2533,7 @@ document.addEventListener('click', function (e) {
         if (!confirm('Cancel this booking?')) return;
         const note = prompt('Reason for cancellation (optional):', '') || '';
         UserAuth.rejectBooking(id, note);
-        DB.update(d => {
-          const a = d.appointments.find(x => x.id === id);
-          if (a) a.status = 'Cancelled';
-        });
+        DB.update(d => { const a = d.appointments.find(x => x.id === id); if (a) a.status = 'Cancelled'; });
         showToast('Booking cancelled', 'error');
       } else if (act === 'complete') {
         UserAuth.completeBooking(id);
@@ -3218,8 +2547,6 @@ document.addEventListener('click', function (e) {
     }
     return;
   }
-
-  /* --- filter chips in Booking Requests --- */
   const chip = e.target.closest('#bookingChips .chip');
   if (chip) {
     document.querySelectorAll('#bookingChips .chip').forEach(c => c.classList.remove('active'));
@@ -3228,31 +2555,20 @@ document.addEventListener('click', function (e) {
     renderBookingRequests();
     return;
   }
-
-  /* --- Confirm all pending --- */
   if (e.target.closest('#confirmAllBookings')) {
     if (typeof UserAuth === 'undefined') return;
     const pending = UserAuth.getAllBookings().filter(b => b.status === 'Pending');
     if (!pending.length) return showToast('No pending requests', 'warning');
     if (!confirm(`Confirm all ${pending.length} pending booking(s)?`)) return;
-
     pending.forEach(b => {
       UserAuth.confirmBooking(b.id);
       DB.update(d => {
         const exists = d.appointments.find(a => a.id === b.id);
-        const payload = {
-          id: b.id,
-          patient: b.patientName || b.userName,
-          doctor: b.doctorName,
-          dept: b.department,
-          datetime: `${b.date || ''}T${b.time || '00:00'}`,
-          status: 'Confirmed'
-        };
+        const payload = { id: b.id, patient: b.patientName || b.userName, doctor: b.doctorName, dept: b.department, datetime: `${b.date || ''}T${b.time || '00:00'}`, status: 'Confirmed' };
         if (exists) Object.assign(exists, payload);
         else d.appointments.push(payload);
       });
     });
-
     showToast(pending.length + ' booking(s) confirmed', 'success');
     renderBookingRequests();
     renderDashboard();
@@ -3261,14 +2577,7 @@ document.addEventListener('click', function (e) {
     updateNavCounts();
     return;
   }
-
-  /* --- Logout (both buttons) --- */
-  if (e.target.closest('#logoutBtn') || e.target.closest('#logoutBtn2')) {
-    logout();
-    return;
-  }
-
-  /* --- Hamburger toggle --- */
+  if (e.target.closest('#logoutBtn') || e.target.closest('#logoutBtn2')) { logout(); return; }
   if (e.target.closest('#menuToggle')) {
     const sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
@@ -3276,14 +2585,7 @@ document.addEventListener('click', function (e) {
     else openSidebar();
     return;
   }
-
-  /* --- Sidebar backdrop --- */
-  if (e.target.closest('#sidebarBackdrop')) {
-    closeSidebar();
-    return;
-  }
-
-  /* --- Page navigation: any [data-page] element --- */
+  if (e.target.closest('#sidebarBackdrop')) { closeSidebar(); return; }
   const navEl = e.target.closest('[data-page]');
   if (navEl && navEl.dataset.page && !navEl.classList.contains('chip')) {
     e.preventDefault();
@@ -3292,7 +2594,6 @@ document.addEventListener('click', function (e) {
   }
 });
 
-/* Search input for Booking Requests (delegated) */
 document.addEventListener('input', function (e) {
   if (e.target && e.target.id === 'searchBookings') {
     bookingQuery = e.target.value.trim();
@@ -3300,30 +2601,213 @@ document.addEventListener('input', function (e) {
   }
 });
 
-/* Live sync between patient booking page and admin */
-window.addEventListener('bookings:changed', () => {
-  renderBookingRequests();
-  renderDashboard();
-  renderAppointments();
-  renderReports();
-  updateNavCounts();
-});
+window.addEventListener('bookings:changed', () => { renderBookingRequests(); renderDashboard(); renderAppointments(); renderReports(); updateNavCounts(); });
 window.addEventListener('storage', (e) => {
   if (e.key === 'medicare_user_bookings' || e.key === 'medicare_bookings') {
-    renderBookingRequests();
-    renderDashboard();
-    renderAppointments();
-    renderReports();
-    updateNavCounts();
+    renderBookingRequests(); renderDashboard(); renderAppointments(); renderReports(); updateNavCounts();
   }
 });
 window.addEventListener('focus', () => {
-  renderBookingRequests();
-  renderDashboard();
-  renderAppointments();
-  renderReports();
-  updateNavCounts();
+  renderBookingRequests(); renderDashboard(); renderAppointments(); renderReports(); updateNavCounts();
 });
+window.addEventListener('medicare:settings-changed', () => { try { renderBilling(); } catch (e) {} });
+
 </script>
+
+<!-- =========================================================
+     INLINE REGION & CURRENCY
+========================================================= -->
+<script>
+(function () {
+  'use strict';
+  console.log('[inline-currency] boot');
+
+  var COUNTRIES = [
+    { code:'PK', name:'Pakistan', dial:'+92', currency:'PKR', symbol:'₨' },
+    { code:'IN', name:'India', dial:'+91', currency:'INR', symbol:'₹' },
+    { code:'BD', name:'Bangladesh', dial:'+880', currency:'BDT', symbol:'৳' },
+    { code:'LK', name:'Sri Lanka', dial:'+94', currency:'LKR', symbol:'Rs' },
+    { code:'CN', name:'China', dial:'+86', currency:'CNY', symbol:'¥' },
+    { code:'JP', name:'Japan', dial:'+81', currency:'JPY', symbol:'¥' },
+    { code:'KR', name:'South Korea', dial:'+82', currency:'KRW', symbol:'₩' },
+    { code:'ID', name:'Indonesia', dial:'+62', currency:'IDR', symbol:'Rp' },
+    { code:'MY', name:'Malaysia', dial:'+60', currency:'MYR', symbol:'RM' },
+    { code:'SG', name:'Singapore', dial:'+65', currency:'SGD', symbol:'S$' },
+    { code:'TH', name:'Thailand', dial:'+66', currency:'THB', symbol:'฿' },
+    { code:'PH', name:'Philippines', dial:'+63', currency:'PHP', symbol:'₱' },
+    { code:'AE', name:'United Arab Emirates', dial:'+971', currency:'AED', symbol:'د.إ' },
+    { code:'SA', name:'Saudi Arabia', dial:'+966', currency:'SAR', symbol:'﷼' },
+    { code:'QA', name:'Qatar', dial:'+974', currency:'QAR', symbol:'ر.ق' },
+    { code:'KW', name:'Kuwait', dial:'+965', currency:'KWD', symbol:'د.ك' },
+    { code:'TR', name:'Turkey', dial:'+90', currency:'TRY', symbol:'₺' },
+    { code:'EG', name:'Egypt', dial:'+20', currency:'EGP', symbol:'E£' },
+    { code:'ZA', name:'South Africa', dial:'+27', currency:'ZAR', symbol:'R' },
+    { code:'NG', name:'Nigeria', dial:'+234', currency:'NGN', symbol:'₦' },
+    { code:'KE', name:'Kenya', dial:'+254', currency:'KES', symbol:'KSh' },
+    { code:'GB', name:'United Kingdom', dial:'+44', currency:'GBP', symbol:'£' },
+    { code:'DE', name:'Germany', dial:'+49', currency:'EUR', symbol:'€' },
+    { code:'FR', name:'France', dial:'+33', currency:'EUR', symbol:'€' },
+    { code:'IT', name:'Italy', dial:'+39', currency:'EUR', symbol:'€' },
+    { code:'ES', name:'Spain', dial:'+34', currency:'EUR', symbol:'€' },
+    { code:'CH', name:'Switzerland', dial:'+41', currency:'CHF', symbol:'CHF' },
+    { code:'SE', name:'Sweden', dial:'+46', currency:'SEK', symbol:'kr' },
+    { code:'RU', name:'Russia', dial:'+7', currency:'RUB', symbol:'₽' },
+    { code:'US', name:'United States', dial:'+1', currency:'USD', symbol:'$' },
+    { code:'CA', name:'Canada', dial:'+1', currency:'CAD', symbol:'C$' },
+    { code:'MX', name:'Mexico', dial:'+52', currency:'MXN', symbol:'MX$' },
+    { code:'BR', name:'Brazil', dial:'+55', currency:'BRL', symbol:'R$' },
+    { code:'AU', name:'Australia', dial:'+61', currency:'AUD', symbol:'A$' },
+    { code:'NZ', name:'New Zealand', dial:'+64', currency:'NZD', symbol:'NZ$' }
+  ];
+
+  var SETTINGS_KEY = 'medicare_global_settings';
+
+  function getSettings() {
+    try {
+      var s = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
+      if (!s.country) s.country = 'PK';
+      if (!s.currency) {
+        var c = COUNTRIES.filter(function(x){return x.code===s.country;})[0];
+        s.currency = c ? c.currency : 'USD';
+      }
+      return s;
+    } catch (e) { return { country:'PK', currency:'PKR' }; }
+  }
+  function saveSettings(obj) {
+    var merged = Object.assign(getSettings(), obj);
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(merged));
+    return merged;
+  }
+  function symbolOf(code) {
+    var c = COUNTRIES.filter(function(x){return x.currency===code;})[0];
+    return c ? c.symbol : code;
+  }
+  function money(n) {
+    var code = getSettings().currency;
+    var num = Number(n) || 0;
+    try {
+      return new Intl.NumberFormat(undefined, { style:'currency', currency:code, maximumFractionDigits:2 }).format(num);
+    } catch (e) { return symbolOf(code) + num.toFixed(2); }
+  }
+
+  window.CurrencyHelper = { money: money, getSettings: getSettings, saveSettings: saveSettings, symbolOf: symbolOf };
+
+  function initCard() {
+    var card = document.getElementById('globalRegionCard');
+    if (!card) return false;
+    if (card.dataset.ready === '1') return true;
+    card.dataset.ready = '1';
+
+    var s = getSettings();
+    var countrySel  = document.getElementById('setCountry');
+    var currencySel = document.getElementById('setCurrency');
+    var previewAmt  = document.getElementById('currencyPreviewAmount');
+    var previewCode = document.getElementById('currencyPreviewCode');
+    if (!countrySel || !currencySel) return false;
+
+    countrySel.innerHTML = COUNTRIES.map(function(c){
+      return '<option value="'+c.code+'"'+(c.code===s.country?' selected':'')+'>'+c.name+' ('+c.dial+')</option>';
+    }).join('');
+
+    var seen = {};
+    var currencyOpts = '';
+    COUNTRIES.forEach(function(c){
+      if (seen[c.currency]) return;
+      seen[c.currency] = true;
+      currencyOpts += '<option value="'+c.currency+'" data-country="'+c.code+'"'+(c.currency===s.currency?' selected':'')+'>'+c.currency+' '+c.symbol+' — '+c.name+'</option>';
+    });
+    currencySel.innerHTML = currencyOpts;
+
+    function updatePreview() {
+      var code = currencySel.value;
+      var formatted;
+      try { formatted = new Intl.NumberFormat(undefined,{style:'currency',currency:code,maximumFractionDigits:2}).format(1234.5); }
+      catch(e) { formatted = symbolOf(code)+'1234.50'; }
+      previewAmt.textContent = formatted;
+      previewCode.textContent = code + ' ' + symbolOf(code);
+    }
+
+    countrySel.addEventListener('change', function(){
+      var c = COUNTRIES.filter(function(x){return x.code===countrySel.value;})[0];
+      if (c) {
+        var opts = currencySel.options;
+        for (var i=0;i<opts.length;i++){
+          if (opts[i].value === c.currency) { currencySel.selectedIndex = i; break; }
+        }
+        updatePreview();
+      }
+    });
+
+    currencySel.addEventListener('change', function(){
+      var opt = currencySel.options[currencySel.selectedIndex];
+      var cc  = opt && opt.dataset && opt.dataset.country;
+      if (cc) countrySel.value = cc;
+      updatePreview();
+    });
+
+    updatePreview();
+
+    document.getElementById('saveRegionBtn').addEventListener('click', function(){
+      var country  = countrySel.value;
+      var currency = currencySel.value;
+      saveSettings({ country:country, currency:currency });
+      if (typeof window.showToast === 'function') window.showToast('Saved: ' + currency + ' ' + symbolOf(currency), 'success');
+      try { window.renderBilling && window.renderBilling(); } catch(e){}
+      window.dispatchEvent(new CustomEvent('medicare:settings-changed', { detail:{ currency:currency } }));
+      setTimeout(function(){ location.reload(); }, 650);
+    });
+
+    console.log('[inline-currency] card ready');
+    return true;
+  }
+  window.initRegionCard = initCard;
+
+  function initPill() {
+    var topbarRight = document.querySelector('.topbar-right');
+    if (!topbarRight) return false;
+    if (document.getElementById('currencyPill')) return true;
+    var s = getSettings();
+    var pill = document.createElement('div');
+    pill.id = 'currencyPill';
+    pill.title = 'Click to change currency';
+    pill.style.cssText = 'display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #e6f0f5;border-radius:40px;padding:10px 16px;font-size:13px;font-weight:700;color:#0b3b4b;box-shadow:0 6px 18px rgba(0,30,45,.04);cursor:pointer;flex-shrink:0;';
+    pill.innerHTML = '<i class="fas fa-coins" style="color:#0d6e9e;"></i> <span>' + s.currency + '</span> <span style="color:#5e7e8c;font-weight:600;">' + symbolOf(s.currency) + '</span>';
+    pill.addEventListener('click', function(){
+      if (typeof window.goToPage === 'function') window.goToPage('settings');
+      setTimeout(function(){
+        var card = document.getElementById('globalRegionCard');
+        if (card) card.scrollIntoView({ behavior:'smooth', block:'center' });
+        initCard();
+      }, 200);
+    });
+    var notif = document.getElementById('notifBtn');
+    if (notif && notif.parentNode === topbarRight) topbarRight.insertBefore(pill, notif);
+    else topbarRight.appendChild(pill);
+    console.log('[inline-currency] pill ready');
+    return true;
+  }
+
+  var attempts = 0;
+  function tryInit() {
+    attempts++;
+    var ok1 = initCard();
+    var ok2 = initPill();
+    if (ok1 && ok2) { console.log('[inline-currency] done at attempt', attempts); return; }
+    if (attempts < 20) setTimeout(tryInit, 400);
+    else console.warn('[inline-currency] gave up');
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(tryInit, 200); });
+  else setTimeout(tryInit, 200);
+})();
+</script>
+
+<!-- =========================================================
+     ADDON SCRIPTS
+========================================================= -->
+<script src="admin-hospitals.js"></script>
+<script src="admin-doctors-public.js"></script>
+<script src="admin-invoice-patch.js"></script>
+
 </body>
 </html>

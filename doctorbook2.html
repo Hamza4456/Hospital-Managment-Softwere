@@ -6,6 +6,10 @@
 <title>Book Appointment · MediCare Hospital</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="public-extras.css">
+<script src="public-doctors.js"></script>
+<script src="public-extras.js"></script>
+<script src="global-support.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -166,6 +170,24 @@ a { text-decoration: none; color: inherit; }
   .step-label { font-size: 10px; }
   .step-circle { width: 34px; height: 34px; font-size: 12px; }
   .card { padding: 20px; }
+}
+@media (max-width: 640px) {
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .form-actions .btn {
+    width: 100%;
+    min-width: 0;
+  }
+  .container { padding: 0 16px; }
+  .card { padding: 18px 16px; border-radius: 18px; }
+  .page-hero { padding: 40px 0 50px; }
+  .page-hero h1 { font-size: 26px; }
+  .page-hero p { font-size: 14px; }
+  .summary-row { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .summary-row .val { max-width: 100%; text-align: left; word-break: break-word; }
 }
 </style>
 <script src="shared.js"></script>
@@ -374,23 +396,27 @@ a { text-decoration: none; color: inherit; }
 <div id="site-footer"></div>
 
 <script>
-const doctors = [
-  { id: 1, name: 'Dr. A. Sharma', initials: 'AS', dept: 'Cardiology', specialty: 'Interventional Cardiology', experience: '15 years', patients: 1240, rating: 4.9, reviews: 312, available: true, degree: 'MD, DM (Cardiology)', languages: 'English, Hindi', expertise: ['Angioplasty & Stenting', 'Heart Failure', 'Coronary Imaging', 'Preventive Cardiology'], schedule: [true, true, true, true, true, false, false] },
-  { id: 2, name: 'Dr. M. Costa', initials: 'MC', dept: 'Neurology', specialty: 'Neurology Specialist', experience: '12 years', patients: 980, rating: 4.8, reviews: 245, available: true, degree: 'MD, DM (Neurology)', languages: 'English, Spanish', expertise: ['Epilepsy', 'Stroke Care', 'Movement Disorders', 'Migraine'], schedule: [true, true, false, true, true, true, false] },
-  { id: 3, name: 'Dr. L. Wong', initials: 'LW', dept: 'Orthopedics', specialty: 'Orthopedic Surgeon', experience: '18 years', patients: 1560, rating: 4.9, reviews: 428, available: false, degree: 'MS (Ortho), FRCS', languages: 'English, Mandarin', expertise: ['Joint Replacement', 'Sports Injuries', 'Spine Surgery', 'Arthroscopy'], schedule: [true, true, true, true, true, true, false] },
-  { id: 4, name: 'Dr. S. Patel', initials: 'SP', dept: 'Pediatrics', specialty: 'Pediatrician', experience: '10 years', patients: 1120, rating: 4.9, reviews: 380, available: true, degree: 'MD (Pediatrics)', languages: 'English, Hindi, Gujarati', expertise: ['Newborn Care', 'Vaccination', 'Child Nutrition', 'Growth Monitoring'], schedule: [true, true, true, true, true, true, true] },
-  { id: 5, name: 'Dr. K. Mensah', initials: 'KM', dept: 'Pulmonology', specialty: 'Pulmonologist', experience: '14 years', patients: 890, rating: 4.8, reviews: 198, available: true, degree: 'MD (Pulmonology)', languages: 'English, French', expertise: ['Asthma & COPD', 'Sleep Medicine', 'Bronchoscopy', 'Lung Function'], schedule: [true, true, true, false, true, true, false] },
-  { id: 6, name: 'Dr. J. Rivera', initials: 'JR', dept: 'Emergency', specialty: 'Emergency Medicine', experience: '9 years', patients: 2100, rating: 4.7, reviews: 456, available: true, degree: 'MD (Emergency Med)', languages: 'English, Spanish', expertise: ['Trauma Care', 'Cardiac Emergencies', 'Toxicology', 'Critical Care'], schedule: [true, true, true, true, true, true, true] },
-  { id: 7, name: 'Dr. R. Nakamura', initials: 'RN', dept: 'Oncology', specialty: 'Medical Oncologist', experience: '20 years', patients: 720, rating: 5.0, reviews: 289, available: true, degree: 'MD, DM (Oncology)', languages: 'English, Japanese', expertise: ['Chemotherapy', 'Immunotherapy', 'Targeted Therapy', 'Breast Cancer'], schedule: [true, false, true, true, true, false, false] },
-  { id: 8, name: 'Dr. E. Okafor', initials: 'EO', dept: 'Cardiology', specialty: 'Cardiac Surgeon', experience: '16 years', patients: 640, rating: 4.9, reviews: 210, available: false, degree: 'MS, MCh (CVTS)', languages: 'English, Igbo', expertise: ['CABG Surgery', 'Valve Replacement', 'Aortic Surgery'], schedule: [true, true, true, false, true, false, false] },
-  { id: 9, name: 'Dr. P. Silva', initials: 'PS', dept: 'Dermatology', specialty: 'Dermatologist', experience: '11 years', patients: 1450, rating: 4.8, reviews: 512, available: true, degree: 'MD (Dermatology)', languages: 'English, Portuguese', expertise: ['Cosmetic Dermatology', 'Skin Cancer', 'Eczema & Psoriasis', 'Acne'], schedule: [true, true, true, true, true, true, false] },
-  { id: 10, name: 'Dr. N. Haddad', initials: 'NH', dept: 'Neurology', specialty: 'Neurosurgeon', experience: '17 years', patients: 580, rating: 4.9, reviews: 178, available: true, degree: 'MS, MCh (Neurosurgery)', languages: 'English, Arabic', expertise: ['Brain Tumor', 'Spinal Surgery', 'Epilepsy Surgery'], schedule: [true, false, true, true, false, true, false] },
-  { id: 11, name: 'Dr. T. Andersson', initials: 'TA', dept: 'Orthopedics', specialty: 'Sports Medicine', experience: '13 years', patients: 1340, rating: 4.8, reviews: 398, available: true, degree: 'MD, PhD (Sports Med)', languages: 'English, Swedish', expertise: ['ACL Reconstruction', 'Shoulder Surgery', 'Cartilage Repair'], schedule: [true, true, true, true, true, false, false] },
-  { id: 12, name: 'Dr. H. Tanaka', initials: 'HT', dept: 'Pediatrics', specialty: 'Pediatric Neurologist', experience: '15 years', patients: 790, rating: 4.9, reviews: 265, available: true, degree: 'MD, DM (Ped Neuro)', languages: 'English, Japanese', expertise: ['Childhood Epilepsy', 'Developmental Disorders', 'Autism', 'Cerebral Palsy'], schedule: [true, true, false, true, true, true, false] },
-  { id: 13, name: 'Dr. F. Rossi', initials: 'FR', dept: 'Pulmonology', specialty: 'Critical Care Specialist', experience: '12 years', patients: 1120, rating: 4.7, reviews: 224, available: false, degree: 'MD (Critical Care)', languages: 'English, Italian', expertise: ['ICU Management', 'Mechanical Ventilation', 'Sepsis Care'], schedule: [true, true, true, true, true, true, true] },
-  { id: 14, name: 'Dr. L. Fernández', initials: 'LF', dept: 'Emergency', specialty: 'Trauma Surgeon', experience: '14 years', patients: 1680, rating: 4.8, reviews: 342, available: true, degree: 'MS (Trauma Surgery)', languages: 'English, Spanish', expertise: ['Polytrauma', 'Emergency Surgery', 'Burn Management'], schedule: [true, true, true, true, true, false, true] },
-  { id: 15, name: 'Dr. A. Ivanova', initials: 'AI', dept: 'Oncology', specialty: 'Radiation Oncologist', experience: '16 years', patients: 660, rating: 4.9, reviews: 201, available: true, degree: 'MD (Radiation Oncology)', languages: 'English, Russian', expertise: ['IMRT & IGRT', 'Stereotactic Radiosurgery', 'Proton Therapy'], schedule: [true, false, true, true, false, true, false] }
+const baseDoctors = [
+  { id: 1, name: 'Dr. A. Sharma', initials: 'AS', dept: 'Cardiology', specialty: 'Interventional Cardiology', experience: '15 years', patients: 1240, rating: 4.9, reviews: 312, available: true, degree: 'MD, DM (Cardiology)', languages: 'English, Hindi', expertise: ['Angioplasty & Stenting', 'Heart Failure Management', 'Coronary Imaging', 'Preventive Cardiology', 'Echocardiography'], education: [{ degree: 'MD (Medicine)', school: 'AIIMS New Delhi', year: '2005' }, { degree: 'DM (Cardiology)', school: 'PGIMER Chandigarh', year: '2009' }, { degree: 'Fellowship in Interventional Cardiology', school: 'Cleveland Clinic, USA', year: '2011' }], schedule: [true, true, true, true, true, false, false], bio: 'A leading interventional cardiologist with 15+ years of experience in complex coronary interventions, structural heart disease, and preventive cardiology.' },
+  { id: 2, name: 'Dr. M. Costa', initials: 'MC', dept: 'Neurology', specialty: 'Neurology Specialist', experience: '12 years', patients: 980, rating: 4.8, reviews: 245, available: true, degree: 'MD, DM (Neurology)', languages: 'English, Spanish', expertise: ['Epilepsy Management', 'Stroke & Thrombolysis', 'Movement Disorders', 'Headache & Migraine', 'EEG Interpretation'], education: [{ degree: 'MD (Medicine)', school: 'University of Barcelona', year: '2008' }, { degree: 'DM (Neurology)', school: 'Hospital Clínic de Barcelona', year: '2012' }], schedule: [true, true, false, true, true, true, false], bio: 'Board-certified neurologist specializing in epilepsy, stroke management, and movement disorders with a patient-focused approach.' },
+  { id: 3, name: 'Dr. L. Wong', initials: 'LW', dept: 'Orthopedics', specialty: 'Orthopedic Surgeon', experience: '18 years', patients: 1560, rating: 4.9, reviews: 428, available: false, degree: 'MS (Ortho), FRCS', languages: 'English, Mandarin', expertise: ['Joint Replacement', 'Sports Injuries', 'Spine Surgery', 'Arthroscopy', 'Trauma Care'], education: [{ degree: 'MS (Orthopedics)', school: 'University of Hong Kong', year: '2002' }, { degree: 'FRCS (Orthopedics)', school: 'Royal College of Surgeons, Edinburgh', year: '2006' }, { degree: 'Fellowship in Joint Replacement', school: 'Mayo Clinic, USA', year: '2008' }], schedule: [true, true, true, true, true, true, false], bio: 'Renowned orthopedic surgeon with 18+ years of expertise in joint replacement, sports medicine, and complex trauma surgeries.' },
+  { id: 4, name: 'Dr. S. Patel', initials: 'SP', dept: 'Pediatrics', specialty: 'Pediatrician', experience: '10 years', patients: 1120, rating: 4.9, reviews: 380, available: true, degree: 'MD (Pediatrics)', languages: 'English, Hindi, Gujarati', expertise: ['Newborn Care', 'Vaccination', 'Child Nutrition', 'Growth Monitoring', 'Pediatric Emergency'], education: [{ degree: 'MD (Pediatrics)', school: 'BJ Medical College, Ahmedabad', year: '2010' }, { degree: 'Diploma in Child Health', school: 'Mumbai University', year: '2012' }], schedule: [true, true, true, true, true, true, true], bio: 'Compassionate pediatrician dedicated to child health, with special interest in newborn care and preventive pediatrics.' },
+  { id: 5, name: 'Dr. K. Mensah', initials: 'KM', dept: 'Pulmonology', specialty: 'Pulmonologist', experience: '14 years', patients: 890, rating: 4.8, reviews: 198, available: true, degree: 'MD (Pulmonology)', languages: 'English, French', expertise: ['Asthma & COPD', 'Sleep Medicine', 'Bronchoscopy', 'Respiratory Infections', 'Lung Function Testing'], education: [{ degree: 'MD (Pulmonology)', school: 'University of Ghana', year: '2006' }, { degree: 'Fellowship in Interventional Pulmonology', school: 'Hôpital Pitié-Salpêtrière, Paris', year: '2010' }], schedule: [true, true, true, false, true, true, false], bio: 'Pulmonologist with expertise in asthma, COPD, sleep disorders, and advanced bronchoscopic procedures.' },
+  { id: 6, name: 'Dr. J. Rivera', initials: 'JR', dept: 'Emergency', specialty: 'Emergency Medicine', experience: '9 years', patients: 2100, rating: 4.7, reviews: 456, available: true, degree: 'MD (Emergency Med)', languages: 'English, Spanish', expertise: ['Trauma Care', 'Cardiac Emergencies', 'Pediatric Emergency', 'Toxicology', 'Critical Care'], education: [{ degree: 'MD (Emergency Medicine)', school: 'Universidad de Buenos Aires', year: '2011' }, { degree: 'Fellowship in Critical Care', school: 'Massachusetts General Hospital', year: '2014' }], schedule: [true, true, true, true, true, true, true], bio: 'Emergency medicine specialist with advanced training in trauma, cardiac emergencies, and critical care.' },
+  { id: 7, name: 'Dr. R. Nakamura', initials: 'RN', dept: 'Oncology', specialty: 'Medical Oncologist', experience: '20 years', patients: 720, rating: 5.0, reviews: 289, available: true, degree: 'MD, DM (Oncology)', languages: 'English, Japanese', expertise: ['Chemotherapy', 'Immunotherapy', 'Targeted Therapy', 'Breast Cancer', 'Lung Cancer'], education: [{ degree: 'MD (Medicine)', school: 'University of Tokyo', year: '2000' }, { degree: 'DM (Medical Oncology)', school: 'National Cancer Center, Tokyo', year: '2005' }, { degree: 'Research Fellowship', school: 'MD Anderson Cancer Center, USA', year: '2008' }], schedule: [true, false, true, true, true, false, false], bio: 'Distinguished oncologist with 20 years of experience in precision oncology, immunotherapy, and patient-centered cancer care.' },
+  { id: 8, name: 'Dr. E. Okafor', initials: 'EO', dept: 'Cardiology', specialty: 'Cardiac Surgeon', experience: '16 years', patients: 640, rating: 4.9, reviews: 210, available: false, degree: 'MS, MCh (CVTS)', languages: 'English, Igbo', expertise: ['CABG Surgery', 'Valve Replacement', 'Aortic Surgery', 'Minimally Invasive Cardiac Surgery'], education: [{ degree: 'MS (General Surgery)', school: 'University of Lagos', year: '2004' }, { degree: 'MCh (Cardiothoracic Surgery)', school: 'University of Cape Town', year: '2009' }], schedule: [true, true, true, false, true, false, false], bio: 'Cardiothoracic surgeon specializing in coronary bypass, valve surgery, and minimally invasive cardiac procedures.' },
+  { id: 9, name: 'Dr. P. Silva', initials: 'PS', dept: 'Dermatology', specialty: 'Dermatologist', experience: '11 years', patients: 1450, rating: 4.8, reviews: 512, available: true, degree: 'MD (Dermatology)', languages: 'English, Portuguese', expertise: ['Cosmetic Dermatology', 'Skin Cancer Screening', 'Eczema & Psoriasis', 'Acne Treatment', 'Laser Therapy'], education: [{ degree: 'MD (Dermatology)', school: 'University of São Paulo', year: '2009' }, { degree: 'Fellowship in Dermatologic Surgery', school: 'NYU Langone, USA', year: '2013' }], schedule: [true, true, true, true, true, true, false], bio: 'Dermatologist with expertise in medical and cosmetic dermatology, skin cancer screening, and laser treatments.' },
+  { id: 10, name: 'Dr. N. Haddad', initials: 'NH', dept: 'Neurology', specialty: 'Neurosurgeon', experience: '17 years', patients: 580, rating: 4.9, reviews: 178, available: true, degree: 'MS, MCh (Neurosurgery)', languages: 'English, Arabic', expertise: ['Brain Tumor Surgery', 'Spinal Surgery', 'Epilepsy Surgery', 'Minimally Invasive Neurosurgery'], education: [{ degree: 'MS (General Surgery)', school: 'American University of Beirut', year: '2003' }, { degree: 'MCh (Neurosurgery)', school: "King's College London", year: '2008' }], schedule: [true, false, true, true, false, true, false], bio: 'Neurosurgeon with advanced expertise in brain tumor surgery, spinal procedures, and minimally invasive neurosurgery.' },
+  { id: 11, name: 'Dr. T. Andersson', initials: 'TA', dept: 'Orthopedics', specialty: 'Sports Medicine', experience: '13 years', patients: 1340, rating: 4.8, reviews: 398, available: true, degree: 'MD, PhD (Sports Med)', languages: 'English, Swedish', expertise: ['ACL Reconstruction', 'Shoulder Surgery', 'Cartilage Repair', 'Sports Injury Rehab'], education: [{ degree: 'MD (Orthopedics)', school: 'Karolinska Institute, Sweden', year: '2007' }, { degree: 'PhD in Sports Medicine', school: 'University of Gothenburg', year: '2012' }], schedule: [true, true, true, true, true, false, false], bio: 'Sports medicine specialist with PhD-level expertise in ACL reconstruction, shoulder surgery, and athletic rehabilitation.' },
+  { id: 12, name: 'Dr. H. Tanaka', initials: 'HT', dept: 'Pediatrics', specialty: 'Pediatric Neurologist', experience: '15 years', patients: 790, rating: 4.9, reviews: 265, available: true, degree: 'MD, DM (Ped Neuro)', languages: 'English, Japanese', expertise: ['Epilepsy in Children', 'Developmental Disorders', 'Autism Spectrum', 'Cerebral Palsy', 'Neuromuscular Disorders'], education: [{ degree: 'MD (Pediatrics)', school: 'University of Tokyo', year: '2005' }, { degree: 'DM (Pediatric Neurology)', school: 'National Center for Child Health, Tokyo', year: '2010' }], schedule: [true, true, false, true, true, true, false], bio: 'Pediatric neurologist with 15 years of experience in childhood epilepsy, developmental disorders, and neuromuscular conditions.' },
+  { id: 13, name: 'Dr. F. Rossi', initials: 'FR', dept: 'Pulmonology', specialty: 'Critical Care Specialist', experience: '12 years', patients: 1120, rating: 4.7, reviews: 224, available: false, degree: 'MD (Critical Care)', languages: 'English, Italian', expertise: ['ICU Management', 'Mechanical Ventilation', 'Sepsis Care', 'Respiratory Failure'], education: [{ degree: 'MD (Anesthesia & Critical Care)', school: 'University of Milan', year: '2008' }, { degree: 'Fellowship in Critical Care', school: 'Johns Hopkins Hospital, USA', year: '2012' }], schedule: [true, true, true, true, true, true, true], bio: 'Critical care specialist with extensive ICU experience in mechanical ventilation, sepsis management, and respiratory failure.' },
+  { id: 14, name: 'Dr. L. Fernández', initials: 'LF', dept: 'Emergency', specialty: 'Trauma Surgeon', experience: '14 years', patients: 1680, rating: 4.8, reviews: 342, available: true, degree: 'MS (Trauma Surgery)', languages: 'English, Spanish', expertise: ['Polytrauma', 'Emergency Surgery', 'Burn Management', 'Orthopedic Trauma'], education: [{ degree: 'MS (General Surgery)', school: 'Universidad de Madrid', year: '2005' }, { degree: 'Fellowship in Trauma Surgery', school: 'R Adams Cowley Shock Trauma Center, USA', year: '2010' }], schedule: [true, true, true, true, true, false, true], bio: 'Trauma surgeon with 14 years of experience in polytrauma, emergency surgery, and burn management.' },
+  { id: 15, name: 'Dr. A. Ivanova', initials: 'AI', dept: 'Oncology', specialty: 'Radiation Oncologist', experience: '16 years', patients: 660, rating: 4.9, reviews: 201, available: true, degree: 'MD (Radiation Oncology)', languages: 'English, Russian', expertise: ['IMRT & IGRT', 'Stereotactic Radiosurgery', 'Proton Therapy', 'Brachytherapy'], education: [{ degree: 'MD (Radiation Oncology)', school: 'Moscow State Medical University', year: '2004' }, { degree: 'Fellowship in Advanced Radiation', school: 'Memorial Sloan Kettering, USA', year: '2009' }], schedule: [true, false, true, true, false, true, false], bio: 'Radiation oncologist with advanced training in IMRT, stereotactic radiosurgery, and proton therapy.' }
 ];
+
+const doctors = window.MediCareDoctors
+  ? MediCareDoctors.merge(baseDoctors)
+  : baseDoctors;
 
 let currentStep = 1;
 const totalSteps = 4;
@@ -401,7 +427,7 @@ let selectedTime = null;
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('doctor')) {
   const id = parseInt(urlParams.get('doctor'));
-  selectedDoctor = doctors.find(d => d.id === id) || null;
+  selectedDoctor = doctors.find(d => String(d.id) === String(id)) || null;
 }
 
 const nextBtn = document.getElementById('nextBtn');
@@ -461,8 +487,8 @@ function renderDoctorPicker() {
   const filtered = filterDept ? doctors.filter(d => d.dept === filterDept) : doctors;
 
   document.getElementById('doctorMiniGrid').innerHTML = filtered.map(d => `
-    <div class="doctor-mini-card ${selectedDoctor && selectedDoctor.id === d.id ? 'selected' : ''}" onclick="selectDoctor(${d.id})">
-      <div class="doctor-mini-avatar">${d.initials}</div>
+    <div class="doctor-mini-card ${selectedDoctor && String(selectedDoctor.id) === String(d.id) ? 'selected' : ''}" onclick="selectDoctor('${d.id}')">
+      <div class="doctor-mini-avatar">${d.initials || ''}</div>
       <div class="doctor-mini-info">
         <h4>${d.name}</h4>
         <p>${d.dept} · ${d.experience}</p>
@@ -472,7 +498,7 @@ function renderDoctorPicker() {
 }
 
 function selectDoctor(id) {
-  selectedDoctor = doctors.find(d => d.id === id);
+  selectedDoctor = doctors.find(d => String(d.id) === String(id));
   renderDoctorPicker();
   updateDoctorPreview();
 }
@@ -551,6 +577,7 @@ function selectSlot(time, btn) {
 }
 
 function formatTime(t) {
+  if (!t) return '—';
   const [h, m] = t.split(':');
   const hour = +h;
   const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -559,6 +586,7 @@ function formatTime(t) {
 }
 
 function formatDate(d) {
+  if (!d) return '—';
   const date = new Date(d);
   return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 }
@@ -580,13 +608,16 @@ function updateDoctorPreview() {
 
   const d = selectedDoctor;
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const schedule = Array.isArray(d.schedule) && d.schedule.length === 7
+    ? d.schedule : [true, true, true, true, true, false, false];
+  const expertise = Array.isArray(d.expertise) ? d.expertise : [];
 
   container.innerHTML = `
     <div class="doctor-preview-card">
       <div class="doctor-preview-hero">
-        <div class="doctor-preview-avatar ${d.available ? '' : 'offline'}">${d.initials}</div>
+        <div class="doctor-preview-avatar ${d.available ? '' : 'offline'}">${d.initials || ''}</div>
         <h3>${d.name}</h3>
-        <p class="specialty">${d.specialty}</p>
+        <p class="specialty">${d.specialty || ''}</p>
         <span class="doctor-preview-badge ${d.available ? '' : 'busy'}">
           ${d.available ? '● Available' : '● Busy'}
         </span>
@@ -595,42 +626,42 @@ function updateDoctorPreview() {
         <div class="preview-stat-row">
           <div class="preview-stat">
             <div class="lbl">Experience</div>
-            <div class="val">${d.experience}</div>
+            <div class="val">${d.experience || '—'}</div>
           </div>
           <div class="preview-stat">
             <div class="lbl">Rating</div>
-            <div class="val gold">★ ${d.rating}</div>
+            <div class="val gold">★ ${d.rating || 0}</div>
           </div>
           <div class="preview-stat">
             <div class="lbl">Patients</div>
-            <div class="val">${d.patients.toLocaleString()}</div>
+            <div class="val">${(Number(d.patients) || 0).toLocaleString()}</div>
           </div>
           <div class="preview-stat">
             <div class="lbl">Reviews</div>
-            <div class="val">${d.reviews}</div>
+            <div class="val">${d.reviews || 0}</div>
           </div>
         </div>
         <div class="preview-detail">
           <i class="fas fa-building"></i>
           <span class="lbl">Department</span>
-          <span class="val">${d.dept}</span>
+          <span class="val">${d.dept || '—'}</span>
         </div>
         <div class="preview-detail">
           <i class="fas fa-certificate"></i>
           <span class="lbl">Qualification</span>
-          <span class="val">${d.degree}</span>
+          <span class="val">${d.degree || '—'}</span>
         </div>
         <div class="preview-detail">
           <i class="fas fa-language"></i>
           <span class="lbl">Languages</span>
-          <span class="val">${d.languages}</span>
+          <span class="val">${d.languages || '—'}</span>
         </div>
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
           <div style="font-size:12px;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:10px;">
             Areas of Expertise
           </div>
           <div class="preview-tags">
-            ${d.expertise.map(t => `<span class="tag">${t}</span>`).join('')}
+            ${expertise.map(t => `<span class="tag">${t}</span>`).join('') || '<span style="color:var(--gray);font-size:12px;">—</span>'}
           </div>
         </div>
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
@@ -638,7 +669,7 @@ function updateDoctorPreview() {
             Weekly Availability
           </div>
           <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
-            ${d.schedule.map((active, i) => `
+            ${schedule.map((active, i) => `
               <div style="text-align:center;padding:6px 2px;border-radius:8px;background:${active ? 'var(--primary-light)' : '#f5f9fc'};font-size:10px;font-weight:700;color:${active ? 'var(--primary)' : '#c5d8e2'};">
                 ${dayNames[i]}
               </div>
@@ -662,8 +693,8 @@ function buildReview() {
     <div class="summary-row"><span class="lbl">Phone</span><span class="val">${phone}</span></div>
     <div class="summary-row"><span class="lbl">Email</span><span class="val">${email}</span></div>
     ${selectedDoctor ? `<div class="summary-row"><span class="lbl">Doctor</span><span class="val">${selectedDoctor.name}</span></div>` : ''}
-    ${selectedDoctor ? `<div class="summary-row"><span class="lbl">Specialty</span><span class="val">${selectedDoctor.specialty}</span></div>` : ''}
-    ${selectedDoctor ? `<div class="summary-row"><span class="lbl">Department</span><span class="val">${selectedDoctor.dept}</span></div>` : ''}
+    ${selectedDoctor ? `<div class="summary-row"><span class="lbl">Specialty</span><span class="val">${selectedDoctor.specialty || '—'}</span></div>` : ''}
+    ${selectedDoctor ? `<div class="summary-row"><span class="lbl">Department</span><span class="val">${selectedDoctor.dept || '—'}</span></div>` : ''}
     ${selectedDate ? `<div class="summary-row"><span class="lbl">Date</span><span class="val">${formatDate(selectedDate)}</span></div>` : ''}
     ${selectedTime ? `<div class="summary-row"><span class="lbl">Time</span><span class="val">${formatTime(selectedTime)}</span></div>` : ''}
     <div class="summary-row"><span class="lbl">Type</span><span class="val">${type}</span></div>
@@ -676,7 +707,6 @@ function buildReview() {
    in My Appointments and Admin Booking Requests
 ===================================================== */
 function submitBooking() {
-  /* 1. Must be signed in */
   const me = (typeof UserAuth !== 'undefined') ? UserAuth.current() : null;
   if (!me) {
     alert('Please sign in to book an appointment.');
@@ -684,13 +714,11 @@ function submitBooking() {
     return;
   }
 
-  /* 2. Terms agreed */
   if (!document.getElementById('agreeTerms').checked) {
     alert('Please agree to the terms of service and privacy policy.');
     return;
   }
 
-  /* 3. Build payload */
   const payload = {
     patientName:      document.getElementById('pName').value.trim(),
     phone:            document.getElementById('pPhone').value.trim(),
@@ -710,7 +738,6 @@ function submitBooking() {
     notes:            document.getElementById('aNotes').value.trim()
   };
 
-  /* 4. THE CRITICAL LINE — save via UserAuth */
   const booking = UserAuth.addBooking(payload);
 
   if (!booking) {
@@ -718,7 +745,6 @@ function submitBooking() {
     return;
   }
 
-  /* 5. Show success screen */
   document.getElementById('appointmentForm').style.display = 'none';
   document.getElementById('stepsIndicator').style.display  = 'none';
 

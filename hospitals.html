@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospitals — MediCare</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="public-extras.css">
+<script src="global-support.js"></script>
+</head>
+<body>
+
+<header id="site-header"></header>
+
+<main class="mp-page">
+  <div class="mp-container">
+    <div class="mp-page-head">
+      <h1>Hospitals Directory</h1>
+      <p class="sub">Browse hospitals by city and country</p>
+    </div>
+
+    <div class="mp-filters">
+      <input class="mp-input search" id="hq" type="search" placeholder="Search hospital, address, specialty…">
+      <select class="mp-select" id="hCity"><option value="">All cities</option></select>
+      <select class="mp-select" id="hCountry"><option value="">All countries</option></select>
+      <button class="btn btn-outline" id="hReset" type="button">
+        <i class="fas fa-rotate"></i> Reset
+      </button>
+    </div>
+
+    <div id="hResults" class="mp-cards"></div>
+  </div>
+</main>
+
+<footer id="site-footer"></footer>
+
+<script src="shared.js"></script>
+<script src="public-extras.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  /* ---- seed hospitals on first run ---- */
+  const KEY = 'medicare_hospitals_v1';
+  if (!localStorage.getItem(KEY)) {
+    localStorage.setItem(KEY, JSON.stringify([
+      { id:'HSP-1', name:'City Care Hospital', city:'Karachi', country:'Pakistan', beds:320, rating:4.5, phone:'+92-21-111-222', address:'Main Clifton Road', specialties:['Cardiology','Neurology'] },
+      { id:'HSP-2', name:'Aga Khan University Hospital', city:'Karachi', country:'Pakistan', beds:700, rating:4.8, phone:'+92-21-111-911', address:'Stadium Road', specialties:['Oncology','Cardiology'] },
+      { id:'HSP-3', name:'Shaukat Khanum Memorial', city:'Lahore', country:'Pakistan', beds:200, rating:4.7, phone:'+92-42-3590-5000', address:'Johar Town', specialties:['Oncology'] },
+      { id:'HSP-4', name:'Apollo Hospital', city:'Delhi', country:'India', beds:900, rating:4.6, phone:'+91-11-2692-5858', address:'Sarita Vihar', specialties:['Transplant','Cardiology'] },
+      { id:'HSP-5', name:'Mount Sinai Hospital', city:'New York', country:'USA', beds:1100, rating:4.4, phone:'+1-212-241-6500', address:'5th Ave', specialties:['Emergency','Pediatrics'] }
+    ]));
+  }
+
+  const all = () => JSON.parse(localStorage.getItem(KEY)) || [];
+  const meta = (() => {
+    const a = all();
+    return {
+      cities: [...new Set(a.map(h => h.city).filter(Boolean))].sort(),
+      countries: [...new Set(a.map(h => h.country).filter(Boolean))].sort()
+    };
+  })();
+
+  meta.cities.forEach(c => $('hCity').insertAdjacentHTML('beforeend',
+    `<option value="${esc(c)}">${esc(c)}</option>`));
+  meta.countries.forEach(c => $('hCountry').insertAdjacentHTML('beforeend',
+    `<option value="${esc(c)}">${esc(c)}</option>`));
+
+  function render() {
+    const q = $('hq').value.trim().toLowerCase();
+    const city = $('hCity').value;
+    const country = $('hCountry').value;
+
+    const list = all().filter(h => {
+      if (city && h.city !== city) return false;
+      if (country && h.country !== country) return false;
+      if (q) {
+        const blob = [h.name, h.address, (h.specialties || []).join(' ')].join(' ').toLowerCase();
+        if (!blob.includes(q)) return false;
+      }
+      return true;
+    }).sort((a, b) => (b.rating || 0) - (a.rating || 0) || a.name.localeCompare(b.name));
+
+    if (!list.length) {
+      $('hResults').innerHTML = `<div class="mp-empty" style="grid-column:1/-1;">
+        <i class="fas fa-hospital"></i><h3>No hospitals match your filters</h3>
+        <p>Try a different city, country, or search term.</p></div>`;
+      return;
+    }
+    $('hResults').innerHTML = list.map(h => `
+      <article class="mp-card">
+        <h3>${esc(h.name)}</h3>
+        <p class="muted">📍 ${esc(h.city)}, ${esc(h.country)}</p>
+        ${h.address ? `<p class="muted">${esc(h.address)}</p>` : ''}
+        ${h.specialties && h.specialties.length ? `<div class="mp-tags">
+          ${h.specialties.map(s => `<span class="mp-tag">${esc(s)}</span>`).join('')}
+        </div>` : ''}
+        <div class="mp-card-foot">
+          <span>🛏 ${h.beds ?? '—'} beds</span>
+          <span>⭐ ${h.rating ?? 0}</span>
+        </div>
+        ${h.phone ? `<a class="btn btn-outline" href="tel:${esc(h.phone)}">
+          <i class="fas fa-phone"></i> ${esc(h.phone)}</a>` : ''}
+      </article>
+    `).join('');
+  }
+
+  let t;
+  ['input','change'].forEach(ev => {
+    $('hq').addEventListener('input', () => { clearTimeout(t); t = setTimeout(render, 180); });
+    $('hCity').addEventListener('change', render);
+    $('hCountry').addEventListener('change', render);
+  });
+  $('hReset').addEventListener('click', () => {
+    $('hq').value = ''; $('hCity').value = ''; $('hCountry').value = '';
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
