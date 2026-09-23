@@ -8,6 +8,82 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="medicare-pages.css">
 <script src="global-support.js"></script>
+
+<style>
+/* ==== Local styles for the new tabs/modal, so nothing breaks if medicare-pages.css is missing ==== */
+.mp-page { padding: 32px 16px 60px; background: #f4f7f9; min-height: 60vh; }
+.mp-container { max-width: 1200px; margin: 0 auto; }
+
+.mp-page-head { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; margin-bottom:20px; }
+.mp-page-head h1 { margin:0; color:#0b3b4b; font-size:28px; font-weight:700; }
+.mp-page-head .sub { margin:4px 0 0; color:#6b7c88; font-size:14px; }
+
+.mp-tabs { display:flex; gap:8px; flex-wrap:wrap; }
+.mp-tab { background:#fff; border:1px solid #d9e2e8; color:#3d4b56; padding:9px 16px; border-radius:10px; cursor:pointer; font-weight:600; font-size:14px; font-family:inherit; transition:all .15s; }
+.mp-tab:hover { background:#eef5f8; }
+.mp-tab.active { background:#0b7d8c; color:#fff; border-color:#0b7d8c; }
+.mp-tab i { margin-right:6px; }
+
+.mp-alert { background:#fff4e5; color:#a05a00; border:1px solid #ffd9a8; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:14px; font-weight:600; }
+
+.mp-filters { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+.mp-input { padding:9px 12px; border:1px solid #d9e2e8; border-radius:8px; font-size:14px; outline:none; background:#fff; font-family:inherit; }
+.mp-input.search { flex:1; min-width:220px; }
+.mp-input:focus { border-color:#0b7d8c; box-shadow:0 0 0 3px rgba(11,125,140,.1); }
+
+.btn { display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:8px; border:none; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; transition:all .15s; text-decoration:none; white-space:nowrap; }
+.btn i { font-size:13px; }
+.btn-primary { background:#0b7d8c; color:#fff; }
+.btn-primary:hover { background:#096672; }
+.btn-outline { background:#fff; color:#0b7d8c; border:1px solid #0b7d8c; }
+.btn-outline:hover { background:#e6f4f6; }
+.btn-danger { background:#fdecef; color:#e84a5f; border:1px solid #fad4da; }
+.btn-danger:hover { background:#e84a5f; color:#fff; }
+.mp-btn-sm { padding:5px 10px; font-size:12.5px; }
+
+.mp-panel { background:#fff; border:1px solid #e2eaee; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:0 2px 8px rgba(11,59,75,.04); }
+.mp-panel h3 { margin:0 0 16px; color:#0b3b4b; font-size:17px; font-weight:700; }
+
+.mp-grid-4 { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; }
+.mp-field { display:flex; flex-direction:column; gap:4px; font-size:13px; font-weight:600; color:#3d4b56; }
+.mp-field input, .mp-field select { padding:8px 10px; border:1px solid #d9e2e8; border-radius:7px; font-size:14px; outline:none; background:#fff; font-weight:400; font-family:inherit; color:#3d4b56; }
+.mp-field input:focus, .mp-field select:focus { border-color:#0b7d8c; box-shadow:0 0 0 3px rgba(11,125,140,.1); }
+
+.mp-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:16px; flex-wrap:wrap; }
+
+.mp-table-wrap { overflow-x:auto; background:#fff; border:1px solid #e2eaee; border-radius:12px; box-shadow:0 2px 8px rgba(11,59,75,.04); }
+.mp-table { width:100%; border-collapse:collapse; font-size:14px; }
+.mp-table thead th { background:#f0f6f8; color:#0b3b4b; text-align:left; padding:11px 12px; font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; border-bottom:1px solid #e2eaee; white-space:nowrap; }
+.mp-table tbody td { padding:11px 12px; border-bottom:1px solid #eef3f5; color:#3d4b56; vertical-align:middle; }
+.mp-table tbody tr:last-child td { border-bottom:none; }
+.mp-table tbody tr:hover { background:#f9fcfd; }
+.mp-table td.low { color:#c0392b; font-weight:700; }
+.mp-table small { color:#8a97a0; font-size:12px; }
+
+.mp-stats { display:flex; gap:12px; flex-wrap:wrap; }
+.mp-stat { flex:1; min-width:150px; background:#f7fafb; border:1px solid #e2eaee; border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:4px; }
+.mp-stat .label { font-size:12px; color:#6b7c88; font-weight:600; text-transform:uppercase; letter-spacing:.3px; }
+.mp-stat .value { font-size:18px; font-weight:700; color:#0b3b4b; }
+.mp-stat .value.ok { color:#0b7d8c; }
+
+/* modal */
+.mp-modal-bg { position:fixed; inset:0; background:rgba(11,59,75,.5); z-index:9999; display:none; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(3px); }
+.mp-modal-bg.show { display:flex; }
+.mp-modal { background:#fff; border-radius:16px; padding:24px; width:100%; max-width:560px; max-height:90vh; overflow:auto; box-shadow:0 40px 80px -20px rgba(0,0,0,.3); }
+.mp-modal h3 { margin:0 0 16px; color:#0b3b4b; font-size:18px; }
+.mp-modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.mp-close { width:34px; height:34px; border-radius:9px; border:none; background:#f0f5f8; color:#5e7e8c; cursor:pointer; }
+.mp-close:hover { background:#fdecef; color:#e84a5f; }
+
+.ps-row { display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:8px; margin-bottom:8px; align-items:end; }
+.mp-total-line { text-align:right; font-size:16px; font-weight:700; color:#0b3b4b; margin-top:12px; }
+
+@media print {
+  body * { visibility:hidden; }
+  #printArea, #printArea * { visibility:visible; }
+  #printArea { position:absolute; left:0; top:0; width:100%; padding:20px; }
+}
+</style>
 </head>
 <body>
 
@@ -15,14 +91,17 @@
 
 <main class="mp-page">
   <div class="mp-container">
-    <div class="mp-page-head row">
+    <div class="mp-page-head">
       <div>
         <h1>Pharmacy</h1>
-        <p class="sub">Medicine stock and purchasing</p>
+        <p class="sub">Stock, sales and purchasing</p>
       </div>
       <div class="mp-tabs">
         <button class="mp-tab active" data-tab="stock">
           <i class="fas fa-pills"></i> Stock <span id="lowBadge"></span>
+        </button>
+        <button class="mp-tab" data-tab="sale">
+          <i class="fas fa-cash-register"></i> Sales <span id="saleBadge"></span>
         </button>
         <button class="mp-tab" data-tab="purchase">
           <i class="fas fa-shopping-cart"></i> Purchases
@@ -32,10 +111,10 @@
 
     <div class="mp-alert" id="phError" style="display:none"></div>
 
-    <!-- STOCK -->
+    <!-- ============ STOCK ============ -->
     <section id="tab-stock">
       <div class="mp-filters">
-        <input class="mp-input search" id="mSearch" placeholder="Search medicine…">
+        <input class="mp-input search" id="mSearch" placeholder="Search medicine or company…">
         <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#3d4b56">
           <input type="checkbox" id="mLowOnly"> Low stock only
         </label>
@@ -48,6 +127,7 @@
         <h3>New Medicine</h3>
         <div class="mp-grid-4">
           <label class="mp-field">Name *<input required id="mName"></label>
+          <label class="mp-field">Company<input id="mCompany" placeholder="e.g. GSK"></label>
           <label class="mp-field">Generic name<input id="mGeneric"></label>
           <label class="mp-field">Category<input id="mCat" value="Tablet"></label>
           <label class="mp-field">Batch no<input id="mBatch"></label>
@@ -69,7 +149,7 @@
         <table class="mp-table">
           <thead>
             <tr>
-              <th>Medicine</th><th>Category</th><th>Batch</th><th>Expiry</th>
+              <th>Medicine</th><th>Company</th><th>Category</th><th>Batch</th><th>Expiry</th>
               <th>Stock</th><th>Purchase</th><th>Selling</th><th>Adjust</th>
             </tr>
           </thead>
@@ -78,7 +158,43 @@
       </div>
     </section>
 
-    <!-- PURCHASE -->
+    <!-- ============ SALES ============ -->
+    <section id="tab-sale" style="display:none">
+      <div class="mp-filters">
+        <input class="mp-input search" id="sSearch" placeholder="Search patient, medicine or invoice…">
+        <button class="btn btn-primary" id="sAddBtn">
+          <i class="fas fa-plus"></i> New Sale
+        </button>
+      </div>
+
+      <div class="mp-stats" style="margin-bottom:16px">
+        <div class="mp-stat"><span class="label">Today's Sales</span><span class="value" id="sTodayCount">0</span></div>
+        <div class="mp-stat"><span class="label">Today's Revenue</span><span class="value ok" id="sTodayRev">$0.00</span></div>
+        <div class="mp-stat"><span class="label">Total Sales (all time)</span><span class="value" id="sAllCount">0</span></div>
+      </div>
+
+      <h3 style="margin: 0 0 12px; color:#0b3b4b">Sales History</h3>
+      <div class="mp-table-wrap">
+        <table class="mp-table">
+          <thead>
+            <tr>
+              <th>Invoice</th>
+              <th>Date</th>
+              <th>Patient</th>
+              <th>Medicine</th>
+              <th>Company</th>
+              <th>Qty</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Bill</th>
+            </tr>
+          </thead>
+          <tbody id="sList"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ PURCHASES ============ -->
     <section id="tab-purchase" style="display:none">
       <form class="mp-panel" id="purForm">
         <h3>New Purchase</h3>
@@ -97,7 +213,7 @@
         <div class="mp-table-wrap" style="margin-top:16px">
           <table class="mp-table">
             <thead>
-              <tr><th>Medicine</th><th>Qty</th><th>Unit cost</th><th>Amount</th><th></th></tr>
+              <tr><th>Medicine</th><th>Company</th><th>Qty</th><th>Unit cost</th><th>Amount</th><th></th></tr>
             </thead>
             <tbody id="pItems"></tbody>
           </table>
@@ -126,7 +242,10 @@
       <div class="mp-table-wrap">
         <table class="mp-table">
           <thead>
-            <tr><th>Invoice</th><th>Date</th><th>Supplier</th><th>Items</th><th>Total</th><th>Status</th></tr>
+            <tr>
+              <th>Invoice</th><th>Date</th><th>Supplier</th><th>Items</th>
+              <th>Total</th><th>Status</th><th>Bill</th>
+            </tr>
           </thead>
           <tbody id="pList"></tbody>
         </table>
@@ -135,10 +254,545 @@
   </div>
 </main>
 
+<!-- ============ MODAL: add medicine (reused) ============ -->
+<!-- ============ MODAL: new sale ============ -->
+<div class="mp-modal-bg" id="saleModal">
+  <div class="mp-modal" style="max-width:720px">
+    <div class="mp-modal-head">
+      <h3 style="margin:0">New Sale</h3>
+      <button class="mp-close" data-close="saleModal"><i class="fas fa-times"></i></button>
+    </div>
+    <form id="saleForm">
+      <div class="mp-grid-4">
+        <label class="mp-field">Invoice no<input id="sInv" placeholder="auto if blank"></label>
+        <label class="mp-field">Patient name *<input required id="sPatient" placeholder="Patient full name"></label>
+        <label class="mp-field">Phone<input id="sPhone"></label>
+        <label class="mp-field">Payment
+          <select id="sPay">
+            <option value="paid">Paid</option>
+            <option value="pending">Pending</option>
+          </select>
+        </label>
+      </div>
+      <div id="sRows" style="margin-top:14px"></div>
+      <button type="button" class="btn btn-outline mp-btn-sm" id="sAddRow"><i class="fas fa-plus"></i> Add medicine row</button>
+      <div class="mp-total-line">Total: <span id="sTotal">$0.00</span></div>
+      <div class="mp-actions">
+        <button type="button" class="btn btn-outline" data-close="saleModal">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save sale</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: bill viewer ============ -->
+<div class="mp-modal-bg" id="billModal">
+  <div class="mp-modal">
+    <div class="mp-modal-head">
+      <h3 style="margin:0" id="billTitle">Invoice</h3>
+      <button class="mp-close" data-close="billModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="printArea"></div>
+    <div class="mp-actions">
+      <button class="btn btn-outline" data-close="billModal">Close</button>
+      <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+    </div>
+  </div>
+</div>
+
 <footer id="site-footer"></footer>
 
 <script src="shared.js"></script>
-<script src="medicare-data.js"></script>
-<script src="pharmacy.js"></script>
+
+<script>
+/* ============================================================
+   PHARMACY (standalone) — stock, sales, purchases, bills
+   Storage: localStorage keys pharmacy_medicines_v1,
+   pharmacy_sales_v1, pharmacy_purchases_v1
+   ============================================================ */
+(function () {
+  'use strict';
+
+  const KEY_MEDS = 'pharmacy_medicines_v1';
+  const KEY_SALES = 'pharmacy_sales_v1';
+  const KEY_PURCH = 'pharmacy_purchases_v1';
+
+  const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch { return d; } };
+  const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+  let medicines = load(KEY_MEDS, []);
+  let sales     = load(KEY_SALES, []);
+  let purchases = load(KEY_PURCH, []);
+
+  const $  = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+  const uid = p => p + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const today = () => new Date().toISOString().slice(0, 10);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function money(n) {
+    try {
+      if (window.GlobalSupport && window.GlobalSupport.money) return window.GlobalSupport.money(n);
+      if (window.CurrencyHelper && window.CurrencyHelper.money) return window.CurrencyHelper.money(n);
+    } catch (e) {}
+    return '$' + (Number(n) || 0).toFixed(2);
+  }
+
+  function showErr(msg) {
+    const el = $('#phError'); if (!el) return;
+    el.textContent = msg; el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 3500);
+  }
+
+  /* ---------- tabs ---------- */
+  function initTabs() {
+    $$('.mp-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $$('.mp-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        ['stock','sale','purchase'].forEach(t => {
+          const sec = document.getElementById('tab-' + t);
+          if (sec) sec.style.display = t === tab ? '' : 'none';
+        });
+        if (tab === 'sale') renderSales();
+        if (tab === 'purchase') renderPurchases();
+      });
+    });
+  }
+
+  /* ---------- modal helpers ---------- */
+  function openModal(id) { document.getElementById(id).classList.add('show'); document.body.style.overflow='hidden'; }
+  function closeModal(id) { document.getElementById(id).classList.remove('show'); document.body.style.overflow=''; }
+  document.addEventListener('click', e => {
+    const closeBtn = e.target.closest('[data-close]');
+    if (closeBtn) { closeModal(closeBtn.dataset.close); return; }
+    if (e.target.classList.contains('mp-modal-bg')) e.target.classList.remove('show');
+  });
+
+  /* ============ STOCK ============ */
+  function renderMedicines() {
+    const tbody = $('#mList'); if (!tbody) return;
+    const q = ($('#mSearch')?.value || '').toLowerCase();
+    const lowOnly = $('#mLowOnly')?.checked;
+    const rows = medicines.filter(m => {
+      const hit = !q || (m.name||'').toLowerCase().includes(q) || (m.company||'').toLowerCase().includes(q);
+      const low = (m.qty||0) <= (m.reorder||0);
+      return hit && (!lowOnly || low);
+    });
+
+    const lowCount = medicines.filter(m => (m.qty||0) <= (m.reorder||0)).length;
+    const badge = $('#lowBadge'); if (badge) badge.textContent = lowCount ? `(${lowCount})` : '';
+
+    tbody.innerHTML = rows.length ? rows.map(m => `
+      <tr>
+        <td><strong>${esc(m.name)}</strong>${m.generic ? `<br><small>${esc(m.generic)}</small>` : ''}</td>
+        <td>${esc(m.company || '—')}</td>
+        <td>${esc(m.category || '')}</td>
+        <td>${esc(m.batch || '—')}</td>
+        <td>${esc(m.expiry || '—')}</td>
+        <td class="${(m.qty||0) <= (m.reorder||0) ? 'low' : ''}">${m.qty||0}</td>
+        <td>${money(m.buy)}</td>
+        <td>${money(m.sell)}</td>
+        <td>
+          <button class="btn btn-outline mp-btn-sm" data-act="inc" data-id="${m.id}">+</button>
+          <button class="btn btn-outline mp-btn-sm" data-act="dec" data-id="${m.id}">−</button>
+        </td>
+      </tr>`).join('') : `<tr><td colspan="9" style="text-align:center;padding:24px;color:#8a97a0">No medicines yet.</td></tr>`;
+
+    tbody.querySelectorAll('button[data-act]').forEach(b => {
+      b.addEventListener('click', () => {
+        const m = medicines.find(x => x.id === b.dataset.id); if (!m) return;
+        m.qty = Math.max(0, (m.qty||0) + (b.dataset.act === 'inc' ? 1 : -1));
+        save(KEY_MEDS, medicines);
+        renderMedicines();
+      });
+    });
+  }
+
+  function initMedicineForm() {
+    const form = $('#medForm'); if (!form) return;
+    $('#mAddBtn')?.addEventListener('click', () => { form.style.display=''; form.scrollIntoView({behavior:'smooth', block:'start'}); });
+    $('#mCancelBtn')?.addEventListener('click', () => { form.reset(); form.style.display='none'; });
+    $('#mSearch')?.addEventListener('input', renderMedicines);
+    $('#mLowOnly')?.addEventListener('change', renderMedicines);
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const med = {
+        id: uid('med'),
+        name: $('#mName').value.trim(),
+        company: $('#mCompany').value.trim(),
+        generic: $('#mGeneric').value.trim(),
+        category: $('#mCat').value.trim(),
+        batch: $('#mBatch').value.trim(),
+        expiry: $('#mExp').value,
+        unit: $('#mUnit').value.trim(),
+        qty: Number($('#mQty').value) || 0,
+        reorder: Number($('#mReorder').value) || 0,
+        buy: Number($('#mBuy').value) || 0,
+        sell: Number($('#mSell').value) || 0,
+        supplier: $('#mSup').value.trim(),
+        createdAt: new Date().toISOString()
+      };
+      if (!med.name) return showErr('Medicine name is required.');
+      medicines.push(med);
+      save(KEY_MEDS, medicines);
+      form.reset(); form.style.display = 'none';
+      renderMedicines();
+      showErr('Medicine added.');
+    });
+  }
+
+  /* ============ SHARED medicine select options ============ */
+  function medOptions(selectedId) {
+    return `<option value="">— select —</option>` + medicines.map(m =>
+      `<option value="${m.id}" ${m.id === selectedId ? 'selected' : ''}>${esc(m.name)}${m.company ? ' — ' + esc(m.company) : ''} (stock ${m.qty||0})</option>`
+    ).join('');
+  }
+
+  /* ============ SALES ============ */
+  function saleRowHtml() {
+    return `
+      <div class="ps-row" data-row>
+        <div class="mp-field"><label>Medicine</label><select class="s-med">${medOptions()}</select></div>
+        <div class="mp-field"><label>Qty</label><input type="number" class="s-qty" min="1" value="1"></div>
+        <div class="mp-field"><label>Price</label><input type="number" class="s-price" min="0" step="0.01" value="0"></div>
+        <button type="button" class="btn btn-danger mp-btn-sm s-del" style="height:38px"><i class="fas fa-trash"></i></button>
+      </div>`;
+  }
+
+  function bindSaleRow(row) {
+    const sel = row.querySelector('.s-med');
+    const qty = row.querySelector('.s-qty');
+    const pri = row.querySelector('.s-price');
+    const del = row.querySelector('.s-del');
+    sel.addEventListener('change', () => {
+      const m = medicines.find(x => x.id === sel.value);
+      if (m) pri.value = m.sell || 0;
+      recalcSale();
+    });
+    qty.addEventListener('input', recalcSale);
+    pri.addEventListener('input', recalcSale);
+    del.addEventListener('click', () => { row.remove(); recalcSale(); });
+  }
+
+  function recalcSale() {
+    let total = 0;
+    $$('#sRows [data-row]').forEach(r => {
+      const q = +r.querySelector('.s-qty').value || 0;
+      const p = +r.querySelector('.s-price').value || 0;
+      total += q * p;
+    });
+    const el = $('#sTotal'); if (el) el.textContent = money(total);
+  }
+
+  function addSaleRow() {
+    const host = $('#sRows'); if (!host) return;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = saleRowHtml();
+    const row = wrap.firstElementChild;
+    host.appendChild(row);
+    bindSaleRow(row);
+    recalcSale();
+  }
+
+  function initSales() {
+    $('#sAddBtn')?.addEventListener('click', () => {
+      if (!medicines.length) return showErr('Add a medicine first in the Stock tab.');
+      $('#sRows').innerHTML = '';
+      $('#saleForm').reset();
+      addSaleRow();
+      openModal('saleModal');
+    });
+    $('#sAddRow')?.addEventListener('click', addSaleRow);
+
+    $('#saleForm')?.addEventListener('submit', e => {
+      e.preventDefault();
+      const patient = $('#sPatient').value.trim();
+      if (!patient) return showErr('Patient name is required.');
+
+      const items = [];
+      for (const r of $$('#sRows [data-row]')) {
+        const id = r.querySelector('.s-med').value;
+        const m = medicines.find(x => x.id === id);
+        if (!m) return showErr('Please select a medicine in every row.');
+        const q = +r.querySelector('.s-qty').value || 0;
+        const p = +r.querySelector('.s-price').value || 0;
+        if (q <= 0) return showErr('Quantity must be greater than 0.');
+        if (q > (m.qty||0)) return showErr(`Not enough stock for ${m.name}. Available: ${m.qty||0}`);
+        items.push({ medicineId: m.id, medicineName: m.name, company: m.company || '', qty: q, price: p, amount: q * p });
+      }
+      if (!items.length) return showErr('Add at least one medicine.');
+
+      const total = items.reduce((s,i) => s + i.amount, 0);
+      const sale = {
+        id: uid('sale'),
+        invoice: $('#sInv').value.trim() || ('S-' + Date.now().toString().slice(-6)),
+        date: today(),
+        patient,
+        phone: $('#sPhone').value.trim(),
+        payment: $('#sPay').value,
+        items, total,
+        createdAt: new Date().toISOString()
+      };
+      items.forEach(it => {
+        const m = medicines.find(x => x.id === it.medicineId);
+        if (m) m.qty = Math.max(0, (m.qty||0) - it.qty);
+      });
+      sales.unshift(sale);
+      save(KEY_SALES, sales);
+      save(KEY_MEDS, medicines);
+      closeModal('saleModal');
+      renderMedicines();
+      renderSales();
+      updateSaleBadge();
+      showErr('Sale saved.');
+    });
+
+    renderSales();
+    updateSaleBadge();
+  }
+
+  function updateSaleBadge() {
+    const b = $('#saleBadge'); if (b) b.textContent = sales.length ? `(${sales.length})` : '';
+  }
+
+  function renderSales() {
+    const tb = $('#sList'); if (!tb) return;
+
+    // stats
+    const t = today();
+    const todaySales = sales.filter(s => s.date === t);
+    const todayRev = todaySales.reduce((s, x) => s + x.total, 0);
+    $('#sTodayCount').textContent = todaySales.length;
+    $('#sTodayRev').textContent = money(todayRev);
+    $('#sAllCount').textContent = sales.length;
+
+    // filter
+    const q = ($('#sSearch')?.value || '').toLowerCase();
+    const filtered = sales.filter(s => !q || JSON.stringify(s).toLowerCase().includes(q));
+
+    if (!filtered.length) {
+      tb.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:#8a97a0">No sales yet.</td></tr>`;
+      return;
+    }
+
+    const rows = [];
+    filtered.forEach(s => {
+      s.items.forEach((it, i) => {
+        rows.push(`
+          <tr>
+            <td>${i === 0 ? `<strong>${esc(s.invoice)}</strong>` : ''}</td>
+            <td>${i === 0 ? esc(s.date) : ''}</td>
+            <td>${i === 0 ? esc(s.patient) : ''}</td>
+            <td>${esc(it.medicineName)}</td>
+            <td>${esc(it.company || '—')}</td>
+            <td>${it.qty}</td>
+            <td>${i === 0 ? money(s.total) : ''}</td>
+            <td>${i === 0 ? `<span class="badge" style="background:${s.payment==='paid'?'#e1f7ed':'#fff0e0'};color:${s.payment==='paid'?'#0e8b5e':'#c96f1e'};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${esc(s.payment)}</span>` : ''}</td>
+            <td>${i === 0 ? `<button class="btn btn-outline mp-btn-sm" data-bill="sale" data-id="${s.id}"><i class="fas fa-file-invoice"></i> View</button>` : ''}</td>
+          </tr>`);
+      });
+    });
+    tb.innerHTML = rows.join('');
+
+    tb.querySelectorAll('button[data-bill="sale"]').forEach(b => {
+      b.addEventListener('click', () => viewBill('sale', b.dataset.id));
+    });
+  }
+
+  /* ============ PURCHASES ============ */
+  function purchaseRowHtml() {
+    return `
+      <tr data-row>
+        <td><select class="p-med">${medOptions()}</select></td>
+        <td class="p-company">—</td>
+        <td><input type="number" class="p-qty" min="1" value="1" style="width:80px"></td>
+        <td><input type="number" class="p-cost" min="0" step="0.01" value="0" style="width:110px"></td>
+        <td class="p-amt">${money(0)}</td>
+        <td><button type="button" class="btn btn-danger mp-btn-sm p-del"><i class="fas fa-trash"></i></button></td>
+      </tr>`;
+  }
+
+  function bindPurchaseRow(tr) {
+    const sel = tr.querySelector('.p-med');
+    const qty = tr.querySelector('.p-qty');
+    const cost = tr.querySelector('.p-cost');
+    const comp = tr.querySelector('.p-company');
+    sel.addEventListener('change', () => {
+      const m = medicines.find(x => x.id === sel.value);
+      comp.textContent = m ? (m.company || '—') : '—';
+      if (m) cost.value = m.buy || 0;
+      recalcPurchaseRow(tr);
+    });
+    qty.addEventListener('input', () => recalcPurchaseRow(tr));
+    cost.addEventListener('input', () => recalcPurchaseRow(tr));
+    tr.querySelector('.p-del').addEventListener('click', () => { tr.remove(); recalcPurchase(); });
+  }
+
+  function recalcPurchaseRow(tr) {
+    const q = +tr.querySelector('.p-qty').value || 0;
+    const c = +tr.querySelector('.p-cost').value || 0;
+    tr.querySelector('.p-amt').textContent = money(q * c);
+    recalcPurchase();
+  }
+
+  function recalcPurchase() {
+    let sub = 0;
+    $$('#pItems tr').forEach(tr => {
+      const q = +tr.querySelector('.p-qty').value || 0;
+      const c = +tr.querySelector('.p-cost').value || 0;
+      sub += q * c;
+    });
+    const taxPct = +$('#pTax').value || 0;
+    const taxAmt = sub * taxPct / 100;
+    $('#pSub').textContent = money(sub);
+    $('#pTaxAmt').textContent = money(taxAmt);
+    $('#pTotal').textContent = money(sub + taxAmt);
+  }
+
+  function addPurchaseRow() {
+    const tb = $('#pItems'); if (!tb) return;
+    const wrap = document.createElement('tbody');
+    wrap.innerHTML = purchaseRowHtml();
+    const tr = wrap.firstElementChild;
+    tb.appendChild(tr);
+    bindPurchaseRow(tr);
+    recalcPurchase();
+  }
+
+  function initPurchases() {
+    $('#pAddRow')?.addEventListener('click', () => {
+      if (!medicines.length) return showErr('Add a medicine first in the Stock tab.');
+      addPurchaseRow();
+    });
+    $('#pTax')?.addEventListener('input', recalcPurchase);
+
+    $('#purForm')?.addEventListener('submit', e => {
+      e.preventDefault();
+      const items = [];
+      for (const tr of $$('#pItems tr')) {
+        const id = tr.querySelector('.p-med').value;
+        const m = medicines.find(x => x.id === id);
+        if (!m) return showErr('Please select a medicine in every row.');
+        const q = +tr.querySelector('.p-qty').value || 0;
+        const c = +tr.querySelector('.p-cost').value || 0;
+        if (q <= 0) return showErr('Quantity must be greater than 0.');
+        items.push({ medicineId: m.id, medicineName: m.name, company: m.company || '', qty: q, cost: c, amount: q * c });
+      }
+      if (!items.length) return showErr('Add at least one medicine.');
+
+      const sub = items.reduce((s,i) => s + i.amount, 0);
+      const taxPct = +$('#pTax').value || 0;
+      const taxAmt = sub * taxPct / 100;
+      const total = sub + taxAmt;
+
+      const purchase = {
+        id: uid('pur'),
+        invoice: $('#pInv').value.trim() || ('P-' + Date.now().toString().slice(-6)),
+        date: today(),
+        supplier: $('#pSup').value.trim(),
+        payment: $('#pPay').value,
+        taxPct, taxAmt,
+        items, total,
+        createdAt: new Date().toISOString()
+      };
+      items.forEach(it => {
+        const m = medicines.find(x => x.id === it.medicineId);
+        if (m) { m.qty = (m.qty||0) + it.qty; if (it.cost > 0) m.buy = it.cost; }
+      });
+      purchases.unshift(purchase);
+      save(KEY_PURCH, purchases);
+      save(KEY_MEDS, medicines);
+      $('#purForm').reset();
+      $('#pItems').innerHTML = '';
+      recalcPurchase();
+      renderMedicines();
+      renderPurchases();
+      showErr('Purchase saved.');
+    });
+
+    renderPurchases();
+  }
+
+  function renderPurchases() {
+    const tb = $('#pList'); if (!tb) return;
+    if (!purchases.length) {
+      tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:#8a97a0">No purchases yet.</td></tr>`;
+      return;
+    }
+    tb.innerHTML = purchases.map(p => `
+      <tr>
+        <td><strong>${esc(p.invoice)}</strong></td>
+        <td>${esc(p.date)}</td>
+        <td>${esc(p.supplier || '—')}</td>
+        <td>${p.items.length}</td>
+        <td>${money(p.total)}</td>
+        <td><span class="badge" style="background:${p.payment==='paid'?'#e1f7ed':'#fff0e0'};color:${p.payment==='paid'?'#0e8b5e':'#c96f1e'};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${esc(p.payment)}</span></td>
+        <td><button class="btn btn-outline mp-btn-sm" data-bill="purchase" data-id="${p.id}"><i class="fas fa-file-invoice"></i> Bill</button></td>
+      </tr>`).join('');
+
+    tb.querySelectorAll('button[data-bill="purchase"]').forEach(b => {
+      b.addEventListener('click', () => viewBill('purchase', b.dataset.id));
+    });
+  }
+
+  /* ============ BILL VIEWER ============ */
+  function viewBill(type, id) {
+    const rec = type === 'sale' ? sales.find(x => x.id === id) : purchases.find(x => x.id === id);
+    if (!rec) return;
+    const isSale = type === 'sale';
+    const rows = (rec.items || []).map((it, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${esc(it.medicineName)}</td>
+        <td>${esc(it.company || '—')}</td>
+        <td>${it.qty}</td>
+        <td>${money(isSale ? it.price : it.cost)}</td>
+        <td>${money(it.amount)}</td>
+      </tr>`).join('');
+
+    $('#billTitle').textContent = (isSale ? 'Sale Invoice' : 'Purchase Bill') + ' — ' + rec.invoice;
+    $('#printArea').innerHTML = `
+      <div style="font-family:inherit; color:#3d4b56;">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+          <div>
+            <div><strong>Invoice:</strong> ${esc(rec.invoice)}</div>
+            <div><strong>Date:</strong> ${esc(rec.date)}</div>
+            <div><strong>${isSale ? 'Patient' : 'Supplier'}:</strong> ${esc(isSale ? rec.patient : (rec.supplier || '—'))}</div>
+            ${isSale && rec.phone ? `<div><strong>Phone:</strong> ${esc(rec.phone)}</div>` : ''}
+          </div>
+          <div style="text-align:right">
+            <div><strong>Payment:</strong> ${esc(rec.payment)}</div>
+            ${!isSale && rec.taxPct ? `<div><strong>Tax:</strong> ${rec.taxPct}% (${money(rec.taxAmt)})</div>` : ''}
+          </div>
+        </div>
+        <table class="mp-table">
+          <thead><tr><th>#</th><th>Medicine</th><th>Company</th><th>Qty</th><th>Price</th><th>Amount</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div style="text-align:right; margin-top:14px; font-size:17px; font-weight:800; color:#0b3b4b;">
+          Total: ${money(rec.total)}
+        </div>
+      </div>`;
+    openModal('billModal');
+  }
+
+  /* ---------- search filters ---------- */
+  $('#sSearch')?.addEventListener('input', renderSales);
+
+  /* ---------- boot ---------- */
+  document.addEventListener('DOMContentLoaded', () => {
+    initTabs();
+    initMedicineForm();
+    initSales();
+    initPurchases();
+    renderMedicines();
+  });
+
+})();
+</script>
+
 </body>
 </html>

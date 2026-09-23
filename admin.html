@@ -1336,10 +1336,10 @@ input:-webkit-autofill:active {
             <span id="userRole">Administrator</span>
           </div>
           <div class="user-dropdown" id="userDropdown">
-            <a data-page="settings"><i class="fas fa-user"></i> My Profile</a>
-            <a data-page="settings"><i class="fas fa-cog"></i> Settings</a>
+            <a data-action="profile"><i class="fas fa-user"></i> My Profile</a>
+            <a data-action="settings"><i class="fas fa-cog"></i> Settings</a>
             <a href="index.html"><i class="fas fa-globe"></i> View Website</a>
-            <a id="logoutBtn2" class="danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a data-action="logout" class="danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
           </div>
         </div>
       </div>
@@ -1972,7 +1972,7 @@ document.getElementById('resetLink').addEventListener('click', () => {
   showScreen('setupScreen');
 });
 
-/* ---------- BOOTSTRAP — the fix ---------- */
+/* ---------- BOOTSTRAP ---------- */
 function bootstrap() {
   const app = document.getElementById('appContainer');
   if (!app) return;
@@ -2093,8 +2093,74 @@ function closeSidebar() {
   document.body.style.overflow = '';
 }
 
-document.addEventListener('click', () => { const drop = document.getElementById('userDropdown'); if (drop) drop.classList.remove('show'); });
-const upb = document.getElementById('userProfileBtn'); if (upb) upb.addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
+/* =====================================================
+   FIXED: User dropdown — single source of truth
+   Handles profile / settings / logout / outside-click
+===================================================== */
+(function setupUserDropdown() {
+  const profileBtn = document.getElementById('userProfileBtn');
+  const dropdown   = document.getElementById('userDropdown');
+  if (!profileBtn || !dropdown) return;
+
+  /* toggle on profile button click */
+  profileBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('show');
+  });
+
+  /* handle link clicks inside the dropdown */
+  dropdown.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (!link) return;
+
+    const action = link.dataset.action;
+
+    if (action === 'logout') {
+      e.preventDefault();
+      e.stopPropagation();
+      dropdown.classList.remove('show');
+      logout();
+      return;
+    }
+
+    if (action === 'profile') {
+      e.preventDefault();
+      e.stopPropagation();
+      dropdown.classList.remove('show');
+      goToPage('settings');
+      setTimeout(() => {
+        const el = document.getElementById('settingName');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 250);
+      return;
+    }
+
+    if (action === 'settings') {
+      e.preventDefault();
+      e.stopPropagation();
+      dropdown.classList.remove('show');
+      goToPage('settings');
+      return;
+    }
+
+    /* "View Website" — allow default navigation */
+    dropdown.classList.remove('show');
+  });
+
+  /* close on outside click */
+  document.addEventListener('click', (e) => {
+    if (!dropdown.classList.contains('show')) return;
+    if (dropdown.contains(e.target)) return;
+    if (profileBtn.contains(e.target)) return;
+    dropdown.classList.remove('show');
+  });
+
+  /* close on Escape */
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') dropdown.classList.remove('show');
+  });
+})();
+
 const nb = document.getElementById('notifBtn'); if (nb) nb.addEventListener('click', () => {
   const pending = (typeof UserAuth !== 'undefined' && UserAuth.getAllBookings) ? UserAuth.getAllBookings().filter(b => b.status === 'Pending').length : 0;
   if (pending) showToast(`You have ${pending} pending booking request(s)`, 'warning');
@@ -2601,7 +2667,7 @@ document.addEventListener('click', function (e) {
     updateNavCounts();
     return;
   }
-  if (e.target.closest('#logoutBtn') || e.target.closest('#logoutBtn2')) { logout(); return; }
+  if (e.target.closest('#logoutBtn')) { logout(); return; }
   if (e.target.closest('#menuToggle')) {
     const sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
@@ -2611,7 +2677,7 @@ document.addEventListener('click', function (e) {
   }
   if (e.target.closest('#sidebarBackdrop')) { closeSidebar(); return; }
   const navEl = e.target.closest('[data-page]');
-  if (navEl && navEl.dataset.page && !navEl.classList.contains('chip')) {
+  if (navEl && navEl.dataset.page && !navEl.classList.contains('chip') && !navEl.closest('#userDropdown')) {
     e.preventDefault();
     goToPage(navEl.dataset.page);
     return;

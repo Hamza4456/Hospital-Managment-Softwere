@@ -1,5 +1,5 @@
 /* =========================================================
-   ADMIN EXTRAS — Pharmacy (stock / purchases / prescriptions)
+   ADMIN EXTRAS — Pharmacy (stock / sales / purchases / prescriptions)
                 + Patient Bills
    Injected at runtime. Does NOT modify any existing code.
    Include AFTER the main admin <script>:
@@ -27,10 +27,11 @@
   const KEYS = {
     MEDICINES:     'medicare_medicines_v1',
     PURCHASES:     'medicare_purchases_v1',
+    SALES:         'medicare_sales_v1',
     PRESCRIPTIONS: 'medicare_prescriptions_v1',
     PATIENT_BILLS: 'medicare_patient_bills_v1',
     SEEDED:        'medicare_extras_seeded_v1',
-    USERS:         'medicare_users'   /* from shared.js UserAuth */
+    USERS:         'medicare_users'
   };
 
   const read  = (k, fb) => { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? fb : v; } catch { return fb; } };
@@ -62,7 +63,6 @@
     return getPatientAccounts().find(a => a.email === e) || null;
   }
 
-  /* Build options for the patient picker dropdown */
   function patientOptionsHTML(selectedEmail) {
     const accounts = getPatientAccounts();
     const sel = String(selectedEmail || '').trim().toLowerCase();
@@ -88,20 +88,21 @@
 
     if (!read(KEYS.MEDICINES, null)) write(KEYS.MEDICINES, [
       { id:'MED-1', name:'Paracetamol', genericName:'Acetaminophen', category:'Tablet',
-        batchNo:'PCM-001', expiryDate:'2026-12-31', unit:'tablet',
+        company:'GSK', batchNo:'PCM-001', expiryDate:'2026-12-31', unit:'tablet',
         stockQty:120, reorderLevel:30, purchasePrice:0.10, sellingPrice:0.25, supplier:'PharmaCo' },
       { id:'MED-2', name:'Amoxicillin', genericName:'Amoxicillin', category:'Capsule',
-        batchNo:'AMX-114', expiryDate:'2025-11-15', unit:'capsule',
+        company:'Pfizer', batchNo:'AMX-114', expiryDate:'2025-11-15', unit:'capsule',
         stockQty:18, reorderLevel:25, purchasePrice:0.40, sellingPrice:0.90, supplier:'PharmaCo' },
       { id:'MED-3', name:'Ibuprofen', genericName:'Ibuprofen', category:'Tablet',
-        batchNo:'IBU-220', expiryDate:'2027-04-30', unit:'tablet',
+        company:'Abbott', batchNo:'IBU-220', expiryDate:'2027-04-30', unit:'tablet',
         stockQty:80, reorderLevel:20, purchasePrice:0.15, sellingPrice:0.30, supplier:'MediSupply' },
       { id:'MED-4', name:'Cough Syrup', genericName:'Dextromethorphan', category:'Syrup',
-        batchNo:'CS-009', expiryDate:'2026-08-20', unit:'bottle',
+        company:'Roche', batchNo:'CS-009', expiryDate:'2026-08-20', unit:'bottle',
         stockQty:12, reorderLevel:15, purchasePrice:1.80, sellingPrice:3.50, supplier:'MediSupply' }
     ]);
 
     if (!read(KEYS.PURCHASES, null))     write(KEYS.PURCHASES, []);
+    if (!read(KEYS.SALES, null))         write(KEYS.SALES, []);
     if (!read(KEYS.PRESCRIPTIONS, null)) write(KEYS.PRESCRIPTIONS, []);
     if (!read(KEYS.PATIENT_BILLS, null)) write(KEYS.PATIENT_BILLS, []);
 
@@ -165,6 +166,7 @@
     return `
       <div class="mp-tabs">
         <button class="mp-tab active" data-ptab="stock"><i class="fas fa-boxes-stacked"></i> Stock</button>
+        <button class="mp-tab" data-ptab="sales"><i class="fas fa-cash-register"></i> Sales</button>
         <button class="mp-tab" data-ptab="purchases"><i class="fas fa-truck-medical"></i> Purchases</button>
         <button class="mp-tab" data-ptab="prescriptions">
           <i class="fas fa-prescription"></i> Prescriptions
@@ -196,11 +198,49 @@
             <table>
               <thead>
                 <tr>
-                  <th>Medicine</th><th>Category</th><th>Batch</th><th>Expiry</th>
+                  <th>Medicine</th><th>Company</th><th>Category</th><th>Batch</th><th>Expiry</th>
                   <th>Stock</th><th>Purchase</th><th>Selling</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody id="medTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ SALES ============ -->
+      <div class="mp-tabpane" data-pane="sales">
+        <div class="stats-grid" id="salesStats"></div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fas fa-cash-register"></i> Sales History</h2>
+            <button class="btn btn-primary btn-sm" id="addSaleBtn">
+              <i class="fas fa-plus"></i> New Sale
+            </button>
+          </div>
+          <div class="mp-filters">
+            <div class="mp-search">
+              <i class="fas fa-search"></i>
+              <input type="text" id="saleSearch" placeholder="Search patient, medicine, invoice…">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Invoice</th>
+                  <th>Date</th>
+                  <th>Patient</th>
+                  <th>Medicine</th>
+                  <th>Company</th>
+                  <th>Qty</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Bill</th>
+                </tr>
+              </thead>
+              <tbody id="saleTableBody"></tbody>
             </table>
           </div>
         </div>
@@ -230,7 +270,7 @@
 
             <div class="table-wrap" style="margin-top:16px;">
               <table>
-                <thead><tr><th>Medicine</th><th>Qty</th><th>Unit Cost</th><th>Amount</th><th></th></tr></thead>
+                <thead><tr><th>Medicine</th><th>Company</th><th>Qty</th><th>Unit Cost</th><th>Amount</th><th></th></tr></thead>
                 <tbody id="purItems"></tbody>
               </table>
             </div>
@@ -265,7 +305,7 @@
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Invoice</th><th>Date</th><th>Supplier</th><th>Items</th><th>Total</th><th>Status</th></tr>
+                <tr><th>Invoice</th><th>Date</th><th>Supplier</th><th>Items</th><th>Total</th><th>Status</th><th>Bill</th></tr>
               </thead>
               <tbody id="purHistoryBody"></tbody>
             </table>
@@ -377,7 +417,7 @@
     const list = all.filter(m => {
       if (medLowOnly && !(Number(m.stockQty) <= Number(m.reorderLevel))) return false;
       if (!q) return true;
-      return (m.name + ' ' + (m.genericName||'') + ' ' + (m.batchNo||'') + ' ' + (m.category||''))
+      return (m.name + ' ' + (m.genericName||'') + ' ' + (m.company||'') + ' ' + (m.batchNo||'') + ' ' + (m.category||''))
         .toLowerCase().includes(q);
     });
 
@@ -385,7 +425,7 @@
     if (!tbody) return;
 
     if (!list.length) {
-      tbody.innerHTML = `<tr><td colspan="8">
+      tbody.innerHTML = `<tr><td colspan="9">
         <div class="mp-empty"><i class="fas fa-pills"></i>
         <h3>No medicines found</h3><p>Try a different search or add a new medicine.</p></div>
       </td></tr>`;
@@ -403,6 +443,7 @@
             <td><strong>${esc(m.name)}</strong>
               ${m.genericName ? `<div style="font-size:12px;color:var(--gray);">${esc(m.genericName)}</div>` : ''}
             </td>
+            <td>${esc(m.company || m.supplier || '—')}</td>
             <td>${esc(m.category || '—')}</td>
             <td>${esc(m.batchNo || '—')}</td>
             <td ${expired ? 'style="color:var(--danger);font-weight:700;"' : ''}>
@@ -437,6 +478,81 @@
   }
 
   /* =========================================================
+     PHARMACY — SALES RENDER
+  ========================================================= */
+  let saleQuery = '';
+
+  function renderSales() {
+    const all = read(KEYS.SALES, []).slice().sort(
+      (a, b) => new Date(b.date) - new Date(a.date));
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todaySales = all.filter(s => (s.date || '').slice(0, 10) === todayStr);
+    const todayRev = todaySales.reduce((sum, s) => sum + Number(s.total || 0), 0);
+    const allRev = all.reduce((sum, s) => sum + Number(s.total || 0), 0);
+
+    const stats = $('salesStats');
+    if (stats) stats.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-cash-register"></i></div>
+        <div class="stat-content"><p>Today's Sales</p><h3>${todaySales.length}</h3>
+          <div class="stat-trend"><i class="fas fa-clock"></i> Transactions today</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-coins"></i></div>
+        <div class="stat-content"><p>Today's Revenue</p><h3>${money(todayRev)}</h3>
+          <div class="stat-trend"><i class="fas fa-arrow-up"></i> Collected today</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-content"><p>All-Time Sales</p><h3>${all.length}</h3>
+          <div class="stat-trend"><i class="fas fa-list"></i> ${money(allRev)} total</div>
+        </div>
+      </div>
+    `;
+
+    const tbody = $('saleTableBody');
+    if (!tbody) return;
+
+    const q = saleQuery.toLowerCase();
+    const filtered = q ? all.filter(s => JSON.stringify(s).toLowerCase().includes(q)) : all;
+
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="9">
+        <div class="mp-empty"><i class="fas fa-cash-register"></i>
+        <h3>No sales yet</h3><p>Click <strong>New Sale</strong> to record a sale.</p></div>
+      </td></tr>`;
+      return;
+    }
+
+    const rows = [];
+    filtered.forEach(s => {
+      const items = s.items || [];
+      items.forEach((it, i) => {
+        rows.push(`
+          <tr>
+            <td>${i === 0 ? `<strong>${esc(s.invoiceNo)}</strong>` : ''}</td>
+            <td>${i === 0 ? new Date(s.date).toLocaleDateString() : ''}</td>
+            <td>${i === 0 ? esc(s.patientName || '—') : ''}</td>
+            <td>${esc(it.name || '—')}</td>
+            <td>${esc(it.company || '—')}</td>
+            <td>${it.qty}</td>
+            <td>${i === 0 ? `<strong>${money(s.total)}</strong>` : ''}</td>
+            <td>${i === 0
+                  ? `<span class="mp-badge ${s.paymentStatus === 'paid' ? 'paid' : 'pending'}">${esc(s.paymentStatus)}</span>`
+                  : ''}</td>
+            <td>${i === 0
+                  ? `<button class="btn btn-outline btn-sm" data-sale-bill="${esc(s.id)}"><i class="fas fa-file-invoice"></i> View</button>`
+                  : ''}</td>
+          </tr>`);
+      });
+    });
+    tbody.innerHTML = rows.join('');
+  }
+
+  /* =========================================================
      PHARMACY — PURCHASES RENDER
   ========================================================= */
   let purRows = [{ medicineId: '', name: '', qty: 1, unitCost: 0 }];
@@ -446,7 +562,10 @@
     const tbody = $('purItems');
     if (!tbody) return;
 
-    tbody.innerHTML = purRows.map((r, idx) => `
+    tbody.innerHTML = purRows.map((r, idx) => {
+      const med = meds.find(x => x.id === r.medicineId);
+      const company = med ? (med.company || med.supplier || '—') : '—';
+      return `
       <tr>
         <td>
           <select data-pi="${idx}" data-pk="medicineId"
@@ -457,6 +576,7 @@
             </option>`).join('')}
           </select>
         </td>
+        <td style="color:var(--gray); font-size:13px;">${esc(company)}</td>
         <td>
           <input type="number" min="1" data-pi="${idx}" data-pk="qty"
                  value="${r.qty}" style="width:80px; padding:8px 10px; border-radius:9px; border:1px solid var(--border); font-family:inherit;">
@@ -472,7 +592,7 @@
             : ''}
         </td>
       </tr>
-    `).join('');
+    `;}).join('');
 
     computePurchaseTotals();
   }
@@ -496,7 +616,7 @@
     if (!tbody) return;
 
     if (!list.length) {
-      tbody.innerHTML = `<tr><td colspan="6">
+      tbody.innerHTML = `<tr><td colspan="7">
         <div class="mp-empty"><i class="fas fa-truck-medical"></i>
         <h3>No purchases yet</h3><p>Purchases you save will appear here.</p></div>
       </td></tr>`;
@@ -510,6 +630,8 @@
         <td>${p.items.length}</td>
         <td><strong>${money(p.totalAmount)}</strong></td>
         <td><span class="mp-badge ${p.paymentStatus}">${esc(p.paymentStatus)}</span></td>
+        <td><button class="btn btn-outline btn-sm" data-pur-bill="${esc(p.id)}">
+          <i class="fas fa-file-invoice"></i> Bill</button></td>
       </tr>
     `).join('');
   }
@@ -677,6 +799,8 @@
         <div class="form-group"><label>Name *</label>
           <input type="text" id="emName" required value="${m ? esc(m.name) : ''}"></div>
         <div class="mp-form-grid">
+          <div class="form-group"><label>Company</label>
+            <input type="text" id="emCompany" value="${m ? esc(m.company || '') : ''}" placeholder="e.g. GSK"></div>
           <div class="form-group"><label>Generic Name</label>
             <input type="text" id="emGeneric" value="${m ? esc(m.genericName || '') : ''}"></div>
           <div class="form-group"><label>Category</label>
@@ -709,6 +833,7 @@
       e.preventDefault();
       const payload = {
         name:          $('emName').value.trim(),
+        company:       $('emCompany').value.trim(),
         genericName:   $('emGeneric').value.trim(),
         category:      $('emCat').value.trim(),
         batchNo:       $('emBatch').value.trim(),
@@ -735,6 +860,294 @@
       renderPharmacyStock();
       renderPurchaseRows();
     });
+  }
+
+  /* =========================================================
+     MODALS — NEW SALE
+  ========================================================= */
+  function openSaleModal() {
+    const meds = read(KEYS.MEDICINES, []);
+    let rows = [{ medicineId: '', name: '', company: '', qty: 1, price: 0 }];
+
+    function rowsHTML() {
+      return rows.map((r, idx) => {
+        const med = meds.find(x => x.id === r.medicineId);
+        const company = med ? (med.company || med.supplier || '—') : '—';
+        const amount = (Number(r.qty) || 0) * (Number(r.price) || 0);
+        return `
+          <tr>
+            <td>
+              <select data-si="${idx}" data-sk="medicineId"
+                      style="width:100%; padding:8px 10px; border-radius:9px; border:1px solid var(--border); font-family:inherit;">
+                <option value="">Select medicine…</option>
+                ${meds.map(m => `<option value="${esc(m.id)}"${r.medicineId === m.id ? ' selected' : ''}>
+                  ${esc(m.name)} — ${esc(m.company || m.supplier || '—')} (stock ${m.stockQty})
+                </option>`).join('')}
+              </select>
+            </td>
+            <td style="color:var(--gray); font-size:13px;">${esc(company)}</td>
+            <td><input type="number" min="1" data-si="${idx}" data-sk="qty" value="${r.qty}"
+                       style="width:70px; padding:8px 10px; border-radius:9px; border:1px solid var(--border); font-family:inherit;"></td>
+            <td><input type="number" min="0" step="0.01" data-si="${idx}" data-sk="price" value="${r.price}"
+                       style="width:100px; padding:8px 10px; border-radius:9px; border:1px solid var(--border); font-family:inherit;"></td>
+            <td>${money(amount)}</td>
+            <td>${rows.length > 1
+              ? `<button type="button" class="btn btn-danger btn-sm" data-si-rm="${idx}"><i class="fas fa-times"></i></button>`
+              : ''}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    function refresh() {
+      $('saleItems').innerHTML = rowsHTML();
+      const total = rows.reduce((s, r) => s + (Number(r.qty) || 0) * (Number(r.price) || 0), 0);
+      $('saleTotal').textContent = money(total);
+    }
+
+    showModal(`
+      <div class="modal-header">
+        <h2>New Sale</h2>
+        <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="saleForm">
+        <div class="form-group"><label>Patient Account</label>
+          <select id="sPatientSelect">${patientOptionsHTML('')}</select>
+        </div>
+        <div class="form-group" id="sCustomWrap" style="display:none;">
+          <label>Custom Email</label>
+          <input type="email" id="sCustomEmail" placeholder="patient@example.com">
+        </div>
+        <div class="mp-form-grid">
+          <div class="form-group"><label>Patient Name *</label>
+            <input type="text" id="sPatientName" required></div>
+          <div class="form-group"><label>Payment</label>
+            <select id="sPayment">
+              <option value="paid">Paid</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Invoice No</label>
+            <input type="text" id="sInvoice" placeholder="auto if blank"></div>
+        </div>
+
+        <label style="display:block; margin-top:14px; margin-bottom:8px; font-size:12px; font-weight:700; color:var(--gray); text-transform:uppercase;">Medicines</label>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Medicine</th><th>Company</th><th>Qty</th><th>Price</th><th>Amount</th><th></th></tr></thead>
+            <tbody id="saleItems">${rowsHTML()}</tbody>
+          </table>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" id="saleAddRow" style="margin-top:10px;">
+          <i class="fas fa-plus"></i> Add Medicine
+        </button>
+
+        <div class="stats-grid" style="margin-top:16px;">
+          <div class="stat-card"><div class="stat-content">
+            <p>Total</p><h3 id="saleTotal" style="font-size:22px;color:var(--success);">$0.00</h3>
+          </div></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Sale</button>
+        </div>
+      </form>
+    `);
+
+    $('sPatientSelect').addEventListener('change', () => {
+      const v = $('sPatientSelect').value;
+      const isOther = v === '__other__';
+      $('sCustomWrap').style.display = isOther ? 'block' : 'none';
+      if (!isOther && v) {
+        const acct = findAccountByEmail(v);
+        if (acct) $('sPatientName').value = acct.name || '';
+      }
+    });
+
+    $('saleAddRow').addEventListener('click', () => {
+      rows.push({ medicineId: '', name: '', company: '', qty: 1, price: 0 });
+      refresh();
+    });
+
+    $('saleItems').addEventListener('input', (e) => {
+      const t = e.target;
+      const i = Number(t.dataset.si);
+      if (Number.isNaN(i)) return;
+      const k = t.dataset.sk;
+      if (k === 'medicineId') {
+        const med = meds.find(x => x.id === t.value);
+        rows[i].medicineId = t.value;
+        rows[i].name = med ? med.name : '';
+        rows[i].company = med ? (med.company || med.supplier || '') : '';
+        rows[i].price = med ? Number(med.sellingPrice) || 0 : 0;
+        refresh();
+      } else {
+        rows[i][k] = t.value;
+        refresh();
+      }
+    });
+
+    $('saleItems').addEventListener('change', (e) => {
+      if (e.target.tagName === 'SELECT') {
+        $('saleItems').dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+
+    $('saleItems').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-si-rm]');
+      if (!btn) return;
+      rows.splice(Number(btn.dataset.si-rm), 1);
+      refresh();
+    });
+
+    refresh();
+
+    $('saleForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const sel = $('sPatientSelect').value;
+      const isOther = sel === '__other__';
+      const patientEmail = isOther
+        ? ($('sCustomEmail').value.trim().toLowerCase() || '')
+        : String(sel || '').trim().toLowerCase();
+      const patientName = $('sPatientName').value.trim();
+      if (!patientName) return showToast('Patient name is required', 'error');
+
+      const items = [];
+      for (const r of rows) {
+        if (!r.medicineId) continue;
+        const med = meds.find(x => x.id === r.medicineId);
+        const qty = Number(r.qty) || 0;
+        const price = Number(r.price) || 0;
+        if (!med) return showToast('Medicine not found', 'error');
+        if (qty <= 0) return showToast('Quantity must be greater than 0', 'error');
+        if (qty > Number(med.stockQty)) {
+          return showToast(`Only ${med.stockQty} of ${med.name} in stock`, 'error');
+        }
+        items.push({
+          medicineId: med.id,
+          name: med.name,
+          company: med.company || med.supplier || '',
+          qty, price,
+          amount: +(qty * price).toFixed(2)
+        });
+      }
+      if (!items.length) return showToast('Add at least one medicine', 'error');
+
+      const total = +items.reduce((s, i) => s + i.amount, 0).toFixed(2);
+      const invNo = $('sInvoice').value.trim()
+        || ('S-' + Date.now().toString(36).toUpperCase());
+
+      const sale = {
+        id: uid('SALE'),
+        invoiceNo: invNo,
+        patientName,
+        patientEmail,
+        items,
+        total,
+        paymentStatus: $('sPayment').value,
+        date: new Date().toISOString()
+      };
+
+      /* deduct stock */
+      const updatedMeds = read(KEYS.MEDICINES, []);
+      items.forEach(it => {
+        const m = updatedMeds.find(x => x.id === it.medicineId);
+        if (m) m.stockQty = Math.max(0, Number(m.stockQty || 0) - it.qty);
+      });
+      write(KEYS.MEDICINES, updatedMeds);
+
+      /* save sale */
+      const sales = read(KEYS.SALES, []);
+      sales.push(sale);
+      write(KEYS.SALES, sales);
+
+      /* auto patient bill when email present */
+      if (patientEmail) {
+        const billItems = items.map(i => ({
+          description: `${i.name} × ${i.qty}`,
+          qty: i.qty,
+          rate: i.price,
+          amount: i.amount
+        }));
+        const bills = read(KEYS.PATIENT_BILLS, []);
+        const year = new Date().getFullYear();
+        const n = bills.filter(b => (b.billNo || '').startsWith('PB-' + year)).length;
+        bills.push({
+          id: uid('PB'),
+          billNo: `PB-${year}-${String(n + 1).padStart(4, '0')}`,
+          patientName,
+          patientEmail,
+          items: billItems,
+          total,
+          status: sale.paymentStatus === 'paid' ? 'Paid' : 'Pending',
+          notes: `Pharmacy sale ${invNo}`,
+          date: new Date().toISOString()
+        });
+        write(KEYS.PATIENT_BILLS, bills);
+      }
+
+      showToast('Sale saved — stock updated', 'success');
+      closeModal();
+      renderSales();
+      renderPharmacyStock();
+      try { renderPatientBills(); } catch (e) {}
+    });
+  }
+
+  /* =========================================================
+     MODALS — BILL VIEWER (sales + purchases)
+  ========================================================= */
+  function viewBillModal(type, id) {
+    const isSale = type === 'sale';
+    const rec = isSale
+      ? read(KEYS.SALES, []).find(x => x.id === id)
+      : read(KEYS.PURCHASES, []).find(x => x.id === id);
+    if (!rec) return;
+
+    const rows = (rec.items || []).map((it, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${esc(it.name || '—')}</td>
+        <td>${esc(it.company || '—')}</td>
+        <td>${it.qty}</td>
+        <td>${money(isSale ? (it.price || 0) : (it.unitCost || 0))}</td>
+        <td>${money(isSale ? (it.amount || 0) : (it.qty * (it.unitCost || 0)))}</td>
+      </tr>`).join('');
+
+    showModal(`
+      <div class="modal-header">
+        <h2>${isSale ? 'Sale Invoice' : 'Purchase Bill'} — ${esc(rec.invoiceNo)}</h2>
+        <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="billPrintArea">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;font-size:13.5px;color:var(--dark);">
+          <div>
+            <div><strong>Invoice:</strong> ${esc(rec.invoiceNo)}</div>
+            <div><strong>Date:</strong> ${new Date(isSale ? rec.date : rec.purchaseDate).toLocaleString()}</div>
+            <div><strong>${isSale ? 'Patient' : 'Supplier'}:</strong> ${esc(isSale ? (rec.patientName || '—') : (rec.supplier || '—'))}</div>
+            ${isSale && rec.patientEmail ? `<div><strong>Email:</strong> ${esc(rec.patientEmail)}</div>` : ''}
+          </div>
+          <div style="text-align:right;">
+            <div><strong>Payment:</strong> ${esc(rec.paymentStatus)}</div>
+            ${!isSale && rec.taxPercent ? `<div><strong>Tax:</strong> ${rec.taxPercent}% (${money(rec.taxAmount)})</div>` : ''}
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Medicine</th><th>Company</th><th>Qty</th><th>Price</th><th>Amount</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+        <div style="text-align:right;margin-top:14px;font-size:18px;font-weight:800;color:var(--dark);">
+          Total: ${money(rec.total != null ? rec.total : rec.totalAmount)}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal()">Close</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+      </div>
+    `);
   }
 
   /* =========================================================
@@ -831,16 +1244,13 @@
       </form>
     `);
 
-    /* patient picker behaviour */
     $('rxPatientSelect').addEventListener('change', () => {
       const v = $('rxPatientSelect').value;
       const isOther = v === '__other__';
       $('rxCustomWrap').style.display = isOther ? 'block' : 'none';
       if (!isOther && v) {
         const acct = findAccountByEmail(v);
-        if (acct) {
-          $('rxPName').value = acct.name || '';
-        }
+        if (acct) $('rxPName').value = acct.name || '';
       }
     });
 
@@ -924,8 +1334,6 @@
 
   /* =========================================================
      MODALS — NEW PATIENT BILL
-     Patient email is chosen from the signed-up accounts list
-     so the bill always lands on the correct patient's account.
   ========================================================= */
   function openBillModal() {
     let items = [{ description: '', qty: 1, rate: 0 }];
@@ -1006,7 +1414,6 @@
       </form>
     `);
 
-    /* patient picker: auto-fill name, show custom email when "Other" */
     $('bPatientSelect').addEventListener('change', () => {
       const v = $('bPatientSelect').value;
       const isOther = v === '__other__';
@@ -1118,7 +1525,6 @@
       $('ebTotal').textContent = money(total);
     }
 
-    /* current email — detect whether it matches a real account */
     const curEmail = String(b.patientEmail || '').trim().toLowerCase();
     const curInList = !!findAccountByEmail(curEmail);
 
@@ -1176,7 +1582,6 @@
       </form>
     `);
 
-    /* picker behaviour */
     $('ebPatientSelect').addEventListener('change', () => {
       const v = $('ebPatientSelect').value;
       const isOther = v === '__other__';
@@ -1381,8 +1786,9 @@
           const t = document.getElementById('pageTitle');
           const s = document.getElementById('pageSubtitle');
           if (t) t.textContent = 'Pharmacy';
-          if (s) s.textContent = 'Stock, purchases, and doctor prescriptions';
+          if (s) s.textContent = 'Stock, sales, purchases, and doctor prescriptions';
           renderPharmacyStock();
+          renderSales();
           renderPurchaseRows();
           renderPurchaseHistory();
           renderPrescriptions();
@@ -1416,6 +1822,7 @@
         tab.classList.add('active');
         const pane = document.querySelector(`#page-pharmacy .mp-tabpane[data-pane="${tab.dataset.ptab}"]`);
         if (pane) pane.classList.add('active');
+        if (tab.dataset.ptab === 'sales')       renderSales();
         if (tab.dataset.ptab === 'purchases') { renderPurchaseRows(); renderPurchaseHistory(); }
         if (tab.dataset.ptab === 'prescriptions') renderPrescriptions();
         return;
@@ -1431,6 +1838,13 @@
       }
 
       if (e.target.closest('#addMedicineBtn')) { openMedicineModal(); return; }
+      if (e.target.closest('#addSaleBtn'))     { openSaleModal(); return; }
+
+      const saleBillBtn = e.target.closest('[data-sale-bill]');
+      if (saleBillBtn) { viewBillModal('sale', saleBillBtn.dataset.saleBill); return; }
+
+      const purBillBtn = e.target.closest('[data-pur-bill]');
+      if (purBillBtn) { viewBillModal('purchase', purBillBtn.dataset.purBill); return; }
 
       const adjBtn = e.target.closest('[data-med-adj]');
       if (adjBtn) {
@@ -1524,6 +1938,7 @@
       if (t.id === 'medSearch') { medQuery = t.value.trim(); renderPharmacyStock(); }
       if (t.id === 'medLowOnly') { medLowOnly = t.checked; renderPharmacyStock(); }
       if (t.id === 'pbSearch') { pbQuery = t.value.trim(); renderPatientBills(); }
+      if (t.id === 'saleSearch') { saleQuery = t.value.trim(); renderSales(); }
       if (t.id === 'purTax') computePurchaseTotals();
 
       if (t.dataset && t.dataset.pi !== undefined) {
@@ -1540,8 +1955,8 @@
         } else {
           purRows[i][k] = t.value;
           const tr = t.closest('tr');
-          if (tr && tr.children[3]) {
-            tr.children[3].textContent =
+          if (tr && tr.children[4]) {
+            tr.children[4].textContent =
               money((Number(purRows[i].qty) || 0) * (Number(purRows[i].unitCost) || 0));
           }
           computePurchaseTotals();
@@ -1555,6 +1970,16 @@
 
     document.addEventListener('submit', (e) => {
       if (e.target.id === 'purchaseForm') savePurchase(e);
+    });
+
+    /* Re-render Patient Bills when something writes there
+       (fixes the invoice-patch → patient-bills sync issue) */
+    window.addEventListener('medicare:changed', (ev) => {
+      try {
+        if (ev.detail && ev.detail.key === KEYS.PATIENT_BILLS) {
+          renderPatientBills();
+        }
+      } catch (err) {}
     });
   }
 
@@ -1570,6 +1995,7 @@
     bindEvents();
 
     renderPharmacyStock();
+    renderSales();
     renderPurchaseHistory();
     renderPrescriptions();
     renderPatientBills();
@@ -1579,6 +2005,7 @@
       window.initApp = function () {
         origInit.apply(this, arguments);
         renderPharmacyStock();
+        renderSales();
         renderPurchaseHistory();
         renderPrescriptions();
         renderPatientBills();

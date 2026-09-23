@@ -4,6 +4,7 @@
    - Mobile number with country code dropdown
    - Auto-selects country from Region & Currency settings
    - Saves to Billing store AND Patient Bills store
+   - Notifies Patient Bills page to re-render (always)
    Include AFTER admin-extras.js:
      <script src="admin-invoice-patch.js"></script>
 ========================================================= */
@@ -459,12 +460,14 @@
 
       if (typeof window.renderBilling === 'function') window.renderBilling();
 
-      var pbPage = document.getElementById('page-patient-bills');
-      if (pbPage && pbPage.classList.contains('active')) {
+      /* FIX: always dispatch the change event so the Patient Bills
+         page re-renders immediately if it's mounted. Admin-extras.js
+         listens for this and updates its own list. */
+      try {
         window.dispatchEvent(new CustomEvent('medicare:changed', {
           detail: { key: BILLS_KEY }
         }));
-      }
+      } catch (e) {}
     });
   };
 
