@@ -6,6 +6,7 @@
 <title>Login — MediCare HMS</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="api-config.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
@@ -198,7 +199,7 @@ body {
 
   <form id="loginForm" autocomplete="on">
     <div class="form-group">
-      <label>Username</label>
+      <label>Username or Email</label>
       <input type="text" id="loginUser" required>
     </div>
     <div class="form-group">
@@ -214,108 +215,49 @@ body {
   </form>
 
   <div class="auth-foot">
-    Forgot your password? <a id="resetLink">Reset this device</a>
+    First time here? <a id="setupLink">Create admin account</a>
   </div>
   <a href="index.html" class="auth-back"><i class="fas fa-arrow-left"></i> Back to Website</a>
 </div>
 
 <script>
 /* =====================================================
-   🔑 AUTH MODULE
+   STAFF AUTH — talks to the backend API
 ===================================================== */
-const Auth = {
-  SALT: 'medicare::hms::v2::salt',
-  SESSION_KEY: 'medicare_session',
-  BACKUP_KEY: 'medicare_session_backup',
-  AUTH_KEY: 'medicare_admin',
+const API_BASE = (window.MEDICARE_API_BASE || '/api').replace(/\/$/, '');
+const STAFF_TOKEN_KEY = 'medicare_staff_token';
+const STAFF_USER_KEY  = 'medicare_staff_user';
 
-  loadAuth() {
-    try { return JSON.parse(localStorage.getItem(this.AUTH_KEY)); }
-    catch (e) { return null; }
-  },
-  saveAuth(obj) {
-    localStorage.setItem(this.AUTH_KEY, JSON.stringify(obj));
-  },
-  async hash(password) {
-    const input = this.SALT + '|' + password;
-    if (window.crypto && window.crypto.subtle && window.isSecureContext) {
-      try {
-        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-        return 'sha256:' + Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-      } catch (e) {}
-    }
-    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
-    for (let i = 0; i < input.length; i++) {
-      const ch = input.charCodeAt(i);
-      h1 = Math.imul(h1 ^ ch, 2654435761);
-      h2 = Math.imul(h2 ^ ch, 1597334677);
-    }
-    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-    return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
-  },
-  hasAccount() {
-    const a = this.loadAuth();
-    return !!(a && a.username && a.passwordHash);
-  },
-  async register({ name, username, password }) {
-    const passwordHash = await this.hash(password);
-    const initials = (name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'AD').toUpperCase();
-    this.saveAuth({
-      name: name.trim(), username: username.trim(), passwordHash, initials,
-      role: 'Administrator', email: '', createdAt: new Date().toISOString()
-    });
-  },
-  async login(username, password) {
-    const a = this.loadAuth();
-    if (!a || !a.username) return false;
-    if (a.username.toLowerCase() !== String(username).trim().toLowerCase()) return false;
-    return (await this.hash(password)) === a.passwordHash;
-  },
-
-  /* ⭐ UPDATED: Write to BOTH sessionStorage AND localStorage */
-  setSession() {
-    const a = this.loadAuth();
-    if (!a) return;
-    const payload = JSON.stringify({ u: a.username, t: Date.now() });
-    try { sessionStorage.setItem(this.SESSION_KEY, payload); } catch (e) {}
-    try { localStorage.setItem(this.BACKUP_KEY, payload); } catch (e) {}
-  },
-
-  /* ⭐ UPDATED: Clear all three keys on logout */
-  clearSession() {
-    try { sessionStorage.removeItem(this.SESSION_KEY); } catch (e) {}
-    try { localStorage.removeItem(this.BACKUP_KEY); } catch (e) {}
-  },
-
-  /* ⭐ UPDATED: Read from sessionStorage → backup → localStorage direct */
-  getSessionRaw() {
-    try {
-      const raw = sessionStorage.getItem(this.SESSION_KEY);
-      if (raw) return raw;
-    } catch (e) {}
-    try {
-      const raw = localStorage.getItem(this.BACKUP_KEY);
-      if (raw) {
-        try { sessionStorage.setItem(this.SESSION_KEY, raw); } catch (e) {}
-        return raw;
-      }
-    } catch (e) {}
-    return null;
-  },
-
-  isLoggedIn() {
-    const raw = this.getSessionRaw();
-    if (!raw) return false;
-    try {
-      const s = JSON.parse(raw);
-      const a = this.loadAuth();
-      return !!(s && a && a.username && s.u === a.username);
-    } catch (e) { return false; }
+function setStaffToken(t) {
+  sessionStorage.setItem(STAFF_TOKEN_KEY, t);
+  try { localStorage.setItem(STAFF_TOKEN_KEY, t); } catch (e) {}
+}
+function getStaffToken() {
+  let t = sessionStorage.getItem(STAFF_TOKEN_KEY);
+  if (!t) {
+    try { t = localStorage.getItem(STAFF_TOKEN_KEY); } catch (e) {}
+    if (t) sessionStorage.setItem(STAFF_TOKEN_KEY, t);
   }
-};
+  return t;
+}
+function clearStaffToken() {
+  sessionStorage.removeItem(STAFF_TOKEN_KEY);
+  try { localStorage.removeItem(STAFF_TOKEN_KEY); } catch (e) {}
+  try { localStorage.removeItem(STAFF_USER_KEY); } catch (e) {}
+}
 
-/* ---------- UI HELPERS ---------- */
+async function apiStaff(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  const t = getStaffToken();
+  if (t) headers.Authorization = 'Bearer ' + t;
+  const res = await fetch(API_BASE + path, { ...opts, headers });
+  let body = null;
+  try { body = await res.json(); } catch (e) {}
+  if (!res.ok) throw new Error((body && body.error) || ('HTTP ' + res.status));
+  return body;
+}
+
+/* ---------- UI helpers ---------- */
 function showScreen(id) {
   ['setupScreen', 'loginScreen'].forEach(sid => {
     const el = document.getElementById(sid);
@@ -354,15 +296,11 @@ function validatePassword(pw) {
   return null;
 }
 
-/* ⭐ UPDATED: Safe navigation — lets the browser commit storage first */
 function goToDashboard() {
-  // Small delay ensures storage writes finish before navigation
-  setTimeout(() => {
-    window.location.href = 'admin.html';
-  }, 200);
+  setTimeout(() => { window.location.href = 'admin.html'; }, 200);
 }
 
-/* ---------- PASSWORD TOGGLE ---------- */
+/* ---------- password toggle ---------- */
 document.addEventListener('click', (e) => {
   const btn = e.target.closest('.pass-toggle');
   if (!btn) return;
@@ -373,15 +311,16 @@ document.addEventListener('click', (e) => {
   btn.innerHTML = `<i class="fas fa-eye${show ? '-slash' : ''}"></i>`;
 });
 
-/* ---------- SETUP FORM ---------- */
+/* ---------- SETUP / CREATE ADMIN ---------- */
 document.getElementById('setupForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   clearAuthError('setupError');
   clearFieldErrors(document.getElementById('setupForm'));
-  const name = document.getElementById('suName').value.trim();
+
+  const name     = document.getElementById('suName').value.trim();
   const username = document.getElementById('suUser').value.trim();
-  const pw = document.getElementById('suPass').value;
-  const pw2 = document.getElementById('suPass2').value;
+  const pw       = document.getElementById('suPass').value;
+  const pw2      = document.getElementById('suPass2').value;
 
   if (name.length < 2) { markFieldError(document.getElementById('suName')); return showAuthError('setupError', 'Please enter your full name.'); }
   if (!/^[A-Za-z0-9._-]{4,20}$/.test(username)) { markFieldError(document.getElementById('suUser')); return showAuthError('setupError', 'Username must be 4–20 characters.'); }
@@ -389,69 +328,102 @@ document.getElementById('setupForm').addEventListener('submit', async (e) => {
   if (rule) { markFieldError(document.getElementById('suPass')); return showAuthError('setupError', rule); }
   if (pw !== pw2) { markFieldError(document.getElementById('suPass2')); return showAuthError('setupError', 'Passwords do not match.'); }
 
-  await Auth.register({ name, username, password: pw });
-  Auth.setSession();
-  goToDashboard();
+  const btn  = e.target.querySelector('button[type="submit"]');
+  const orig = btn.innerHTML;
+  btn.disabled  = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+  try {
+    const data = await apiStaff('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        username,
+        email: username + '@medicare.local',
+        password: pw,
+        role: 'admin'
+      })
+    });
+    setStaffToken(data.token);
+    try { localStorage.setItem(STAFF_USER_KEY, JSON.stringify(data.user)); } catch (e) {}
+    goToDashboard();
+  } catch (err) {
+    btn.disabled  = false;
+    btn.innerHTML = orig;
+    showAuthError('setupError', err.message);
+  }
 });
 
-/* ---------- LOGIN FORM ---------- */
+/* ---------- LOGIN ---------- */
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   clearAuthError('loginError');
   clearFieldErrors(document.getElementById('loginForm'));
 
   const btn = e.target.querySelector('button[type="submit"]');
-  const username = document.getElementById('loginUser').value;
-  const password = document.getElementById('loginPass').value;
+  const id  = document.getElementById('loginUser').value.trim();
+  const pw  = document.getElementById('loginPass').value;
 
-  btn.disabled = true;
-  const original = btn.innerHTML;
+  btn.disabled  = true;
+  const orig    = btn.innerHTML;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
 
-  const ok = await Auth.login(username, password);
-
-  btn.disabled = false;
-  btn.innerHTML = original;
-
-  if (!ok) {
-    showAuthError('loginError', 'Invalid username or password.');
+  try {
+    const data = await apiStaff('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username: id, email: id, password: pw })
+    });
+    setStaffToken(data.token);
+    try { localStorage.setItem(STAFF_USER_KEY, JSON.stringify(data.user)); } catch (e) {}
+    goToDashboard();
+  } catch (err) {
+    btn.disabled  = false;
+    btn.innerHTML = orig;
+    document.getElementById('loginPass').value = '';
     markFieldError(document.getElementById('loginUser'));
     markFieldError(document.getElementById('loginPass'));
-    document.getElementById('loginPass').value = '';
-    document.getElementById('loginPass').focus();
-    return;
+    showAuthError('loginError', err.message);
   }
-
-  Auth.setSession();
-  goToDashboard();
 });
 
-/* ---------- RESET DEVICE ---------- */
-document.getElementById('resetLink').addEventListener('click', () => {
-  const sure = confirm('Reset the login for this device?\n\nYou will be asked to create a new username and password.\nHospital records will be KEPT.');
-  if (!sure) return;
-  localStorage.removeItem(Auth.AUTH_KEY);
-  Auth.clearSession();
-  document.getElementById('loginForm').reset();
+/* ---------- "Create admin account" link ---------- */
+document.getElementById('setupLink').addEventListener('click', () => {
   showScreen('setupScreen');
+  setTimeout(() => {
+    const el = document.getElementById('suName');
+    if (el) el.focus();
+  }, 100);
 });
 
 /* ---------- BOOTSTRAP ---------- */
-(function boot() {
-  if (Auth.isLoggedIn()) {
-    // Already logged in → go straight to dashboard
-    goToDashboard();
-    return;
+(async function boot() {
+  /* already logged in? verify the token and jump to dashboard */
+  const t = getStaffToken();
+  if (t) {
+    try {
+      await apiStaff('/auth/me');
+      goToDashboard();
+      return;
+    } catch (e) {
+      clearStaffToken();
+    }
   }
-  if (!Auth.hasAccount()) {
-    showScreen('setupScreen');
-  } else {
+
+  /* not logged in — decide which screen to show */
+  try {
+    /* try /auth/me without a token to see if we get a 401 (server reachable) */
+    const res = await fetch(API_BASE + '/auth/me');
+    /* server responded → account may exist. Show login. */
     showScreen('loginScreen');
-    setTimeout(() => {
-      const el = document.getElementById('loginUser');
-      if (el) el.focus();
-    }, 100);
+  } catch (e) {
+    /* server unreachable — still show login; the user can try or create */
+    showScreen('loginScreen');
   }
+
+  setTimeout(() => {
+    const el = document.getElementById('loginUser');
+    if (el) el.focus();
+  }, 100);
 })();
 </script>
 </body>

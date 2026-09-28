@@ -1,10 +1,9 @@
 /* =====================================================
    MEDICARE — SHARED HEADER + FOOTER + AUTH + POPUP
-   - Sticky header AND sticky footer
-   - Patient + staff sessions coexist (separate keys)
-   - Forced auth popup on index.html
-   - Admin pages are protected (staff session required)
-   Just include:  <script src="shared.js"></script>
+   Patient auth is now backed by the API (Stage 1).
+   Bookings still use localStorage for now (Stage 2 will move them).
+   Just include:  <script src="api-config.js"></script>
+                  <script src="shared.js"></script>
 ===================================================== */
 (function () {
   'use strict';
@@ -26,384 +25,291 @@
   })();
 
   /* =====================================================
-     SECTION A — PATIENT AUTH
+     API BASE
   ===================================================== */
-  const UserAuth = (function () {
-    const DB_KEY = 'medicare_users';
-    const SESSION_KEY = 'medicare_user_session';
-    const SALT = 'medicare::user::v1';
+  const API_BASE = (window.MEDICARE_API_BASE || '/api').replace(/\/$/, '');
 
-    /* All the keys that different pages might use for bookings.
-       We read from ALL of them, and write to ALL of them, so no
-       page ever misses a booking. */
-    const BOOKINGS_KEYS = [
-      'medicare_user_bookings',
-      'medicare_bookings',
-      'medicare_user_bookings_v1',
-      'bookings',
-      'appointments'
-    ];
+  /* =====================================================
+     SECTION A — PATIENT AUTH (API-backed)
+  ===================================================== */
+  const TOKEN_KEY = 'medicare_user_token';
+  const USER_KEY  = 'medicare_user_cache';
 
-    /* ---------- session helpers (localStorage + sessionStorage) ---------- */
-    function setSession(id) {
-      const payload = JSON.stringify({ id, t: Date.now() });
-      sessionStorage.setItem(SESSION_KEY, payload);
-      try { localStorage.setItem(SESSION_KEY, payload); } catch (e) {}
+  function setToken(t) {
+    sessionStorage.setItem(TOKEN_KEY, t);
+    try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {}
+  }
+  function getToken() {
+    let t = sessionStorage.getItem(TOKEN_KEY);
+    if (!t) {
+      try { t = localStorage.getItem(TOKEN_KEY); } catch (e) {}
+      if (t) sessionStorage.setItem(TOKEN_KEY, t);
     }
-    function getSessionRaw() {
-      let raw = sessionStorage.getItem(SESSION_KEY);
-      if (!raw) {
-        try { raw = localStorage.getItem(SESSION_KEY); } catch (e) { raw = null; }
-        if (raw) { try { sessionStorage.setItem(SESSION_KEY, raw); } catch (e) {} }
-      }
-      return raw;
-    }
-    function clearSession() {
-      sessionStorage.removeItem(SESSION_KEY);
-      try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
-    }
+    return t;
+  }
+  function clearToken() {
+    sessionStorage.removeItem(TOKEN_KEY);
+    try { localStorage.removeItem(TOKEN_KEY); } catch (e) {}
+    try { localStorage.removeItem(USER_KEY); } catch (e) {}
+  }
+  function setUserCache(u) {
+    try { localStorage.setItem(USER_KEY, JSON.stringify(u)); } catch (e) {}
+  }
+  function getUserCache() {
+    try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch (e) { return null; }
+  }
 
-    /* ---------- users ---------- */
-    const loadUsers = () => {
-      try { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
-      catch (e) { return []; }
-    };
-    const saveUsers = list => localStorage.setItem(DB_KEY, JSON.stringify(list));
+  async function api(path, opts = {}) {
+    const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+    const t = getToken();
+    if (t) headers.Authorization = 'Bearer ' + t;
 
-    /* ---------- bookings: multi-key read/write ---------- */
-    function readKey(k) {
+    const res = await fetch(API_BASE + path, { ...opts, headers });
+    let body = null;
+    try { body = await res.json(); } catch (e) {}
+
+    if (!res.ok) {
+      const msg = (body && (body.error || body.message)) || ('HTTP ' + res.status);
+      throw new Error(msg);
+    }
+    return body;
+  }
+
+  /* ---------- local bookings storage (used until Stage 2) ---------- */
+  const BOOKINGS_KEYS = [
+    'medicare_user_bookings',
+    'medicare_bookings',
+    'medicare_user_bookings_v1',
+    'bookings',
+    'appointments'
+  ];
+
+  function readKey(k) {
+    try {
+      const raw = JSON.parse(localStorage.getItem(k));
+      return Array.isArray(raw) ? raw : [];
+    } catch (e) { return []; }
+  }
+  function writeKey(k, list) {
+    try { localStorage.setItem(k, JSON.stringify(list)); } catch (e) {}
+  }
+  function loadAllBookings() {
+    const seen = new Set();
+    const out = [];
+    BOOKINGS_KEYS.forEach(k => {
+      readKey(k).forEach(b => {
+        if (!b || typeof b !== 'object') return;
+        const uniq = b.id || JSON.stringify(b);
+        if (seen.has(uniq)) return;
+        seen.add(uniq);
+        out.push(b);
+      });
+    });
+    return out;
+  }
+  function persistNewBooking(entry) {
+    BOOKINGS_KEYS.forEach(k => {
+      const list = readKey(k);
+      if (list.some(b => b && b.id === entry.id)) return;
+      list.push(entry);
+      writeKey(k, list);
+    });
+    fireBookingEvents();
+  }
+  function patchBookingEverywhere(id, patch) {
+    let updated = null;
+    BOOKINGS_KEYS.forEach(k => {
+      const list = readKey(k);
+      if (!list.length) return;
+      let touched = false;
+      const next = list.map(b => {
+        if (b && b.id === id) {
+          touched = true;
+          updated = { ...b, ...patch, updatedAt: new Date().toISOString() };
+          return updated;
+        }
+        return b;
+      });
+      if (touched) writeKey(k, next);
+    });
+    fireBookingEvents();
+    return updated;
+  }
+  function fireBookingEvents() {
+    try { window.dispatchEvent(new CustomEvent('bookings:changed')); } catch (e) {}
+    BOOKINGS_KEYS.forEach(k => {
+      try { window.dispatchEvent(new StorageEvent('storage', { key: k })); } catch (e) {}
+    });
+  }
+
+  const UserAuth = {
+    validateEmail: e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e),
+    validatePassword: p => {
+      if (!p || p.length < 8) return 'Password must be at least 8 characters.';
+      if (!/[A-Za-z]/.test(p)) return 'Password must contain a letter.';
+      if (!/\d/.test(p))       return 'Password must contain a number.';
+      return null;
+    },
+
+    async signup({ name, email, phone, password }) {
       try {
-        const raw = JSON.parse(localStorage.getItem(k));
-        return Array.isArray(raw) ? raw : [];
-      } catch (e) { return []; }
-    }
-    function writeKey(k, list) {
-      try { localStorage.setItem(k, JSON.stringify(list)); } catch (e) {}
-    }
-
-    function loadAllBookings() {
-      const seen = new Set();
-      const out = [];
-      BOOKINGS_KEYS.forEach(k => {
-        readKey(k).forEach(b => {
-          if (!b || typeof b !== 'object') return;
-          const uniq = b.id || JSON.stringify(b);
-          if (seen.has(uniq)) return;
-          seen.add(uniq);
-          out.push(b);
+        const data = await api('/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({ name, email, phone, password })
         });
-      });
-      return out;
-    }
+        setToken(data.token);
+        setUserCache(data.user);
+        return { ok: true, user: data.user };
+      } catch (err) { return { ok: false, error: err.message }; }
+    },
 
-    function persistNewBooking(entry) {
-      BOOKINGS_KEYS.forEach(k => {
-        const list = readKey(k);
-        /* Don't add a second copy if it's already there */
-        if (list.some(b => b && b.id === entry.id)) return;
-        list.push(entry);
-        writeKey(k, list);
-      });
-      fireBookingEvents();
-    }
+    async login(emailOrUsername, password) {
+      try {
+        const data = await api('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email: emailOrUsername, password })
+        });
+        setToken(data.token);
+        setUserCache(data.user);
+        return { ok: true, user: data.user };
+      } catch (err) { return { ok: false, error: err.message }; }
+    },
 
-    function patchBookingEverywhere(id, patch) {
-      let updated = null;
+    logout() { clearToken(); },
+    current() { return getUserCache(); },
+    isLoggedIn() { return !!getToken() && !!getUserCache(); },
+
+    async changePassword(current, next) {
+      try {
+        await api('/auth/change-password', {
+          method: 'POST',
+          body: JSON.stringify({ current, next })
+        });
+        return { ok: true };
+      } catch (err) { return { ok: false, error: err.message }; }
+    },
+
+    async updateProfile({ name, phone }) {
+      try {
+        const data = await api('/auth/update-profile', {
+          method: 'POST',
+          body: JSON.stringify({ name, phone })
+        });
+        setUserCache(data.user);
+        return { ok: true, user: data.user };
+      } catch (err) { return { ok: false, error: err.message }; }
+    },
+
+    async refresh() {
+      try {
+        const data = await api('/auth/me');
+        setUserCache(data.user);
+        return data.user;
+      } catch (e) { return null; }
+    },
+
+    /* ---------- bookings: still localStorage until Stage 2 ---------- */
+    getBookings() {
+      const me = this.current();
+      if (!me) return [];
+      const myId = me.id;
+      const myEmail = (me.email || '').toLowerCase();
+      return loadAllBookings().filter(b => {
+        const oId = b.userId || b.uid;
+        const oEmail = (b.userEmail || b.email || '').toLowerCase();
+        return oId === myId || (myEmail && oEmail === myEmail);
+      });
+    },
+
+    getAllBookings() { return loadAllBookings(); },
+
+    addBooking(data) {
+      const me = this.current();
+      if (!me) { console.warn('[UserAuth.addBooking] No signed-in user'); return null; }
+      const entry = {
+        ...(data || {}),
+        id: 'BK-' + Date.now().toString(36).toUpperCase() +
+            Math.random().toString(36).slice(2, 5).toUpperCase(),
+        userId:    me.id,
+        uid:       me.id,
+        userEmail: (data && data.userEmail) || me.email,
+        email:     (data && data.email)     || me.email,
+        userName:  me.name,
+        patientName: (data && data.patientName) || me.name,
+        phone:     (data && data.phone) || me.phone || '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status:    'Pending',
+        adminNote: ''
+      };
+      persistNewBooking(entry);
+      return entry;
+    },
+
+    cancelBooking(id) {
+      const me = this.current();
+      if (!me) return;
+      const myId = me.id;
+      const myEmail = (me.email || '').toLowerCase();
       BOOKINGS_KEYS.forEach(k => {
         const list = readKey(k);
         if (!list.length) return;
         let touched = false;
         const next = list.map(b => {
-          if (b && b.id === id) {
+          const oId = b.userId || b.uid;
+          const oEmail = (b.userEmail || b.email || '').toLowerCase();
+          if (b.id === id && (oId === myId || (myEmail && oEmail === myEmail))) {
             touched = true;
-            updated = { ...b, ...patch, updatedAt: new Date().toISOString() };
-            return updated;
+            return { ...b, status: 'Cancelled', updatedAt: new Date().toISOString() };
           }
           return b;
         });
         if (touched) writeKey(k, next);
       });
       fireBookingEvents();
-      return updated;
+    },
+
+    confirmBooking(id) { return patchBookingEverywhere(id, { status: 'Confirmed' }); },
+    rejectBooking(id, note) {
+      return patchBookingEverywhere(id, { status: 'Cancelled', adminNote: note || '' });
+    },
+    completeBooking(id) { return patchBookingEverywhere(id, { status: 'Completed' }); },
+
+    isAdmin() { return false; },
+    makeAdmin() { },
+    debugBookings() {
+      const out = {};
+      BOOKINGS_KEYS.forEach(k => { out[k] = readKey(k).length; });
+      out._currentUser = this.current();
+      out._myBookingsCount = this.getBookings().length;
+      out._allBookingsCount = this.getAllBookings().length;
+      console.table(out);
+      return out;
     }
-
-    function fireBookingEvents() {
-      try {
-        window.dispatchEvent(new CustomEvent('bookings:changed'));
-      } catch (e) {}
-      BOOKINGS_KEYS.forEach(k => {
-        try {
-          window.dispatchEvent(new StorageEvent('storage', { key: k }));
-        } catch (e) {}
-      });
-    }
-
-    /* ---------- password hashing ---------- */
-    async function hash(password) {
-      const input = SALT + '|' + password;
-      if (window.crypto && window.crypto.subtle && window.isSecureContext) {
-        try {
-          const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-          return 'sha256:' + Array.from(new Uint8Array(buf))
-            .map(b => b.toString(16).padStart(2, '0')).join('');
-        } catch (e) {}
-      }
-      let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
-      for (let i = 0; i < input.length; i++) {
-        const ch = input.charCodeAt(i);
-        h1 = Math.imul(h1 ^ ch, 2654435761);
-        h2 = Math.imul(h2 ^ ch, 1597334677);
-      }
-      h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-      h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-      return 'fnv:' + (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
-    }
-
-    const publicUser = u => ({
-      id: u.id, name: u.name, email: u.email, phone: u.phone,
-      initials: u.initials, createdAt: u.createdAt
-    });
-
-    return {
-      validateEmail: e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e),
-      validatePassword: p => {
-        if (!p || p.length < 8) return 'Password must be at least 8 characters.';
-        if (!/[A-Za-z]/.test(p)) return 'Password must contain a letter.';
-        if (!/\d/.test(p)) return 'Password must contain a number.';
-        return null;
-      },
-
-      async signup({ name, email, phone, password }) {
-        const users = loadUsers();
-        const emailLower = email.trim().toLowerCase();
-        if (users.some(u => u.email === emailLower)) {
-          return { ok: false, error: 'An account with this email already exists.' };
-        }
-        const passwordHash = await hash(password);
-        const initials = (name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'U').toUpperCase();
-        const user = {
-          id: 'U-' + Date.now().toString(36).toUpperCase(),
-          name: name.trim(),
-          email: emailLower,
-          phone: phone.trim(),
-          passwordHash,
-          initials,
-          createdAt: new Date().toISOString()
-        };
-        users.push(user);
-        saveUsers(users);
-        return { ok: true, user: publicUser(user) };
-      },
-
-      async login(email, password) {
-        const users = loadUsers();
-        const user = users.find(u => u.email === String(email).trim().toLowerCase());
-        if (!user) return { ok: false, error: 'No account found with this email.' };
-        if ((await hash(password)) !== user.passwordHash) {
-          return { ok: false, error: 'Incorrect password.' };
-        }
-        setSession(user.id);
-        return { ok: true, user: publicUser(user) };
-      },
-
-      logout() { clearSession(); },
-
-      current() {
-        try {
-          const raw = getSessionRaw();
-          if (!raw) return null;
-          const s = JSON.parse(raw);
-          const user = loadUsers().find(u => u.id === s.id);
-          return user ? publicUser(user) : null;
-        } catch (e) { return null; }
-      },
-
-      isLoggedIn() { return !!this.current(); },
-
-      async changePassword(current, next) {
-        const me = this.current();
-        if (!me) return { ok: false, error: 'Not signed in.' };
-        const users = loadUsers();
-        const idx = users.findIndex(u => u.id === me.id);
-        if ((await hash(current)) !== users[idx].passwordHash) {
-          return { ok: false, error: 'Current password is incorrect.' };
-        }
-        users[idx].passwordHash = await hash(next);
-        saveUsers(users);
-        return { ok: true };
-      },
-
-      updateProfile({ name, phone }) {
-        const me = this.current();
-        if (!me) return { ok: false, error: 'Not signed in.' };
-        const users = loadUsers();
-        const idx = users.findIndex(u => u.id === me.id);
-        users[idx].name = name.trim();
-        users[idx].phone = phone.trim();
-        users[idx].initials = (name.trim().split(/\s+/).map(n => n[0]).join('').slice(0, 2) || 'U').toUpperCase();
-        saveUsers(users);
-        return { ok: true, user: publicUser(users[idx]) };
-      },
-
-      /* =====================================================
-         BOOKINGS
-      ===================================================== */
-
-      /* Patient's own bookings — matched on userId, uid, or email */
-      getBookings() {
-        const me = this.current();
-        if (!me) return [];
-        const myId = me.id;
-        const myEmail = (me.email || '').toLowerCase();
-        return loadAllBookings().filter(b => {
-          const oId = b.userId || b.uid;
-          const oEmail = (b.userEmail || b.email || '').toLowerCase();
-          return oId === myId || (myEmail && oEmail === myEmail);
-        });
-      },
-
-      /* Every booking — for the admin dashboard */
-      getAllBookings() { return loadAllBookings(); },
-
-      /* Create a new booking — writes to every known key */
-      addBooking(data) {
-        const me = this.current();
-        if (!me) {
-          console.warn('[UserAuth.addBooking] No signed-in user — booking NOT saved.');
-          return null;
-        }
-
-        const entry = {
-          ...(data || {}),
-          id: 'BK-' + Date.now().toString(36).toUpperCase() +
-              Math.random().toString(36).slice(2, 5).toUpperCase(),
-
-          /* Owner fields — fill in as many aliases as possible */
-          userId:    me.id,
-          uid:       me.id,
-          userEmail: (data && data.userEmail) || me.email,
-          email:     (data && data.email)     || me.email,
-          userName:  me.name,
-          patientName: (data && data.patientName) || me.name,
-          phone:     (data && data.phone) || me.phone || '',
-
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          status:    'Pending',
-          adminNote: ''
-        };
-
-        persistNewBooking(entry);
-        return entry;
-      },
-
-      /* Patient cancels their own booking */
-      cancelBooking(id) {
-        const me = this.current();
-        if (!me) return;
-        const myId = me.id;
-        const myEmail = (me.email || '').toLowerCase();
-        BOOKINGS_KEYS.forEach(k => {
-          const list = readKey(k);
-          if (!list.length) return;
-          let touched = false;
-          const next = list.map(b => {
-            const oId = b.userId || b.uid;
-            const oEmail = (b.userEmail || b.email || '').toLowerCase();
-            if (b.id === id && (oId === myId || (myEmail && oEmail === myEmail))) {
-              touched = true;
-              return { ...b, status: 'Cancelled', updatedAt: new Date().toISOString() };
-            }
-            return b;
-          });
-          if (touched) writeKey(k, next);
-        });
-        fireBookingEvents();
-      },
-
-      /* =====================================================
-         ADMIN STATUS-CHANGE HELPERS
-      ===================================================== */
-      confirmBooking(id) {
-        return patchBookingEverywhere(id, { status: 'Confirmed' });
-      },
-      rejectBooking(id, note) {
-        return patchBookingEverywhere(id, {
-          status: 'Cancelled',
-          adminNote: note || ''
-        });
-      },
-      completeBooking(id) {
-        return patchBookingEverywhere(id, { status: 'Completed' });
-      },
-
-      /* =====================================================
-         ADMIN FLAG (mirrors StaffAuth)
-      ===================================================== */
-      isAdmin() {
-        try {
-          const raw = sessionStorage.getItem('medicare_session');
-          if (!raw) return false;
-          const s = JSON.parse(raw);
-          const db = JSON.parse(localStorage.getItem('medicare_hms') || '{}');
-          return !!(s && db.user && db.user.username && s.u === db.user.username);
-        } catch (e) { return false; }
-      },
-      makeAdmin() { /* no-op */ },
-
-      /* =====================================================
-         DEBUG HELPER
-         Call UserAuth.debugBookings() in the console to see
-         what each storage key contains.
-      ===================================================== */
-      debugBookings() {
-        const out = {};
-        BOOKINGS_KEYS.forEach(k => {
-          const list = readKey(k);
-          out[k] = list.length;
-        });
-        out['_currentUser'] = this.current();
-        out['_myBookingsCount'] = this.getBookings().length;
-        out['_allBookingsCount'] = this.getAllBookings().length;
-        console.table(out);
-        return out;
-      }
-    };
-  })();
+  };
 
   window.UserAuth = UserAuth;
 
   /* =====================================================
-     SECTION B — STAFF (ADMIN) SESSION HELPER
-     ✅ This now reads from the SAME key that login.html writes:
-        medicare_session (sessionStorage)
-        and verifies against localStorage.medicare_admin
+     SECTION B — STAFF SESSION (API-backed)
   ===================================================== */
+  const STAFF_TOKEN_KEY = 'medicare_staff_token';
+  const STAFF_USER_KEY  = 'medicare_staff_user';
+
   const StaffAuth = {
-    SESSION_KEY: 'medicare_session',
-    AUTH_KEY: 'medicare_admin',
-
-    /* Logged in if sessionStorage has a session AND
-       localStorage has a matching medicare_admin record. */
     isLoggedIn() {
-      try {
-        const raw = sessionStorage.getItem(this.SESSION_KEY);
-        if (!raw) return false;
-        const s = JSON.parse(raw);
-        const a = JSON.parse(localStorage.getItem(this.AUTH_KEY) || 'null');
-        return !!(s && a && a.username && s.u === a.username);
-      } catch (e) { return false; }
+      const t = sessionStorage.getItem(STAFF_TOKEN_KEY)
+             || localStorage.getItem(STAFF_TOKEN_KEY);
+      return !!t;
     },
-
     current() {
-      try {
-        const a = JSON.parse(localStorage.getItem(this.AUTH_KEY) || 'null');
-        return a || null;
-      } catch (e) { return null; }
+      try { return JSON.parse(localStorage.getItem(STAFF_USER_KEY) || 'null'); }
+      catch (e) { return null; }
     },
-
     logout() {
-      sessionStorage.removeItem(this.SESSION_KEY);
+      sessionStorage.removeItem(STAFF_TOKEN_KEY);
+      try { localStorage.removeItem(STAFF_TOKEN_KEY); } catch (e) {}
+      try { localStorage.removeItem(STAFF_USER_KEY); } catch (e) {}
     }
   };
 
@@ -411,7 +317,6 @@
 
   /* =====================================================
      SECTION C — PAGE INFO + ADMIN GUARD
-     ✅ Admin pages now redirect to login.html
   ===================================================== */
   const path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const ADMIN_PAGES = ['admin.html', 'dashboard.html', '1.html'];
@@ -963,7 +868,6 @@
 
   /* =====================================================
      SECTION F — HEADER + FOOTER HTML
-     ✅ Staff Login links now point to login.html
   ===================================================== */
   const headerHTML = `
     <nav class="navbar">
@@ -1043,7 +947,6 @@
 
   /* =====================================================
      SECTION G — RENDER AUTH SLOT
-     ✅ Staff Login button now points to login.html
   ===================================================== */
   function closeAllMenus() {
     const userMenu = document.getElementById('navUserMenu');
@@ -1512,7 +1415,6 @@
 
       if (!res.ok) return showPopupErr('popupSignupErr', res.error);
 
-      await UserAuth.login(email, pw);
       closeAuthPopup(true);
       location.reload();
     });
